@@ -7,7 +7,7 @@ import { InstagramLogoIcon, WhatsappLogoIcon } from '@phosphor-icons/react'
 const Footer = () => {
   return (
     <footer className="relative bg-black text-white overflow-hidden">
-      <div className="absolute inset-0 opacity-20 bg-gradient-to-t from-primary/20 via-transparent to-transparent" />
+      <div className="absolute inset-0 opacity-20 bg-linear-to-t from-primary/20 via-transparent to-transparent" />
 
       <div className="relative max-w-7xl mx-auto px-6 py-12 flex flex-col gap-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
