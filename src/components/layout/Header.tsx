@@ -284,7 +284,7 @@ const MobileMenu = ({
       <div
         ref={panelRef}
         className={cn(
-          'absolute top-[4.5rem] left-3 right-3 rounded-2xl overflow-hidden',
+          'absolute top-18 left-3 right-3 rounded-2xl overflow-hidden',
           'border border-border/30',
           'shadow-[0_32px_64px_rgba(0,0,0,0.15)]',
         )}
