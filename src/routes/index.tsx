@@ -14,7 +14,7 @@ export const Route = createFileRoute('/')({
 
 function Home() {
   return (
-    <div className="min-h-screen pt-18">
+    <div className="min-h-screen">
       <HeroSecttion />
       <AboutSection />
       <WhySection />

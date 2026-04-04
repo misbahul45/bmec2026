@@ -2,14 +2,11 @@ import { Image } from '@unpic/react'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import ToggleUser from './ToggleUser'
 import { NAV_ITEMS } from '~/contants'
-import { Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import gsap from 'gsap'
 import { cn } from '~/lib/utils'
 import { Menu, X } from 'lucide-react'
 
-// ─────────────────────────────────────────────
-// Animated SVG Ribbon (floating background)
-// ─────────────────────────────────────────────
 const RibbonSVG = () => {
   const pathRef = useRef<SVGPathElement>(null)
   const path2Ref = useRef<SVGPathElement>(null)
@@ -18,9 +15,7 @@ const RibbonSVG = () => {
     if (!pathRef.current || !path2Ref.current) return
 
     gsap.to(pathRef.current, {
-      attr: {
-        d: 'M0,40 Q200,0 400,35 T800,30 T1200,40 T1600,30 L1600,0 L0,0 Z',
-      },
+      attr: { d: 'M0,40 Q200,0 400,35 T800,30 T1200,40 T1600,30 L1600,0 L0,0 Z' },
       duration: 4,
       ease: 'sine.inOut',
       yoyo: true,
@@ -28,9 +23,7 @@ const RibbonSVG = () => {
     })
 
     gsap.to(path2Ref.current, {
-      attr: {
-        d: 'M0,50 Q300,10 600,45 T1000,25 T1400,45 T1600,40 L1600,0 L0,0 Z',
-      },
+      attr: { d: 'M0,50 Q300,10 600,45 T1000,25 T1400,45 T1600,40 L1600,0 L0,0 Z' },
       duration: 5.5,
       ease: 'sine.inOut',
       yoyo: true,
@@ -72,9 +65,6 @@ const RibbonSVG = () => {
   )
 }
 
-// ─────────────────────────────────────────────
-// Animated Nav Indicator (sliding pill)
-// ─────────────────────────────────────────────
 const NavIndicator = ({
   activeIndex,
   navRefs,
@@ -99,16 +89,9 @@ const NavIndicator = ({
     const width = rect.width
 
     if (prevIndex.current === -1) {
-      // First time: no animation, just snap
       gsap.set(indicator, { left, width, opacity: 1 })
     } else {
-      gsap.to(indicator, {
-        left,
-        width,
-        opacity: 1,
-        duration: 0.35,
-        ease: 'power3.out',
-      })
+      gsap.to(indicator, { left, width, opacity: 1, duration: 0.35, ease: 'power3.out' })
     }
     prevIndex.current = activeIndex
   }, [activeIndex, navRefs])
@@ -127,9 +110,6 @@ const NavIndicator = ({
   )
 }
 
-// ─────────────────────────────────────────────
-// Hamburger / X icon morph button
-// ─────────────────────────────────────────────
 const HamburgerButton = ({
   isOpen,
   onClick,
@@ -180,9 +160,6 @@ const HamburgerButton = ({
   )
 }
 
-// ─────────────────────────────────────────────
-// Mobile Overlay Menu
-// ─────────────────────────────────────────────
 const MobileMenu = ({
   isOpen,
   navItems,
@@ -201,6 +178,12 @@ const MobileMenu = ({
   const itemsRef = useRef<(HTMLElement | null)[]>([])
   const mounted = useRef(false)
 
+  const pathName = useLocation().pathname
+
+  const toggleHome = (href: string) => {
+    return pathName === '/' ? href : '/' + href
+  }
+
   useEffect(() => {
     const overlay = overlayRef.current
     const panel = panelRef.current
@@ -208,7 +191,6 @@ const MobileMenu = ({
     if (!overlay || !panel) return
 
     if (!mounted.current) {
-      // Set initial state
       gsap.set(overlay, { opacity: 0, pointerEvents: 'none' })
       gsap.set(panel, { y: -24, opacity: 0, scale: 0.97 })
       gsap.set(items, { y: 16, opacity: 0 })
@@ -221,32 +203,12 @@ const MobileMenu = ({
       gsap.killTweensOf([overlay, panel, ...items])
 
       gsap.to(overlay, { opacity: 1, duration: 0.25, ease: 'power2.out' })
-      gsap.to(panel, {
-        y: 0,
-        opacity: 1,
-        scale: 1,
-        duration: 0.4,
-        ease: 'expo.out',
-      })
-      gsap.to(items, {
-        y: 0,
-        opacity: 1,
-        duration: 0.4,
-        stagger: 0.06,
-        ease: 'power3.out',
-        delay: 0.1,
-      })
+      gsap.to(panel, { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: 'expo.out' })
+      gsap.to(items, { y: 0, opacity: 1, duration: 0.4, stagger: 0.06, ease: 'power3.out', delay: 0.1 })
     } else {
       gsap.killTweensOf([overlay, panel, ...items])
 
-      // Reverse stagger on close
-      gsap.to([...items].reverse(), {
-        y: 10,
-        opacity: 0,
-        duration: 0.2,
-        stagger: 0.04,
-        ease: 'power2.in',
-      })
+      gsap.to([...items].reverse(), { y: 10, opacity: 0, duration: 0.2, stagger: 0.04, ease: 'power2.in' })
       gsap.to(panel, {
         y: -16,
         opacity: 0,
@@ -254,15 +216,12 @@ const MobileMenu = ({
         duration: 0.3,
         ease: 'power3.in',
         delay: 0.05,
-        onComplete: () => {
-          overlay.style.pointerEvents = 'none'
-        },
+        onComplete: () => { overlay.style.pointerEvents = 'none' },
       })
       gsap.to(overlay, { opacity: 0, duration: 0.3, ease: 'power2.in', delay: 0.05 })
     }
   }, [isOpen])
 
-  // Force mount the effect after first render
   useEffect(() => {
     mounted.current = true
   }, [])
@@ -273,14 +232,11 @@ const MobileMenu = ({
       className="md:hidden fixed inset-0 z-40"
       style={{ pointerEvents: 'none' }}
     >
-      {/* Blurred backdrop */}
       <div
         className="absolute inset-0 bg-background/80 backdrop-blur-xl"
         onClick={onClose}
         aria-hidden="true"
       />
-
-      {/* Panel */}
       <div
         ref={panelRef}
         className={cn(
@@ -295,7 +251,6 @@ const MobileMenu = ({
           willChange: 'transform, opacity',
         }}
       >
-        {/* Subtle inner glow top */}
         <div
           className="absolute inset-x-0 top-0 h-px"
           style={{
@@ -307,14 +262,12 @@ const MobileMenu = ({
         <nav className="flex flex-col p-4 gap-1">
           {navItems.map((item, i) => {
             const isActive =
-              item.href === '/'
-                ? activeSection === ''
-                : activeSection === item.href
+              item.href === '/' ? activeSection === '' : activeSection === item.href
 
             return (
               <Link
                 key={item.title}
-                to={item.href}
+                to={toggleHome(item.href)}
                 onClick={onClose}
                 ref={(el) => { itemsRef.current[i] = el }}
                 className={cn(
@@ -338,10 +291,8 @@ const MobileMenu = ({
           })}
         </nav>
 
-        {/* Divider */}
         <div className="mx-4 h-px bg-border/20" />
 
-        {/* Auth section */}
         <div
           className="p-4"
           ref={(el) => { itemsRef.current[navItems.length] = el }}
@@ -378,16 +329,12 @@ const MobileMenu = ({
           )}
         </div>
 
-        {/* Safe area */}
         <div className="h-safe-area-inset-bottom" />
       </div>
     </div>
   )
 }
 
-// ─────────────────────────────────────────────
-// Main Header
-// ─────────────────────────────────────────────
 const Header = () => {
   const isLogin = false
 
@@ -405,17 +352,41 @@ const Header = () => {
   const isShrunk = useRef(false)
   const tween = useRef<gsap.core.Tween | null>(null)
 
-  // ── Section observer ──
+  const pathName = useLocation().pathname
+
+  const toggleHome = (href: string) => {
+    return pathName === '/' ? href : '/' + href
+  }
+
   useEffect(() => {
-    const sections = document.querySelectorAll('section')
+    const idToHref = new Map<string, string>()
+
+    NAV_ITEMS.forEach((item) => {
+      if (item.href !== '/') {
+        const id = item.href.replace(/^#/, '')
+        idToHref.set(id, item.href)
+      }
+    })
+
+    const homeEl =
+      document.querySelector<HTMLElement>('section#home') ??
+      document.querySelector<HTMLElement>('section')
+    if (homeEl?.id) {
+      idToHref.set(homeEl.id, '')
+    }
+
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>('section')
+    ).filter((s) => idToHref.has(s.id))
 
     const observer = new IntersectionObserver(
       (entries) => {
-        let visibleSection = ''
         entries.forEach((entry) => {
-          if (entry.isIntersecting) visibleSection = `#${entry.target.id}`
+          if (entry.isIntersecting) {
+            const href = idToHref.get(entry.target.id) ?? ''
+            setActiveSection(href)
+          }
         })
-        if (visibleSection) setActiveSection(visibleSection)
       },
       { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' }
     )
@@ -424,7 +395,6 @@ const Header = () => {
     return () => sections.forEach((s) => observer.unobserve(s))
   }, [])
 
-  // ── Sync active nav index ──
   useEffect(() => {
     const idx = NAV_ITEMS.findIndex((item) =>
       item.href === '/' ? activeSection === '' : activeSection === item.href
@@ -432,7 +402,6 @@ const Header = () => {
     setActiveNavIndex(idx >= 0 ? idx : 0)
   }, [activeSection])
 
-  // ── Scroll-based animation ──
   const handleScroll = useCallback(() => {
     const now = Date.now()
     const dt = now - lastScrollTime.current || 16
@@ -440,10 +409,8 @@ const Header = () => {
     lastScrollY.current = window.scrollY
     lastScrollTime.current = now
 
-    // velocity factor: faster scroll → snappier transition (capped)
     const speed = Math.min(scrollVelocity.current * 60, 1)
-    const baseDuration = 0.45
-    const duration = baseDuration - speed * 0.2 // 0.25–0.45s
+    const duration = 0.45 - speed * 0.2
 
     const el = headerRef.current
     if (!el) return
@@ -496,7 +463,6 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [handleScroll])
 
-  // ── Close menu on resize ──
   useEffect(() => {
     const onResize = () => {
       if (window.innerWidth >= 768 && isOpen) setIsOpen(false)
@@ -505,7 +471,6 @@ const Header = () => {
     return () => window.removeEventListener('resize', onResize)
   }, [isOpen])
 
-  // ── Nav hover glow ──
   const handleNavHover = (el: HTMLAnchorElement | null, entering: boolean) => {
     if (!el) return
     gsap.to(el, {
@@ -518,20 +483,15 @@ const Header = () => {
 
   return (
     <>
-      {/* Full-width fixed header track */}
       <header
         ref={wrapperRef}
-        className={cn(
-          'w-full fixed top-0 left-0 z-50 flex justify-center',
-        )}
+        className="w-full fixed top-0 left-0 z-50 flex justify-center"
         style={{ willChange: 'auto' }}
       >
-        {/* Animated ribbon behind header */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <RibbonSVG />
         </div>
 
-        {/* Scroll-based color wash */}
         <div
           className={cn(
             'absolute inset-0 pointer-events-none transition-opacity duration-700',
@@ -543,16 +503,11 @@ const Header = () => {
           }}
         />
 
-        {/* Header pill / bar */}
         <div
           ref={headerRef}
-          className={cn(
-            'w-full max-w-7xl h-16 flex items-center justify-between px-6',
-            'relative',
-          )}
+          className="w-full max-w-7xl h-16 flex items-center justify-between px-4 md:justify-around md:px-6 relative"
           style={{ willChange: 'transform, max-width, border-radius, box-shadow, backdrop-filter' }}
         >
-          {/* Logo */}
           <Link
             to="/"
             className="flex items-center gap-2 group"
@@ -585,29 +540,24 @@ const Header = () => {
             </span>
           </Link>
 
-          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-0.5 relative text-xs">
-            {/* Sliding pill indicator */}
             <NavIndicator activeIndex={activeNavIndex} navRefs={navRefs} />
 
             {NAV_ITEMS.map((item, i) => {
               const isActive =
-                item.href === '/'
-                  ? activeSection === ''
-                  : activeSection === item.href
+                item.href === '/' ? activeSection === '' : activeSection === item.href
 
               return (
                 <Link
                   key={item.title}
-                  to={item.href}
+                  to={toggleHome(item.href)}
                   ref={(el) => { navRefs.current[i] = el }}
                   onMouseEnter={(e) => handleNavHover(e.currentTarget, true)}
                   onMouseLeave={(e) => handleNavHover(e.currentTarget, false)}
                   className={cn(
-                    'relative px-3 py-1.5 rounded-full z-10 transition-colors duration-200',
-                    'select-none',
+                    'relative px-3 py-1.5 rounded-full z-10 transition-colors duration-200 select-none',
                     isActive
-                      ? 'text-primary font-medium'
+                      ? 'text-black font-medium'
                       : 'text-foreground/55 hover:text-foreground/85'
                   )}
                   style={{ willChange: 'transform' }}
@@ -618,7 +568,6 @@ const Header = () => {
             })}
           </nav>
 
-          {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-2">
             {isLogin ? (
               <ToggleUser />
@@ -628,8 +577,7 @@ const Header = () => {
                   to="/auth/login"
                   className={cn(
                     'px-3 py-1.5 text-xs rounded-full font-medium',
-                    'text-foreground/60 hover:text-foreground/90',
-                    'transition-colors duration-200'
+                    'text-foreground/60 hover:text-foreground/90 transition-colors duration-200'
                   )}
                 >
                   Login
@@ -650,7 +598,6 @@ const Header = () => {
             )}
           </div>
 
-          {/* Hamburger */}
           <HamburgerButton isOpen={isOpen} onClick={() => setIsOpen((v) => !v)} />
         </div>
       </header>
