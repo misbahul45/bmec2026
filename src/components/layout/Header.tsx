@@ -77,6 +77,8 @@ const Header = () => {
   const lastScrollTime = useRef(Date.now())
   const isShrunk = useRef(false)
   const tween = useRef<gsap.core.Tween | null>(null)
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isHidden = useRef(false)
 
   const pathName = useLocation().pathname
 
@@ -129,6 +131,42 @@ const Header = () => {
     setActiveNavIndex(idx >= 0 ? idx : 0)
   }, [activeSection])
 
+  const hideHeader = useCallback(() => {
+    const el = headerRef.current
+    if (!el || isHidden.current) return
+    isHidden.current = true
+    gsap.to(el, {
+      y: -90,
+      opacity: 0,
+      scale: 0.96,
+      duration: 0.55,
+      ease: 'power3.inOut',
+      overwrite: true,
+    })
+  }, [])
+
+  const showHeader = useCallback(() => {
+    const el = headerRef.current
+    if (!el || !isHidden.current) return
+    isHidden.current = false
+    gsap.to(el, {
+      y: isShrunk.current ? 14 : 0,
+      opacity: 1,
+      scale: 1,
+      duration: 0.5,
+      ease: 'expo.out',
+      overwrite: true,
+    })
+  }, [])
+
+  const resetIdleTimer = useCallback(() => {
+    if (idleTimer.current) clearTimeout(idleTimer.current)
+    showHeader()
+    if (window.scrollY > 20) {
+      idleTimer.current = setTimeout(hideHeader, 2000)
+    }
+  }, [hideHeader, showHeader])
+
   const handleScroll = useCallback(() => {
     const now = Date.now()
     const dt = now - lastScrollTime.current || 16
@@ -141,6 +179,8 @@ const Header = () => {
 
     const el = headerRef.current
     if (!el) return
+
+    resetIdleTimer()
 
     if (window.scrollY > 20 && !isShrunk.current) {
       isShrunk.current = true
@@ -187,8 +227,11 @@ const Header = () => {
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [handleScroll])
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (idleTimer.current) clearTimeout(idleTimer.current)
+    }
+  }, [handleScroll, resetIdleTimer])
 
   useEffect(() => {
     const onResize = () => {
