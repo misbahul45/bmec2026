@@ -87,47 +87,35 @@ const Header = () => {
   }
 
   useEffect(() => {
-    const idToHref = new Map<string, string>()
+    const getSectionIds = () =>
+      NAV_ITEMS.map((item) => item.href.replace(/^#/, '')).filter(Boolean)
 
-    NAV_ITEMS.forEach((item) => {
-      if (item.href !== '/') {
-        const id = item.href.replace(/^#/, '')
-        idToHref.set(id, item.href)
+    const getActiveId = () => {
+      const offset = 100
+      const ids = getSectionIds()
+      let current = ids[0]
+      for (const id of ids) {
+        const el = document.getElementById(id)
+        if (!el) continue
+        if (el.getBoundingClientRect().top <= offset) {
+          current = id
+        }
       }
-    })
-
-    const homeEl =
-      document.querySelector<HTMLElement>('section#home') ??
-      document.querySelector<HTMLElement>('section')
-    if (homeEl?.id) {
-      idToHref.set(homeEl.id, '')
+      return '#' + current
     }
 
-    const sections = Array.from(
-      document.querySelectorAll<HTMLElement>('section')
-    ).filter((s) => idToHref.has(s.id))
+    const onScroll = () => {
+      const active = getActiveId()
+      setActiveSection((prev) => (prev === active ? prev : active))
+    }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const href = idToHref.get(entry.target.id) ?? ''
-            setActiveSection(href)
-          }
-          console.log(entry.target.id, entry.isIntersecting)
-        })
-      },
-      { threshold: 0.2, rootMargin: '-80px 0px -50% 0px' }
-    )
-
-    sections.forEach((s) => observer.observe(s))
-    return () => sections.forEach((s) => observer.unobserve(s))
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   useEffect(() => {
-    const idx = NAV_ITEMS.findIndex((item) =>
-      item.href === '/' ? activeSection === '' : activeSection === item.href
-    )
+    const idx = NAV_ITEMS.findIndex((item) => item.href === activeSection)
     setActiveNavIndex(idx >= 0 ? idx : 0)
   }, [activeSection])
 
@@ -162,10 +150,10 @@ const Header = () => {
   const resetIdleTimer = useCallback(() => {
     if (idleTimer.current) clearTimeout(idleTimer.current)
     showHeader()
-    if (window.scrollY > 20) {
+    if (window.scrollY > 20 && !isOpen) {
       idleTimer.current = setTimeout(hideHeader, 2000)
     }
-  }, [hideHeader, showHeader])
+  }, [hideHeader, showHeader, isOpen])
 
   const handleScroll = useCallback(() => {
     const now = Date.now()
@@ -232,6 +220,17 @@ const Header = () => {
       if (idleTimer.current) clearTimeout(idleTimer.current)
     }
   }, [handleScroll, resetIdleTimer])
+
+  useEffect(() => {
+    if (isOpen) {
+      if (idleTimer.current) clearTimeout(idleTimer.current)
+      showHeader()
+    } else {
+      if (window.scrollY > 20) {
+        idleTimer.current = setTimeout(hideHeader, 2000)
+      }
+    }
+  }, [isOpen, hideHeader, showHeader])
 
   useEffect(() => {
     const onResize = () => {
@@ -314,8 +313,7 @@ const Header = () => {
             <NavIndicator isScroll={isScroll} activeIndex={activeNavIndex} navRefs={navRefs} />
 
             {NAV_ITEMS.map((item, i) => {
-              const isActive =
-                item.href === '/' ? activeSection === '' : activeSection === item.href
+              const isActive = activeSection === item.href
 
               return (
                 <Link
@@ -384,3 +382,4 @@ const Header = () => {
 }
 
 export default Header
+

@@ -80,9 +80,6 @@ const TimelineSection = () => {
 
       <div className="relative z-10 max-w-5xl mx-auto px-6">
         <div className="tl-header text-center mb-16">
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-4">
-            Jadwal Kegiatan
-          </span>
           <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
             Timeline BMEC 2026
           </h2>
