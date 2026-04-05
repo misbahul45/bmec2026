@@ -6,64 +6,8 @@ import { Link, useLocation } from '@tanstack/react-router'
 import gsap from 'gsap'
 import { cn } from '~/lib/utils'
 import { Menu, X } from 'lucide-react'
-
-const RibbonSVG = () => {
-  const pathRef = useRef<SVGPathElement>(null)
-  const path2Ref = useRef<SVGPathElement>(null)
-
-  useEffect(() => {
-    if (!pathRef.current || !path2Ref.current) return
-
-    gsap.to(pathRef.current, {
-      attr: { d: 'M0,40 Q200,0 400,35 T800,30 T1200,40 T1600,30 L1600,0 L0,0 Z' },
-      duration: 4,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-    })
-
-    gsap.to(path2Ref.current, {
-      attr: { d: 'M0,50 Q300,10 600,45 T1000,25 T1400,45 T1600,40 L1600,0 L0,0 Z' },
-      duration: 5.5,
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-      delay: 1,
-    })
-  }, [])
-
-  return (
-    <svg
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      viewBox="0 0 1600 64"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="ribbonGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.06" />
-          <stop offset="50%" stopColor="var(--primary)" stopOpacity="0.12" />
-          <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.04" />
-        </linearGradient>
-        <linearGradient id="ribbonGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.03" />
-          <stop offset="50%" stopColor="var(--primary)" stopOpacity="0.08" />
-          <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.02" />
-        </linearGradient>
-      </defs>
-      <path
-        ref={pathRef}
-        d="M0,32 Q200,10 400,30 T800,25 T1200,35 T1600,25 L1600,0 L0,0 Z"
-        fill="url(#ribbonGrad1)"
-      />
-      <path
-        ref={path2Ref}
-        d="M0,45 Q300,15 600,40 T1000,20 T1400,40 T1600,35 L1600,0 L0,0 Z"
-        fill="url(#ribbonGrad2)"
-      />
-    </svg>
-  )
-}
+import MobileMenu from './MobileMenu'
+import RibbonSVG from '../ui/RibbonSVG'
 
 const NavIndicator = ({
   activeIndex,
@@ -160,180 +104,6 @@ const HamburgerButton = ({
   )
 }
 
-const MobileMenu = ({
-  isOpen,
-  navItems,
-  activeSection,
-  isLogin,
-  onClose,
-}: {
-  isOpen: boolean
-  navItems: typeof NAV_ITEMS
-  activeSection: string
-  isLogin: boolean
-  onClose: () => void
-}) => {
-  const overlayRef = useRef<HTMLDivElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
-  const itemsRef = useRef<(HTMLElement | null)[]>([])
-  const mounted = useRef(false)
-
-  const pathName = useLocation().pathname
-
-  const toggleHome = (href: string) => {
-    return pathName === '/' ? href : '/' + href
-  }
-
-  useEffect(() => {
-    const overlay = overlayRef.current
-    const panel = panelRef.current
-    const items = itemsRef.current.filter(Boolean)
-    if (!overlay || !panel) return
-
-    if (!mounted.current) {
-      gsap.set(overlay, { opacity: 0, pointerEvents: 'none' })
-      gsap.set(panel, { y: -24, opacity: 0, scale: 0.97 })
-      gsap.set(items, { y: 16, opacity: 0 })
-      mounted.current = true
-      return
-    }
-
-    if (isOpen) {
-      overlay.style.pointerEvents = 'auto'
-      gsap.killTweensOf([overlay, panel, ...items])
-
-      gsap.to(overlay, { opacity: 1, duration: 0.25, ease: 'power2.out' })
-      gsap.to(panel, { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: 'expo.out' })
-      gsap.to(items, { y: 0, opacity: 1, duration: 0.4, stagger: 0.06, ease: 'power3.out', delay: 0.1 })
-    } else {
-      gsap.killTweensOf([overlay, panel, ...items])
-
-      gsap.to([...items].reverse(), { y: 10, opacity: 0, duration: 0.2, stagger: 0.04, ease: 'power2.in' })
-      gsap.to(panel, {
-        y: -16,
-        opacity: 0,
-        scale: 0.97,
-        duration: 0.3,
-        ease: 'power3.in',
-        delay: 0.05,
-        onComplete: () => { overlay.style.pointerEvents = 'none' },
-      })
-      gsap.to(overlay, { opacity: 0, duration: 0.3, ease: 'power2.in', delay: 0.05 })
-    }
-  }, [isOpen])
-
-  useEffect(() => {
-    mounted.current = true
-  }, [])
-
-  return (
-    <div
-      ref={overlayRef}
-      className="md:hidden fixed inset-0 z-40"
-      style={{ pointerEvents: 'none' }}
-    >
-      <div
-        className="absolute inset-0 bg-background/80 backdrop-blur-xl"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <div
-        ref={panelRef}
-        className={cn(
-          'absolute top-18 left-3 right-3 rounded-2xl overflow-hidden',
-          'border border-border/30',
-          'shadow-[0_32px_64px_rgba(0,0,0,0.15)]',
-        )}
-        style={{
-          background:
-            'linear-gradient(145deg, color-mix(in srgb, var(--background) 92%, var(--primary)), var(--background))',
-          backdropFilter: 'blur(24px)',
-          willChange: 'transform, opacity',
-        }}
-      >
-        <div
-          className="absolute inset-x-0 top-0 h-px"
-          style={{
-            background:
-              'linear-gradient(90deg, transparent, color-mix(in srgb, var(--primary) 40%, transparent), transparent)',
-          }}
-        />
-
-        <nav className="flex flex-col p-4 gap-1">
-          {navItems.map((item, i) => {
-            const isActive =
-              item.href === '/' ? activeSection === '' : activeSection === item.href
-
-            return (
-              <Link
-                key={item.title}
-                to={toggleHome(item.href)}
-                onClick={onClose}
-                ref={(el) => { itemsRef.current[i] = el }}
-                className={cn(
-                  'flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium',
-                  'transition-colors duration-150',
-                  isActive
-                    ? 'bg-primary/12 text-primary'
-                    : 'text-foreground/70 hover:bg-foreground/5 hover:text-foreground'
-                )}
-                style={{ willChange: 'transform, opacity' }}
-              >
-                <span>{item.title}</span>
-                {isActive && (
-                  <span
-                    className="w-1.5 h-1.5 rounded-full bg-primary"
-                    style={{ boxShadow: '0 0 6px var(--primary)' }}
-                  />
-                )}
-              </Link>
-            )
-          })}
-        </nav>
-
-        <div className="mx-4 h-px bg-border/20" />
-
-        <div
-          className="p-4"
-          ref={(el) => { itemsRef.current[navItems.length] = el }}
-          style={{ willChange: 'transform, opacity' }}
-        >
-          {isLogin ? (
-            <ToggleUser />
-          ) : (
-            <div className="flex gap-2">
-              <Link
-                to="/auth/login"
-                onClick={onClose}
-                className={cn(
-                  'flex-1 text-center py-2.5 rounded-xl text-sm font-medium',
-                  'border border-border/40 text-foreground/70',
-                  'hover:border-primary/40 hover:text-primary transition-colors'
-                )}
-              >
-                Login
-              </Link>
-              <Link
-                to="/auth/register"
-                onClick={onClose}
-                className={cn(
-                  'flex-1 text-center py-2.5 rounded-xl text-sm font-semibold',
-                  'bg-primary text-primary-foreground',
-                  'hover:opacity-90 transition-opacity',
-                  'shadow-[0_4px_12px_color-mix(in_srgb,var(--primary)_30%,transparent)]'
-                )}
-              >
-                Daftar
-              </Link>
-            </div>
-          )}
-        </div>
-
-        <div className="h-safe-area-inset-bottom" />
-      </div>
-    </div>
-  )
-}
 
 const Header = () => {
   const isLogin = false
@@ -386,9 +156,10 @@ const Header = () => {
             const href = idToHref.get(entry.target.id) ?? ''
             setActiveSection(href)
           }
+          console.log(entry.target.id, entry.isIntersecting)
         })
       },
-      { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' }
+      { threshold: 0.2, rootMargin: '-80px 0px -50% 0px' }
     )
 
     sections.forEach((s) => observer.observe(s))

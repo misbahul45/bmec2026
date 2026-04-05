@@ -113,14 +113,14 @@ const HeroSection = () => {
               <br />
               <span className="relative inline-block">
                 Competition
-                <span className="absolute -bottom-1 left-0 w-full h-[3px] bg-primary/60 rounded-full" />
+                <span className="absolute -bottom-1 left-0 w-full h-0.75 bg-primary/60 rounded-full" />
               </span>{' '}
               2026
             </h1>
 
             <p
               ref={descRef}
-              className="text-sm sm:text-md lg:text-xl sm:max-w-md lg:max-w-xl"
+              className="text-md sm:text-lg lg:text-2xl sm:max-w-md lg:max-w-xl"
             >
               Ajang kompetisi tahunan Teknik Biomedis oleh HMTB Universitas Airlangga
               untuk mengembangkan potensi, kreativitas, dan inovasi di bidang kesehatan.
@@ -149,7 +149,7 @@ const HeroSection = () => {
           alt="maskot"
           src="/images/app/maskot.png"
           layout="fullWidth"
-          className="w-full max-w-[72px] sm:max-w-[100px] lg:max-w-32 drop-shadow-2xl"
+          className="w-full max-w-40 sm:max-w-28 lg:max-w-40 drop-shadow-2xl"
         />
       </div>
 
@@ -158,7 +158,7 @@ const HeroSection = () => {
           alt="maskot"
           src="/images/app/maskot.png"
           layout="fullWidth"
-          className="w-full max-w-[72px] sm:max-w-[100px] lg:max-w-32 drop-shadow-2xl"
+          className="w-full max-w-40 sm:max-w-28 lg:max-w-40 drop-shadow-2xl"
         />
       </div>
     </section>

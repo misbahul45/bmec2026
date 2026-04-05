@@ -2,7 +2,7 @@ import React from 'react'
 
 const CTASection = () => {
   return (
-    <div className='h-screen'>CTASection</div>
+    <div id='cta' className='h-screen'>CTASection</div>
   )
 }
 
