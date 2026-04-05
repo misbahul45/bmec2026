@@ -8,51 +8,7 @@ import { cn } from '~/lib/utils'
 import { Menu, X } from 'lucide-react'
 import MobileMenu from './MobileMenu'
 import RibbonSVG from '../ui/RibbonSVG'
-
-const NavIndicator = ({
-  activeIndex,
-  navRefs,
-}: {
-  activeIndex: number
-  navRefs: React.MutableRefObject<(HTMLAnchorElement | null)[]>
-}) => {
-  const indicatorRef = useRef<HTMLDivElement>(null)
-  const prevIndex = useRef<number>(-1)
-
-  useEffect(() => {
-    const indicator = indicatorRef.current
-    const activeEl = navRefs.current[activeIndex]
-    if (!indicator || !activeEl) return
-
-    const rect = activeEl.getBoundingClientRect()
-    const parentRect = activeEl.offsetParent
-      ? (activeEl.offsetParent as HTMLElement).getBoundingClientRect()
-      : { left: 0 }
-
-    const left = rect.left - parentRect.left
-    const width = rect.width
-
-    if (prevIndex.current === -1) {
-      gsap.set(indicator, { left, width, opacity: 1 })
-    } else {
-      gsap.to(indicator, { left, width, opacity: 1, duration: 0.35, ease: 'power3.out' })
-    }
-    prevIndex.current = activeIndex
-  }, [activeIndex, navRefs])
-
-  return (
-    <div
-      ref={indicatorRef}
-      className="absolute top-0 h-full rounded-full pointer-events-none"
-      style={{
-        background:
-          'linear-gradient(135deg, color-mix(in srgb, var(--primary) 15%, transparent), color-mix(in srgb, var(--primary) 8%, transparent))',
-        boxShadow: '0 0 12px color-mix(in srgb, var(--primary) 20%, transparent)',
-        opacity: 0,
-      }}
-    />
-  )
-}
+import NavIndicator from './NavIndicator'
 
 const HamburgerButton = ({
   isOpen,
@@ -276,7 +232,7 @@ const Header = () => {
 
         <div
           ref={headerRef}
-          className="w-full max-w-7xl h-16 flex items-center justify-between px-4 md:justify-around md:px-6 relative"
+          className="w-full max-w-7xl h-16 flex items-center justify-between px-2 md:justify-around md:px-4 relative"
           style={{ willChange: 'transform, max-width, border-radius, box-shadow, backdrop-filter' }}
         >
           <Link
@@ -312,7 +268,7 @@ const Header = () => {
           </Link>
 
           <nav className="hidden md:flex items-center gap-0.5 relative text-xs">
-            <NavIndicator activeIndex={activeNavIndex} navRefs={navRefs} />
+            <NavIndicator isScroll={isScroll} activeIndex={activeNavIndex} navRefs={navRefs} />
 
             {NAV_ITEMS.map((item, i) => {
               const isActive =
