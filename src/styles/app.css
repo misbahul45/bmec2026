@@ -22,10 +22,42 @@
   html {
     @apply font-mono;
   }
-}
 
-@layer base {
-  html {
+  .animated-border {
+    position: relative;
+    border: 4px solid transparent;
+      border-radius: var(--radius-lg);
+    box-shadow:
+      0 0 20px color-mix(in oklch, var(--primary) 20%, transparent),
+      inset 0 0 20px rgba(255,255,255,0.03);
+    background:
+      linear-gradient(
+        45deg,
+        var(--background),
+        color-mix(in oklch, var(--primary) 20%, transparent) 50%,
+        var(--background)
+      ) padding-box,
+
+      conic-gradient(
+        from var(--border-angle),
+        transparent 0%,
+        var(--primary) 20%,
+        var(--accent) 40%,
+        var(--secondary) 60%,
+        var(--primary) 80%,
+        transparent 100%
+      ) border-box;
+
+    backdrop-filter: blur(12px);
+    animation: rotate-border 6s linear infinite;
+  }
+
+  @keyframes rotate-border {
+    to {
+      --border-angle: 360deg;
+    }
+  }
+    html {
     color-scheme: light dark;
     scroll-behavior: smooth;
   }
@@ -209,4 +241,15 @@
 
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.75 0.08 230);
+}
+
+@property --border-angle {
+  inherits: false;
+  initial-value: 0deg;
+  syntax: "<angle>";
+}
+@property --border-angle {
+  inherits: false;
+  initial-value: 0deg;
+  syntax: "<angle>";
 }

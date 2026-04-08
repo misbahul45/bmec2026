@@ -7,10 +7,16 @@ import GalerySection from '~/components/LandingPage/GalerySection'
 import HeroSecttion from '~/components/LandingPage/HeroSecttion'
 import TimelineSection from '~/components/LandingPage/TimelineSection'
 import WhySection from '~/components/LandingPage/WhySection'
+import { seo } from '~/lib/utils/seo'
 
 export const Route = createFileRoute('/')({
   head: () => ({
     meta: [
+      ...seo({
+        title:
+          'BMEC 2026 - Biomedical Engineering Competition Universitas Airlangga',
+        description: `TanStack Start is a type-safe, client-first, full-stack React framework. `,
+      }),
       {
         title:
           'BMEC 2025 - Biomedical Engineering Competition Universitas Airlangga',
@@ -21,14 +27,11 @@ export const Route = createFileRoute('/')({
           'BMEC 2025 merupakan kompetisi Teknik Biomedis tingkat nasional yang diselenggarakan oleh Himpunan Mahasiswa Teknik Biomedis Universitas Airlangga. Terdiri dari Olimpiade, LKTI, dan Infografis dengan total hadiah belasan juta rupiah.',
       },
 
-      // SEO Keywords
       {
         name: 'keywords',
         content:
           'BMEC 2025, Biomedical Engineering Competition, Lomba Teknik Biomedis, Olimpiade Biomedis, LKTI Biomedis, Infografis Biomedis, Universitas Airlangga, Kompetisi Nasional SMA',
       },
-
-      // Open Graph (WhatsApp / Discord / LinkedIn)
       {
         property: 'og:title',
         content:
@@ -45,7 +48,7 @@ export const Route = createFileRoute('/')({
       },
       {
         property: 'og:image',
-        content: '/banner-bmec-2025.png', // ganti dengan banner kamu
+        content: '/banner-bmec-2025.png',
       },
 
       // Twitter / X Preview

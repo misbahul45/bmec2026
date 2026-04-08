@@ -4,6 +4,7 @@ import {
   Link,
   Scripts,
   createRootRoute,
+  useLocation,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import * as React from 'react'
@@ -12,7 +13,7 @@ import { NotFound } from '~/components/NotFound'
 import Footer from '~/components/layout/Footer'
 import Header from '~/components/layout/Header'
 import appCss from '~/styles/app.css?url'
-import { seo } from '~/utils/seo'
+import { seo } from '~/lib/utils/seo'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -65,13 +66,14 @@ export const Route = createRootRoute({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const router= useLocation()
   return (
     <html>
       <head>
         <HeadContent />
       </head>
       <body className='bg-background'>
-        <Header />
+        {router.pathname.includes('/auth') ? null : <Header />}
         {children}
         <TanStackRouterDevtools position="bottom-right" />
         <Scripts />

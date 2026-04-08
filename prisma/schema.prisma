@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+
+  name      String
+  code      String   @unique
+  password  String
+
+  schoolName    String
+  schoolAddress String
+
+  members Member[]
+
+  registration Registration?
+
+  submissions Submission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("team")
+}
+
+model Member {
+  id String @id @default(uuid())
+
+  name String
+  nis  String
+
+  documentUrl String?
+
+  teamId String
+  team   User @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+
+  name      String
+  email     String   @unique
+  password  String
+
+  registrations Registration[]
+  submissions Submission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admin")
+}
+
+model Competition {
+  id        String   @id @default(uuid())
+
+  name      String
+  description String?
+
+  batches   Batch[]
+  stages    Stage[]
+
+  registrations Registration[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Batch {
+  id        String   @id @default(uuid())
+
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  price     Decimal
+
+  competitionId String
+  competition Competition @relation(fields: [competitionId], references: [id])
+
+  registrations Registration[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Stage {
+  id String @id @default(uuid())
+
+  name StageType
+
+  competitionId String
+  competition Competition @relation(fields: [competitionId], references: [id])
+
+  submissions Submission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Registration {
+  id String @id @default(uuid())
+
+  userId        String @unique
+  competitionId String
+  batchId       String
+
+  paymentProof  String?
+
+  status PaymentStatus @default(PENDING)
+
+  user        User        @relation(fields: [userId], references: [id])
+  competition Competition @relation(fields: [competitionId], references: [id])
+  batch       Batch       @relation(fields: [batchId], references: [id])
+
+  approvedBy String?
+  admin      Admin? @relation(fields: [approvedBy], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Submission {
+  id String @id @default(uuid())
+
+  teamId String
+  stageId String
+
+  title String?
+  fileUrl String?
+
+  status SubmissionStatus @default(PENDING)
+
+  team  User  @relation(fields: [teamId], references: [id])
+  stage Stage @relation(fields: [stageId], references: [id])
+
+  reviewedBy String?
+  admin Admin? @relation(fields: [reviewedBy], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum StageType {
+  PENYISIHAN
+  SEMIFINAL
+  FINAL
+}

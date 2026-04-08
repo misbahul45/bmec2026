@@ -12,10 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as ApiUsersRouteImport } from './routes/api/users'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard/team/index'
 import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard/admin/index'
-import { Route as ApiUsersUserIdRouteImport } from './routes/api/users.$userId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -32,11 +31,6 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiUsersRoute = ApiUsersRouteImport.update({
-  id: '/api/users',
-  path: '/api/users',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DashboardTeamIndexRoute = DashboardTeamIndexRouteImport.update({
   id: '/dashboard/team/',
   path: '/dashboard/team/',
@@ -47,37 +41,34 @@ const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
   path: '/dashboard/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiUsersUserIdRoute = ApiUsersUserIdRouteImport.update({
-  id: '/$userId',
-  path: '/$userId',
-  getParentRoute: () => ApiUsersRoute,
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/api/users': typeof ApiUsersRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/api/users/$userId': typeof ApiUsersUserIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/api/users': typeof ApiUsersRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/api/users/$userId': typeof ApiUsersUserIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/admin': typeof DashboardAdminIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/api/users': typeof ApiUsersRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
-  '/api/users/$userId': typeof ApiUsersUserIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
 }
@@ -85,37 +76,34 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/api/users'
     | '/auth/login'
     | '/auth/register'
-    | '/api/users/$userId'
+    | '/api/auth/$'
     | '/dashboard/admin/'
     | '/dashboard/team/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/api/users'
     | '/auth/login'
     | '/auth/register'
-    | '/api/users/$userId'
+    | '/api/auth/$'
     | '/dashboard/admin'
     | '/dashboard/team'
   id:
     | '__root__'
     | '/'
-    | '/api/users'
     | '/auth/login'
     | '/auth/register'
-    | '/api/users/$userId'
+    | '/api/auth/$'
     | '/dashboard/admin/'
     | '/dashboard/team/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ApiUsersRoute: typeof ApiUsersRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   DashboardAdminIndexRoute: typeof DashboardAdminIndexRoute
   DashboardTeamIndexRoute: typeof DashboardTeamIndexRoute
 }
@@ -143,13 +131,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/users': {
-      id: '/api/users'
-      path: '/api/users'
-      fullPath: '/api/users'
-      preLoaderRoute: typeof ApiUsersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dashboard/team/': {
       id: '/dashboard/team/'
       path: '/dashboard/team'
@@ -164,33 +145,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/users/$userId': {
-      id: '/api/users/$userId'
-      path: '/$userId'
-      fullPath: '/api/users/$userId'
-      preLoaderRoute: typeof ApiUsersUserIdRouteImport
-      parentRoute: typeof ApiUsersRoute
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface ApiUsersRouteChildren {
-  ApiUsersUserIdRoute: typeof ApiUsersUserIdRoute
-}
-
-const ApiUsersRouteChildren: ApiUsersRouteChildren = {
-  ApiUsersUserIdRoute: ApiUsersUserIdRoute,
-}
-
-const ApiUsersRouteWithChildren = ApiUsersRoute._addFileChildren(
-  ApiUsersRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ApiUsersRoute: ApiUsersRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
   DashboardAdminIndexRoute: DashboardAdminIndexRoute,
   DashboardTeamIndexRoute: DashboardTeamIndexRoute,
 }
