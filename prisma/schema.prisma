@@ -7,13 +7,20 @@ datasource db {
   provider = "postgresql"
 }
 
+enum CompetitionType {
+  OLIMPIADE
+  LKTI
+  INFOGRAFIS
+}
+
 model User {
   id        String   @id @default(uuid())
 
   name      String
   code      String   @unique
   password  String
-
+  
+  phone     String 
   schoolName    String
   schoolAddress String
 
@@ -22,6 +29,7 @@ model User {
   registration Registration?
 
   submissions Submission[]
+  competitionType CompetitionType
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

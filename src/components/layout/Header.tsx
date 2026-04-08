@@ -4,7 +4,7 @@ import ToggleUser from './ToggleUser'
 import { NAV_ITEMS } from '~/contants'
 import { Link, useLocation } from '@tanstack/react-router'
 import gsap from 'gsap'
-import { cn } from '~/lib/utils'
+import { cn, toggleHome } from '~/lib/utils'
 import { Menu, X } from 'lucide-react'
 import MobileMenu from './MobileMenu'
 import RibbonSVG from '../ui/RibbonSVG'
@@ -82,9 +82,6 @@ const Header = () => {
 
   const pathName = useLocation().pathname
 
-  const toggleHome = (href: string) => {
-    return pathName === '/' ? href : '/' + href
-  }
 
   useEffect(() => {
     const getSectionIds = () =>
@@ -318,7 +315,7 @@ const Header = () => {
               return (
                 <Link
                   key={item.title}
-                  to={toggleHome(item.href)}
+                  to={toggleHome(pathName, item.href)}
                   ref={(el) => { navRefs.current[i] = el }}
                   onMouseEnter={(e) => handleNavHover(e.currentTarget, true)}
                   onMouseLeave={(e) => handleNavHover(e.currentTarget, false)}

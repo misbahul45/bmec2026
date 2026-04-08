@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card"
+import { CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card"
 import { loginSchema } from "~/schemas/auth.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, Controller } from "react-hook-form"
@@ -13,10 +13,7 @@ type LoginForm = z.infer<typeof loginSchema>
 const FormSignin = () => {
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: ""
-    }
+    defaultValues: { email: "", password: "" },
   })
 
   const onSubmit = (data: LoginForm) => {
@@ -24,29 +21,23 @@ const FormSignin = () => {
   }
 
   return (
-    <div
-    className="w-full max-w-sm rounded-md bg-transparent border-none">
-      <CardHeader className="mb-4">
+    <div className="w-full max-w-sm">
+      <CardHeader className="mb-4 px-0">
         <CardTitle className="text-center font-bold">BMEC</CardTitle>
-        <CardDescription className="text-center">
-          Silakan masuk ke akun Team
+        <CardDescription className="text-center text-xs">
+          Silakan masuk ke akun Tim
         </CardDescription>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="px-0">
         <form id="form-login" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
-
-            {/* Email */}
             <Controller
               name="email"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="email">
-                    Email
-                  </FieldLabel>
-
+                  <FieldLabel htmlFor="email">Email</FieldLabel>
                   <Input
                     {...field}
                     id="email"
@@ -54,26 +45,19 @@ const FormSignin = () => {
                     placeholder="bmec@email.com"
                     autoComplete="email"
                     aria-invalid={fieldState.invalid}
-                    className="rounded"
+                    className="rounded text-xs"
                   />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
 
-            {/* Password */}
             <Controller
               name="password"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="password">
-                    Password
-                  </FieldLabel>
-
+                  <FieldLabel htmlFor="password">Password</FieldLabel>
                   <Input
                     {...field}
                     id="password"
@@ -81,28 +65,25 @@ const FormSignin = () => {
                     placeholder="********"
                     autoComplete="current-password"
                     aria-invalid={fieldState.invalid}
-                    className="rounded"
+                    className="rounded text-xs"
                   />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
             />
-
           </FieldGroup>
         </form>
       </CardContent>
 
-      <CardFooter>
-        <Field orientation="horizontal" className="w-full">
-          <Button type="submit" className="rounded flex-1" form="form-login">
-            Masuk
-          </Button>
-        </Field>
+      <CardFooter className="px-0 flex-col gap-2">
+        <Button type="submit" className="rounded w-full" form="form-login">
+          Masuk
+        </Button>
+        <p className="text-center text-[10px] opacity-65">
+          Belum daftar lomba?{' '}
+          <Link to="/auth/register" className="text-primary hover:underline">Ayo daftar</Link>
+        </p>
       </CardFooter>
-      <p className="text-center text-[10px] opacity-65">Belum daftar lomba? <Link to="/auth/register" className="text-blue-400 hover:underline">Ayo daftar</Link></p>
     </div>
   )
 }

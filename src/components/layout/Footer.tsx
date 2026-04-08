@@ -1,6 +1,7 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { NAV_ITEMS } from '~/contants'
 import { InstagramLogoIcon, WhatsappLogoIcon, GoogleDriveLogoIcon } from '@phosphor-icons/react'
+import { toggleHome } from '~/lib/utils'
 
 const socials = [
   {
@@ -24,6 +25,7 @@ const socials = [
 ]
 
 const Footer = () => {
+  const pathName = useLocation().pathname
   return (
     <footer className="relative bg-foreground text-background overflow-hidden">
       <div className="absolute inset-0 bg-linear-to-t from-primary/10 via-transparent to-transparent pointer-events-none" />
@@ -44,7 +46,7 @@ const Footer = () => {
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.title}
-                to={item.href}
+                to={toggleHome(pathName, item.href)}
                 className="text-sm text-background/60 hover:text-background transition-colors duration-200"
               >
                 {item.title}
