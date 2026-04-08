@@ -96,7 +96,7 @@ const MobileMenu = ({
   return (
     <div
       ref={overlayRef}
-      className="md:hidden fixed inset-0 z-40 opacity-0 pointer-events-none"
+      className="lg:hidden fixed inset-0 z-40 opacity-0 pointer-events-none"
     >
       <div
         className="absolute inset-0 bg-background/80 backdrop-blur-xl"

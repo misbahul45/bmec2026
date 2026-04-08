@@ -80,10 +80,10 @@ const TimelineSection = () => {
 
       <div className="relative z-10 max-w-5xl mx-auto px-6">
         <div className="tl-header text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-4">
             Timeline BMEC 2026
           </h2>
-          <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed text-sm">
+          <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
             Tiga jalur kompetisi, satu perjalanan. Pilih jalurmu dan mulai persiapan dari sekarang.
           </p>
         </div>

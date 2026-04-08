@@ -22,9 +22,9 @@ const GalerySection = () => {
     >
       <GalleryThreeAmbient />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
+      <div className="relative z-10 max-w-6xl mx-auto px-2 sm:px-4 md:px-6">
         <div className="gallery-header text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3">
             Momen BMEC 2025
           </h2>
           <p className="text-muted-foreground text-sm max-w-md mx-auto leading-relaxed">

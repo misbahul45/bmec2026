@@ -133,7 +133,7 @@ export function FlowPath({ containerRef }: Props) {
       <circle
         ref={dotRef}
         r="7"
-        fill="var(--accent)"
+        fill="var(--primary-foreground)"
         filter="url(#dot-glow)"
         opacity="0"
       />

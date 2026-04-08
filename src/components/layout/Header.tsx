@@ -43,7 +43,7 @@ const HamburgerButton = ({
       ref={btnRef}
       onClick={handleClick}
       className={cn(
-        'md:hidden relative w-9 h-9 rounded-xl flex items-center justify-center',
+        'lg:hidden relative w-9 h-9 rounded-xl flex items-center justify-center',
         'transition-colors duration-200',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
         isOpen
@@ -274,7 +274,7 @@ const Header = () => {
 
         <div
           ref={headerRef}
-          className="w-full max-w-7xl h-16 flex items-center justify-between px-2 md:justify-around md:px-4 relative"
+          className="w-full max-w-7xl h-16 flex items-center justify-between px-2 lg:justify-around md:px-4 relative"
           style={{ willChange: 'transform, max-width, border-radius, box-shadow, backdrop-filter' }}
         >
           <Link
@@ -309,7 +309,7 @@ const Header = () => {
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-0.5 relative text-xs">
+          <nav className="hidden lg:flex items-center gap-0.5 relative text-xs">
             <NavIndicator isScroll={isScroll} activeIndex={activeNavIndex} navRefs={navRefs} />
 
             {NAV_ITEMS.map((item, i) => {
@@ -323,7 +323,7 @@ const Header = () => {
                   onMouseEnter={(e) => handleNavHover(e.currentTarget, true)}
                   onMouseLeave={(e) => handleNavHover(e.currentTarget, false)}
                   className={cn(
-                    'relative px-3 py-1.5 rounded-full z-10 transition-colors duration-200 select-none',
+                    'relative px-3 py-1.5 rounded-full z-10 transition-colors duration-200 select-none text-[10px]',
                     isActive
                       ? 'text-black font-medium'
                       : 'text-foreground/55 hover:text-foreground/85'
@@ -336,7 +336,7 @@ const Header = () => {
             })}
           </nav>
 
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2">
             {isLogin ? (
               <ToggleUser />
             ) : (

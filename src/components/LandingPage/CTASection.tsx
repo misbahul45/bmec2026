@@ -29,9 +29,9 @@ const CTASection = () => {
       <CTAThree />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        <h2 className="cta-headline text-4xl md:text-6xl lg:text-7xl font-bold text-accent-foreground leading-[1.05] tracking-tight mb-6">
+        <h2 className="cta-headline text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-accent-foreground leading-[1.05] tracking-tight mb-6">
           Jadilah Bagian dari<br />
-          <span className="text-accent-foreground/80">Generasi Inovator</span><br />
+          <span className="text-primary/80">Generasi Inovator</span><br />
           <span className="text-accent-foreground">Biomedis Indonesia</span>
         </h2>
 

@@ -66,7 +66,7 @@ export function TimelineCard({ process, dotId }: Props) {
               className="flex items-center gap-2.5 rounded-xl bg-muted/50 border border-border px-3 py-2"
             >
               <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${colors.dot}`} />
-              <span className="text-[11px] font-semibold text-muted-foreground w-[88px] shrink-0">
+              <span className="text-[11px] font-semibold text-muted-foreground shrink-0">
                 {ev.date}
               </span>
               <span className="text-[11px] font-medium text-card-foreground leading-tight flex-1">

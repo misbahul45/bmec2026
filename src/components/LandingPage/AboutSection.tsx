@@ -100,14 +100,14 @@ const AboutSection: React.FC = () => {
           >
             <h2
               ref={titleRef}
-              className="text-3xl lg:text-4xl font-bold leading-tight mb-4"
+              className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight mb-4"
             >
               Tentang <span className="text-primary">BMEC</span> 2026
             </h2>
 
             <p
               ref={desc1Ref}
-              className="text-muted-foreground leading-relaxed text-justify mb-3"
+              className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed text-justify mb-3"
             >
               Biomedical Engineering Competition (BMEC) merupakan ajang
               kompetisi tahunan yang berfokus pada ilmu Teknik Biomedis Dasar
@@ -117,7 +117,7 @@ const AboutSection: React.FC = () => {
 
             <p
               ref={desc2Ref}
-              className="text-muted-foreground/70 text-sm leading-relaxed text-justify mb-8"
+              className="text-xs sm:text-sm md:text-base text-muted-foreground/70  leading-relaxed text-justify mb-8"
             >
               BMEC 2025 menghadirkan berbagai fasilitas menarik untuk membantu
               peserta mengembangkan kemampuan akademik dan inovasi di bidang

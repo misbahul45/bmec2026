@@ -84,10 +84,10 @@ const WhySection = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         <div className="why-header text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-4">
             Why BMEC 2026?
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
             Lebih dari sekadar kompetisi, ini adalah perjalanan untuk membangun masa depanmu
             di bidang Teknik Biomedis.
           </p>

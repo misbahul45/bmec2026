@@ -73,8 +73,8 @@ const CompetitionDetailSection = () => {
       className="bg-background py-20 md:py-28"
     >
       <div className="max-w-6xl mx-auto px-6">
-        <div className="comp-header text-center mb-20">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+        <div className="comp-header text-center mb-9">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-4">
             Detail Kompetisi
           </h2>
           <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed text-sm">

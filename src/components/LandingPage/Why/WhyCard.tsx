@@ -46,7 +46,7 @@ export function WhyCard({ node, nodeId, className = '' }: Props) {
         id={nodeId}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
-        className={`why-card w-full rounded-3xl p-6 md:p-8 border border-accent/60 bg-accent/40 shadow-lg cursor-default ${className}`}
+        className={`why-card w-full rounded-3xl p-2 sm:p-6 md:p-8 border border-accent/60 bg-accent/40 shadow-lg cursor-default ${className}`}
         style={{ transformStyle: 'preserve-3d' }}
       >
         <div className="flex items-center gap-3 mb-4">
@@ -57,19 +57,19 @@ export function WhyCard({ node, nodeId, className = '' }: Props) {
             <span className="text-[10px] font-semibold uppercase tracking-widest text-accent-foreground/60 block">
               Step {node.step}
             </span>
-            <h3 className="text-lg font-bold text-accent-foreground leading-tight">{node.title}</h3>
+            <h3 className="text-base md:text-lg font-bold text-accent-foreground leading-tight">{node.title}</h3>
           </div>
         </div>
-        <p className="text-accent-foreground/70 text-sm leading-relaxed mb-5">{node.desc}</p>
+        <p className="text-accent-foreground/70 text-xs sm:text-sm leading-relaxed mb-5 text-justify">{node.desc}</p>
         {node.highlightItems && (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 gap-2">
             {node.highlightItems.map((item) => (
               <div
                 key={item.label}
-                className="flex flex-col items-center gap-1.5 bg-background border border-border rounded-xl px-2 py-3"
+                className="flex items-center gap-1.5 bg-background border border-border rounded-xl px-2 py-3"
               >
                 <item.Icon size={16} className="text-accent-foreground" />
-                <span className="text-xs font-semibold text-foreground text-center leading-tight">{item.label}</span>
+                <span className="text-[10px] sm:text-xs font-semibold text-foreground text-center leading-tight">{item.label}</span>
                 <span className="text-[10px] text-muted-foreground">{item.sub}</span>
               </div>
             ))}
@@ -98,7 +98,7 @@ export function WhyCard({ node, nodeId, className = '' }: Props) {
             <h3 className="text-base font-bold text-foreground leading-tight">{node.title}</h3>
           </div>
         </div>
-        <p className="text-muted-foreground text-sm leading-relaxed mb-4">{node.desc}</p>
+        <p className="text-muted-foreground text-xs sm:text-sm text-justify leading-relaxed mb-4">{node.desc}</p>
         <div className="flex flex-col gap-2">
           {node.compItems.map((item) => (
             <div key={item.title} className="flex items-center gap-3 bg-muted border border-border rounded-xl px-4 py-3">

@@ -28,7 +28,7 @@ const FaqSection = () => {
     >
       <div className="max-w-3xl mx-auto px-6">
         <div className="faq-header text-center mb-14">
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl  font-bold text-foreground mb-4">
             Pertanyaan yang Sering Ditanyakan
           </h2>
           <p className="text-muted-foreground text-sm max-w-lg mx-auto leading-relaxed">

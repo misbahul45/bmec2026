@@ -105,7 +105,7 @@ const HeroSection = () => {
           <div className="w-full max-w-xs sm:max-w-lg lg:max-w-2xl px-4 sm:px-6 text-center flex flex-col items-center gap-3 sm:gap-5 lg:gap-6">
             <h1
               ref={titleRef}
-              className="text-3xl sm:text-4xl lg:text-6xl font-black leading-[1.05]"
+              className="text-2xl sm:text-4xl lg:text-6xl font-black leading-[1.05]"
               style={{ fontFamily: 'Georgia, serif' }}
             >
               <span className="text-primary">Biomedical</span>{' '}
@@ -120,7 +120,7 @@ const HeroSection = () => {
 
             <p
               ref={descRef}
-              className="text-md sm:text-lg lg:text-2xl sm:max-w-md lg:max-w-xl"
+              className="text-sm opacity-90 md:text-md sm:text-lg lg:text-2xl sm:max-w-md lg:max-w-xl"
             >
               Ajang kompetisi tahunan Teknik Biomedis oleh HMTB Universitas Airlangga
               untuk mengembangkan potensi, kreativitas, dan inovasi di bidang kesehatan.
