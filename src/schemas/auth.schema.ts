@@ -25,8 +25,11 @@ export const registerSchema = z.object({
   phone: z.string().min(9, 'Nomor telepon tidak valid'),
   competitionType: z.enum(competitionTypes, { required_error: 'Pilih jenis lomba' }),
   address: z.string().min(5, 'Alamat wajib diisi'),
-  proposal: z.instanceof(File).optional(),
-  infographic: z.instanceof(File).optional(),
+  password: z
+    .string({
+      required_error: 'Password tidak boleh kosong'
+    })
+    .min(8, 'Password minimal 8 karakter')
 })
 
 

@@ -1,6 +1,6 @@
 import { COMPETITIONS } from '~/contants'
 import CompetitionCard from './CompetitionCard'
-import { useStackedCarousel } from './useStackedCarousel'
+import { useStackedCarousel } from '../../hooks/useStackedCarousel'
 
 export function StackedCarousel() {
   const { active, goTo, pause, resume, cardRefs } = useStackedCarousel(COMPETITIONS.length)

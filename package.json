@@ -14,6 +14,7 @@
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@hookform/resolvers": "^5.2.2",
     "@phosphor-icons/react": "^2.1.10",
+    "@prisma/adapter-neon": "^7.7.0",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "@react-google-maps/api": "^2.20.8",
@@ -51,6 +52,7 @@
     "nitro": "^3.0.260311-beta",
     "prisma": "^7.7.0",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "vite": "^8.0.0"
   }

@@ -19,6 +19,7 @@ model User {
   name      String
   code      String   @unique
   password  String
+  email     String
   
   phone     String 
   schoolName    String

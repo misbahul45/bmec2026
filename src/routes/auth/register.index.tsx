@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import RegisterForm from '~/components/auth/RegisterForm'
 import { StackedCarousel } from '~/components/auth/StackedCarousel'
 
-export const Route = createFileRoute('/auth/register')({
+export const Route = createFileRoute('/auth/register/')({
   component: RouteComponent,
 })
 

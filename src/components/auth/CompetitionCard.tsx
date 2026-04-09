@@ -1,4 +1,6 @@
+import { Image } from '@unpic/react'
 import { Button } from '../ui/button'
+import { Badge } from '../ui/badge'
 
 type Accent = 'primary' | 'secondary' | 'accent'
 
@@ -39,22 +41,20 @@ const CompetitionCard = ({ label, title, description, img, className, accent, is
         <h3 className="text-sm font-bold text-foreground leading-tight">{title}</h3>
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{description}</p>
         {isActive && (
-          <Button
+          <Badge
             variant={buttonVariants[accent]}
-            size="sm"
             className="w-fit rounded-lg mt-1 text-xs"
           >
             Daftar Lomba
-          </Button>
+          </Badge>
         )}
       </div>
-      <img
+      <Image
         src={img}
         alt={title}
         width={320}
         height={160}
-        className="w-full object-cover"
-        style={{ height: '120px' }}
+        className="w-full object-cover h-40 "
       />
     </div>
   )

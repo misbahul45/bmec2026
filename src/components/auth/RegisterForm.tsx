@@ -9,8 +9,11 @@ import { AddressField } from './AddressField'
 import { CompetitionSelect } from './CompetitionSelect'
 import { FileUploadField } from './FileUploadField'
 import { RegisterFormData, registerSchema } from '~/schemas/auth.schema'
+import { useRegisteredTeam } from '~/hooks/useRegisteredTeam'
 
 const RegisterForm = () => {
+  const { updateTeam } = useRegisteredTeam()
+
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -20,8 +23,7 @@ const RegisterForm = () => {
       phone: '',
       competitionType: undefined,
       address: '',
-      proposal: undefined,
-      infographic: undefined,
+      password: '',
     },
   })
 
@@ -29,11 +31,12 @@ const RegisterForm = () => {
 
   const onSubmit = (data: RegisterFormData) => {
     console.log(data)
+    // call api
   }
 
   return (
     <div className="w-full max-w-md">
-      <CardHeader className="mb-1 px-0">
+      <CardHeader className="mb-6 px-0">
         <CardTitle className="text-center font-bold text-lg">Daftar BMEC 2026</CardTitle>
         <CardDescription className="text-center text-xs">
           Isi data tim untuk mendaftarkan diri ke kompetisi
@@ -73,12 +76,13 @@ const RegisterForm = () => {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="reg-email">Email</FieldLabel>
-                    <Input {...field} id="reg-email" type="email" placeholder="email@sekolah.com" autoComplete="email" aria-invalid={fieldState.invalid} className="rounded text-xs" />
+                    <FieldLabel htmlFor="reg-email">Email Team</FieldLabel>
+                    <Input {...field} id="reg-email" type="email" placeholder="email@team.com" autoComplete="email" aria-invalid={fieldState.invalid} className="rounded text-xs" />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
               />
+
 
               <Controller
                 name="phone"
@@ -92,6 +96,18 @@ const RegisterForm = () => {
                 )}
               />
             </div>
+
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="password">Password Team</FieldLabel>
+                  <Input {...field} id="password" type="password" placeholder="••••••••" aria-invalid={fieldState.invalid} className="rounded text-xs" />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
 
             <Controller
               name="competitionType"
@@ -108,46 +124,6 @@ const RegisterForm = () => {
                 </Field>
               )}
             />
-
-            {competitionType === 'LKTI' && (
-              <Controller
-                name="proposal"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Upload Proposal</FieldLabel>
-                    <FileUploadField
-                      value={field.value}
-                      onChange={field.onChange}
-                      accept=".pdf,.doc,.docx"
-                      label="Pilih file proposal (PDF/DOC)"
-                      error={fieldState.invalid}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            )}
-
-            {competitionType === 'INFOGRAFIS' && (
-              <Controller
-                name="infographic"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Upload Infografis</FieldLabel>
-                    <FileUploadField
-                      value={field.value}
-                      onChange={field.onChange}
-                      accept=".jpg,.jpeg,.png,.pdf"
-                      label="Pilih file infografis (JPG/PNG/PDF)"
-                      error={fieldState.invalid}
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                  </Field>
-                )}
-              />
-            )}
 
             <Controller
               name="address"
@@ -173,7 +149,7 @@ const RegisterForm = () => {
           Daftar Sekarang
         </Button>
         <p className="text-center text-[10px] opacity-65">
-          Sudah punya akun?{' '}
+          Sudah punya team?{' '}
           <Link to="/auth/login" className="text-primary hover:underline">Masuk</Link>
         </p>
       </CardFooter>
