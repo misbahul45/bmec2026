@@ -3,8 +3,8 @@ import { AppError } from "../utils/app-error"
 import { PaginationMeta } from "../types/pagination"
 import { ServiceResponse } from "../types/service-response"
 import { QueryTeam } from "~/schemas/team.schema"
-import { CompetitionType, Prisma } from "~/generated/prisma/browser"
 import { prisma } from "../utils/prisma"
+import { CompetitionType, Prisma } from "@prisma/client"
 
 export default class TeamService {
 
