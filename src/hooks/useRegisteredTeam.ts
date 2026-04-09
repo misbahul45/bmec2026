@@ -1,5 +1,5 @@
+import { Member, User } from "@prisma/client"
 import { useEffect, useState } from "react"
-import { Member, User } from "~/generated/prisma/browser"
 
 interface TeamWithMembers extends User {
   members: Member[]
