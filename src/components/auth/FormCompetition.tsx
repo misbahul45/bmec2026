@@ -1,8 +1,18 @@
-import React from 'react'
+import { CompetitionType } from "@prisma/client"
+import React from "react"
+import FormMahasiswa from "./FormMahasiswa"
+import FormSiswa from "./FormSiswa"
 
-const FormCompetition = () => {
+type Props = {
+  type: CompetitionType
+}
+
+const FormCompetition: React.FC<Props> = ({ type }) => {
+
   return (
-    <div>FormCompetition</div>
+    <div>
+      {type === "LKTI" ? <FormMahasiswa /> : <FormSiswa type={type} />}
+    </div>
   )
 }
 

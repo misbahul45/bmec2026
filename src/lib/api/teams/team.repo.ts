@@ -2,10 +2,10 @@ import { MemberData } from "~/schemas/team.member.schema"
 import { prisma } from "../../utils/prisma"
 import { Prisma } from "@prisma/client"
 
-export default class TeamRepoSafe {
+export default class TeamRepo {
 
   countApprovedTeams() {
-    return prisma.user.count({
+    return prisma.team.count({
       where: {
         registration: {
           status: "APPROVED",
@@ -15,23 +15,23 @@ export default class TeamRepoSafe {
   }
 
   findByEmail(email: string) {
-    return prisma.user.findUnique({
+    return prisma.team.findUnique({
       where: { email },
     })
   }
 
   findByName(name: string) {
-    return prisma.user.findUnique({
+    return prisma.team.findUnique({
       where: { name },
     })
   }
 
-  create(data: Prisma.UserCreateInput) {
-    return prisma.user.create({ data })
+  create(data: Prisma.TeamCreateInput) {
+    return prisma.team.create({ data })
   }
 
-  findAll(where: Prisma.UserWhereInput, skip: number, take: number) {
-    return prisma.user.findMany({
+  findAll(where: Prisma.TeamWhereInput, skip: number, take: number) {
+    return prisma.team.findMany({
       where,
       skip,
       take,
@@ -40,36 +40,36 @@ export default class TeamRepoSafe {
     })
   }
 
-  count(where: Prisma.UserWhereInput) {
-    return prisma.user.count({ where })
+  count(where: Prisma.TeamWhereInput) {
+    return prisma.team.count({ where })
   }
 
   findById(id: string) {
-    return prisma.user.findUnique({
+    return prisma.team.findUnique({
       where: { id },
       include: { members: true },
     })
   }
 
   delete(id: string) {
-    return prisma.user.delete({ where: { id } })
+    return prisma.team.delete({ where: { id } })
   }
 
-  update(id: string, data: Prisma.UserUpdateInput) {
-    return prisma.user.update({
+  update(id: string, data: Prisma.TeamUpdateInput) {
+    return prisma.team.update({
       where: { id },
       data,
     })
   }
 
-  createMember(data:MemberData[]){
+  createMember(data: MemberData[]) {
     return prisma.member.createMany({
-      data:data.map((t)=>({
-        role:t.role,
-        studentId:t.studentId,
-        teamId:t.teamId!,
-        name:t.name
-      }))
+      data: data.map((t) => ({
+        role: t.role,
+        studentId: t.studentId,
+        teamId: t.teamId!,
+        name: t.name,
+      })),
     })
   }
 }

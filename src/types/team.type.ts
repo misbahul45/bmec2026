@@ -1,6 +1,6 @@
-import { Prisma, User } from "@prisma/client"
+import { Prisma, Team } from "@prisma/client"
 
-export type SafeTeam = Omit<User, "password">
+export type SafeTeam = Omit<Team, "password">
 
 export type TeamsResponse = {
   teams: SafeTeam[]
@@ -13,7 +13,7 @@ export type TeamsResponse = {
 }
 
 export type TeamWithMembers =
-  Prisma.UserGetPayload<{
+  Prisma.TeamGetPayload<{
     include: {
       members: true
     }

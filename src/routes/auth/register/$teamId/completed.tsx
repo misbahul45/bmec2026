@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router'
 import FormCompetition from '~/components/auth/FormCompetition';
-import ProfileTeam from '~/components/auth/ProfileTeam';
+import ProfileTeam from '~/components/ui/ProfileTeam';
 import { TeamNotFound } from '~/components/errors/TeamNotFound';
 import { teamQueryOptions } from '~/lib/api/teams/team.query-options';
 
@@ -21,9 +21,9 @@ function RouteComponent() {
   const { data: res } = useSuspenseQuery(teamQueryOptions(teamId))
 
   return <div className='w-full min-h-screen py-10 px-8'>
-    <div className="w-full max-w-6xl mx-auto">
+    <div className="w-full max-w-6xl mx-auto space-y-8">
       <ProfileTeam data={res.data! as any} />
-      <FormCompetition/>
+      <FormCompetition type={res.data?.competitionType!} />
     </div>
   </div>
 }

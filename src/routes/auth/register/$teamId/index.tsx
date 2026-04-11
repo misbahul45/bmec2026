@@ -88,7 +88,7 @@ function RouteComponent() {
       navigate({
         to: '/auth/register/$teamId/completed',
         params: {
-          teamId: res.data!.id,
+          teamId
         },
       })
 

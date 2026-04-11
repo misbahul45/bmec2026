@@ -5,14 +5,12 @@ import TeamService from "~/lib/api/teams/team.service"
 import { z } from "zod"
 import { registerSchema } from "~/schemas/auth.schema"
 import { createMembersSchema, queryTeam } from "~/schemas/team.member.schema"
-import { User } from "@prisma/client"
 import { Uuid } from "~/schemas/general.schema"
 import { SafeTeam, TeamsResponse } from "~/types/team.type"
 import { updateTeamSchema } from "~/schemas/team,schema"
 
 
 const teamService = new TeamService()
-
 
 
 export const getTeams = createServerFn({ method: "GET" })

@@ -75,7 +75,7 @@ export default class TeamService {
     const limit = query.limit ?? 10
     const skip = (page - 1) * limit
 
-    const where: Prisma.UserWhereInput = {}
+    const where: Prisma.TeamWhereInput = {}
 
     if (query.search) {
       where.OR = [
