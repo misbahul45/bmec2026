@@ -23,4 +23,6 @@ export const competitionWithActiveBatch =
         createdAt: Date
         updatedAt: Date
     }[]
-    }
+  }
+
+

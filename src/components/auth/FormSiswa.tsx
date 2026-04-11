@@ -1,9 +1,9 @@
 import { CompetitionType } from '@prisma/client'
 import { useServerFn } from '@tanstack/react-start'
 import React, { useEffect, useState } from 'react'
-import { getCompetition } from '~/server/competition'
+import { getCompetition, registrationCompetition } from '~/server/competition'
 import { CompetitionWithActiveBatch } from '~/types/competition.type'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Card, CardContent, CardHeader } from '../ui/card'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -21,6 +21,8 @@ import {
 import { Button } from '../ui/button'
 import { uploadToImageKit } from '~/lib/api/uploads/service'
 import CompetitionPriceCard from './CompetitionPriceCard'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 type Props = {
   type: CompetitionType
@@ -37,6 +39,31 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
     resolver: zodResolver(createCompetitionRegistrationSchema),
   })
 
+  const mutation = useMutation({
+    mutationFn: async (data: CreateCompetitionRegistrationData) => {
+      let imageUrl: string | null = null
+
+      // ⬅️ upload dipindah ke sini
+      if (data.paymentProof) {
+        imageUrl = await uploadToImageKit(data.paymentProof)
+      }
+
+      return await registrationCompetition({
+        data: {
+          ...data,
+          paymentProof: imageUrl ?? '',
+        },
+      })
+    },
+    onError: (error: any) => {
+      console.error(error)
+      toast.error(error.message || 'Terjadi kesalahan')
+    },
+    onSuccess: (res) => {
+      toast.success(res.message)
+    },
+  })
+
   useEffect(() => {
     fetchCompetition({ data: type }).then((res) => {
       const comp = res.data ?? null
@@ -50,25 +77,14 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
         })
       }
     })
-  }, [type])
-
+  }, [type, teamId])
 
   const activeBatch = competition?.batches?.[0]
 
-  const onSubmit = async (data: CreateCompetitionRegistrationData) => {
-    let imageUrl: string | null = null
-
-    if (data.paymentProof) {
-      imageUrl = await uploadToImageKit(data.paymentProof)
-    }
-
-    const payload = {
-      ...data,
-      paymentProof: imageUrl,
-    }
-
-    console.log(payload)
+  const onSubmit = (data: CreateCompetitionRegistrationData) => {
+    mutation.mutate(data)
   }
+
   return (
     <Card className="rounded-md shadow-xl">
       <CardHeader>
@@ -94,6 +110,7 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
                   <UploadImage
                     value={field.value}
                     onChange={field.onChange}
+                    disabled={mutation.isPending}
                   />
 
                   {fieldState.invalid && (
@@ -103,8 +120,12 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
               )}
             />
 
-            <Button type="submit" className="w-full rounded-xl hover:opacity-90 cursor-pointer active:scale-95">
-              Daftar Sekarang
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className="w-full rounded-xl hover:opacity-90 cursor-pointer active:scale-95"
+            >
+              {mutation.isPending ? 'Menyimpan...' : 'Simpan data'}
             </Button>
 
           </FieldGroup>

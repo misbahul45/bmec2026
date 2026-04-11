@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start"
 import crypto from "crypto"
+import { prisma } from "~/lib/utils/prisma"
+import { fileSchema } from "~/schemas/general.schema"
 
-export const imagekitAuth = createServerFn().handler(async () => {
+export const imagekitAuth = createServerFn({ method:'GET' }).handler(async () => {
   const token = crypto.randomBytes(16).toString("hex")
   const expire = Math.floor(Date.now() / 1000) + 2400
 
@@ -17,3 +19,21 @@ export const imagekitAuth = createServerFn().handler(async () => {
     publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
   }
 })
+
+
+export const saveUpload = createServerFn({ method: "POST" })
+  .inputValidator(fileSchema)
+  .handler(async ({ data }) => {
+    const file = await prisma.file.upsert({
+      where: { fileId: data.fileId },
+      update: {
+        url: data.url,
+      },
+      create: {
+        url: data.url,
+        fileId: data.fileId,
+      },
+    })
+
+    return file
+  })

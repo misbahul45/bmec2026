@@ -182,6 +182,14 @@ model Submission {
   updatedAt DateTime @updatedAt
 }
 
+
+model File {
+  url     String
+  fileId String @unique
+
+  @@index([url])
+}
+
 enum PaymentStatus {
   PENDING
   APPROVED

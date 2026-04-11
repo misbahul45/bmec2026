@@ -4,10 +4,11 @@ import { Button } from "./button"
 
 type Props = {
   value?: File | null
-  onChange?: (file: File | null) => void
+  onChange: (file: File | null) => void
+  disabled?: boolean
 }
 
-const UploadImage: React.FC<Props> = ({ value, onChange }) => {
+const UploadImage: React.FC<Props> = ({ value, onChange, disabled }) => {
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +68,7 @@ const UploadImage: React.FC<Props> = ({ value, onChange }) => {
 
       <input
         ref={inputRef}
+        disabled={disabled}
         type="file"
         accept="image/png,image/jpeg,image/jpg"
         hidden

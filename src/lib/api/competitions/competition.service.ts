@@ -1,6 +1,7 @@
 import { CompetitionType } from "@prisma/client";
 import CompetitionRepo from "./competition.repo";
 import { AppError } from "~/lib/utils/app-error";
+import { RegistrationCompetitionData } from "~/schemas/competition.schema";
 
 export default class CompetitionService{
     private repo = new CompetitionRepo();
@@ -21,11 +22,26 @@ export default class CompetitionService{
         if (!data) return data
 
         return {
-            ...data,
-            batches: data.batches.map((b: any) => ({
-            ...b,
-            price: b.price.toNumber(),
+                ...data,
+                batches: data.batches.map((b: any) => ({
+                ...b,
+                price: b.price.toNumber(),
             })),
+        }
+    }
+
+    async registrationCompetition(data:RegistrationCompetitionData){
+        const teamAlreadyRegister = await this.repo.findRegistrationByTeamid(data.teamId)
+
+        if(teamAlreadyRegister){
+            throw new AppError('Team already registered')
+        }
+
+        const created=await this.repo.createRegistration(data)
+
+        return {
+            data:created,
+            message:'Successfully registered competition'
         }
     }
 }
