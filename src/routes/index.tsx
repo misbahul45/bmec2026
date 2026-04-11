@@ -15,32 +15,26 @@ export const Route = createFileRoute('/')({
       ...seo({
         title:
           'BMEC 2026 - Biomedical Engineering Competition Universitas Airlangga',
-        description: `TanStack Start is a type-safe, client-first, full-stack React framework. `,
+        description:
+          'BMEC 2026 merupakan kompetisi Teknik Biomedis tingkat nasional yang diselenggarakan oleh Universitas Airlangga. Terdiri dari Olimpiade, LKTI, dan Infografis.',
       }),
-      {
-        title:
-          'BMEC 2025 - Biomedical Engineering Competition Universitas Airlangga',
-      },
-      {
-        name: 'description',
-        content:
-          'BMEC 2025 merupakan kompetisi Teknik Biomedis tingkat nasional yang diselenggarakan oleh Himpunan Mahasiswa Teknik Biomedis Universitas Airlangga. Terdiri dari Olimpiade, LKTI, dan Infografis dengan total hadiah belasan juta rupiah.',
-      },
 
       {
         name: 'keywords',
         content:
-          'BMEC 2025, Biomedical Engineering Competition, Lomba Teknik Biomedis, Olimpiade Biomedis, LKTI Biomedis, Infografis Biomedis, Universitas Airlangga, Kompetisi Nasional SMA',
+          'BMEC 2026, Biomedical Engineering Competition, Olimpiade Biomedis, LKTI Biomedis, Infografis Biomedis, Universitas Airlangga',
       },
+
+      // Open Graph
       {
         property: 'og:title',
         content:
-          'BMEC 2025 - Biomedical Engineering Competition Universitas Airlangga',
+          'BMEC 2026 - Biomedical Engineering Competition Universitas Airlangga',
       },
       {
         property: 'og:description',
         content:
-          'Kompetisi nasional Teknik Biomedis dengan 3 cabang lomba: Olimpiade, LKTI, dan Infografis. Raih hadiah belasan juta rupiah dan sertifikat nasional.',
+          'Kompetisi nasional Teknik Biomedis dengan 3 cabang lomba: Olimpiade, LKTI, dan Infografis.',
       },
       {
         property: 'og:type',
@@ -48,25 +42,26 @@ export const Route = createFileRoute('/')({
       },
       {
         property: 'og:image',
-        content: '/banner-bmec-2025.png',
+        content: '/banner-bmec-2026.png',
       },
 
-      // Twitter / X Preview
+      // Twitter
       {
         name: 'twitter:card',
         content: 'summary_large_image',
       },
       {
         name: 'twitter:title',
-        content: 'BMEC 2025 - Biomedical Engineering Competition',
+        content: 'BMEC 2026 - Biomedical Engineering Competition',
       },
       {
         name: 'twitter:description',
         content:
-          'Kompetisi Teknik Biomedis Nasional 2025. Olimpiade, LKTI, dan Infografis.',
+          'Kompetisi Teknik Biomedis Nasional 2026. Olimpiade, LKTI, dan Infografis.',
       },
     ],
   }),
+
   component: Home,
 })
 

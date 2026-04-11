@@ -13,11 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard/team/index'
 import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard/admin/index'
-import { Route as AuthRegisterIndexRouteImport } from './routes/auth/register.index'
-import { Route as ApiTeamsIndexRouteImport } from './routes/api/teams/index'
-import { Route as AuthRegisterTeamIdRouteImport } from './routes/auth/register.$teamId'
-import { Route as ApiTeamsIdRouteImport } from './routes/api/teams/$id'
+import { Route as AuthRegisterIndexRouteImport } from './routes/auth/register/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthRegisterTeamIdIndexRouteImport } from './routes/auth/register/$teamId/index'
+import { Route as AuthRegisterTeamIdCompletedRouteImport } from './routes/auth/register/$teamId/completed'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -44,60 +43,53 @@ const AuthRegisterIndexRoute = AuthRegisterIndexRouteImport.update({
   path: '/auth/register/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiTeamsIndexRoute = ApiTeamsIndexRouteImport.update({
-  id: '/api/teams/',
-  path: '/api/teams/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRegisterTeamIdRoute = AuthRegisterTeamIdRouteImport.update({
-  id: '/auth/register/$teamId',
-  path: '/auth/register/$teamId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiTeamsIdRoute = ApiTeamsIdRouteImport.update({
-  id: '/api/teams/$id',
-  path: '/api/teams/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRegisterTeamIdIndexRoute = AuthRegisterTeamIdIndexRouteImport.update({
+  id: '/auth/register/$teamId/',
+  path: '/auth/register/$teamId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRegisterTeamIdCompletedRoute =
+  AuthRegisterTeamIdCompletedRouteImport.update({
+    id: '/auth/register/$teamId/completed',
+    path: '/auth/register/$teamId/completed',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/teams/$id': typeof ApiTeamsIdRoute
-  '/auth/register/$teamId': typeof AuthRegisterTeamIdRoute
-  '/api/teams/': typeof ApiTeamsIndexRoute
   '/auth/register/': typeof AuthRegisterIndexRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
+  '/auth/register/$teamId/completed': typeof AuthRegisterTeamIdCompletedRoute
+  '/auth/register/$teamId/': typeof AuthRegisterTeamIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/teams/$id': typeof ApiTeamsIdRoute
-  '/auth/register/$teamId': typeof AuthRegisterTeamIdRoute
-  '/api/teams': typeof ApiTeamsIndexRoute
   '/auth/register': typeof AuthRegisterIndexRoute
   '/dashboard/admin': typeof DashboardAdminIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
+  '/auth/register/$teamId/completed': typeof AuthRegisterTeamIdCompletedRoute
+  '/auth/register/$teamId': typeof AuthRegisterTeamIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth/login': typeof AuthLoginRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/teams/$id': typeof ApiTeamsIdRoute
-  '/auth/register/$teamId': typeof AuthRegisterTeamIdRoute
-  '/api/teams/': typeof ApiTeamsIndexRoute
   '/auth/register/': typeof AuthRegisterIndexRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
+  '/auth/register/$teamId/completed': typeof AuthRegisterTeamIdCompletedRoute
+  '/auth/register/$teamId/': typeof AuthRegisterTeamIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -105,46 +97,42 @@ export interface FileRouteTypes {
     | '/'
     | '/auth/login'
     | '/api/auth/$'
-    | '/api/teams/$id'
-    | '/auth/register/$teamId'
-    | '/api/teams/'
     | '/auth/register/'
     | '/dashboard/admin/'
     | '/dashboard/team/'
+    | '/auth/register/$teamId/completed'
+    | '/auth/register/$teamId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth/login'
     | '/api/auth/$'
-    | '/api/teams/$id'
-    | '/auth/register/$teamId'
-    | '/api/teams'
     | '/auth/register'
     | '/dashboard/admin'
     | '/dashboard/team'
+    | '/auth/register/$teamId/completed'
+    | '/auth/register/$teamId'
   id:
     | '__root__'
     | '/'
     | '/auth/login'
     | '/api/auth/$'
-    | '/api/teams/$id'
-    | '/auth/register/$teamId'
-    | '/api/teams/'
     | '/auth/register/'
     | '/dashboard/admin/'
     | '/dashboard/team/'
+    | '/auth/register/$teamId/completed'
+    | '/auth/register/$teamId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthLoginRoute: typeof AuthLoginRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiTeamsIdRoute: typeof ApiTeamsIdRoute
-  AuthRegisterTeamIdRoute: typeof AuthRegisterTeamIdRoute
-  ApiTeamsIndexRoute: typeof ApiTeamsIndexRoute
   AuthRegisterIndexRoute: typeof AuthRegisterIndexRoute
   DashboardAdminIndexRoute: typeof DashboardAdminIndexRoute
   DashboardTeamIndexRoute: typeof DashboardTeamIndexRoute
+  AuthRegisterTeamIdCompletedRoute: typeof AuthRegisterTeamIdCompletedRoute
+  AuthRegisterTeamIdIndexRoute: typeof AuthRegisterTeamIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -184,32 +172,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/teams/': {
-      id: '/api/teams/'
-      path: '/api/teams'
-      fullPath: '/api/teams/'
-      preLoaderRoute: typeof ApiTeamsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/register/$teamId': {
-      id: '/auth/register/$teamId'
-      path: '/auth/register/$teamId'
-      fullPath: '/auth/register/$teamId'
-      preLoaderRoute: typeof AuthRegisterTeamIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/teams/$id': {
-      id: '/api/teams/$id'
-      path: '/api/teams/$id'
-      fullPath: '/api/teams/$id'
-      preLoaderRoute: typeof ApiTeamsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/register/$teamId/': {
+      id: '/auth/register/$teamId/'
+      path: '/auth/register/$teamId'
+      fullPath: '/auth/register/$teamId/'
+      preLoaderRoute: typeof AuthRegisterTeamIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/register/$teamId/completed': {
+      id: '/auth/register/$teamId/completed'
+      path: '/auth/register/$teamId/completed'
+      fullPath: '/auth/register/$teamId/completed'
+      preLoaderRoute: typeof AuthRegisterTeamIdCompletedRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -219,12 +200,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthLoginRoute: AuthLoginRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiTeamsIdRoute: ApiTeamsIdRoute,
-  AuthRegisterTeamIdRoute: AuthRegisterTeamIdRoute,
-  ApiTeamsIndexRoute: ApiTeamsIndexRoute,
   AuthRegisterIndexRoute: AuthRegisterIndexRoute,
   DashboardAdminIndexRoute: DashboardAdminIndexRoute,
   DashboardTeamIndexRoute: DashboardTeamIndexRoute,
+  AuthRegisterTeamIdCompletedRoute: AuthRegisterTeamIdCompletedRoute,
+  AuthRegisterTeamIdIndexRoute: AuthRegisterTeamIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,18 +1,19 @@
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card'
 import { Field, FieldGroup, FieldError, FieldLabel } from '../ui/field'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { AddressField } from './AddressField'
 import { CompetitionSelect } from './CompetitionSelect'
-import { FileUploadField } from './FileUploadField'
 import { RegisterFormData, registerSchema } from '~/schemas/auth.schema'
-import { useRegisteredTeam } from '~/hooks/useRegisteredTeam'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { createTeam } from '~/server/team'
 
 const RegisterForm = () => {
-  const { updateTeam } = useRegisteredTeam()
+  const navigate = useNavigate()
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -27,11 +28,29 @@ const RegisterForm = () => {
     },
   })
 
-  const competitionType = form.watch('competitionType')
+  const mutation = useMutation({
+    mutationFn: async (formData: RegisterFormData) => {
+      return await createTeam({
+        data: formData,
+      })
+    },
+    onError: (error: any) => {
+      console.log(error)
+      toast.error(error.message)
+    },
+    onSuccess: (res) => {
+      toast.success(res.message)
+      navigate({
+        to: '/auth/register/$teamId',
+        params: {
+          teamId: res.data!.id,
+        },
+      })
+    },
+  })
 
   const onSubmit = (data: RegisterFormData) => {
-    console.log(data)
-    // call api
+    mutation.mutate(data)
   }
 
   return (
@@ -82,7 +101,6 @@ const RegisterForm = () => {
                   </Field>
                 )}
               />
-
 
               <Controller
                 name="phone"
@@ -145,8 +163,13 @@ const RegisterForm = () => {
       </CardContent>
 
       <CardFooter className="px-0 flex-col gap-2">
-        <Button type="submit" className="rounded w-full" form="form-register">
-          Daftar Sekarang
+        <Button
+          type="submit"
+          form="form-register"
+          disabled={mutation.isPending}
+          className="rounded-md active:scale-95 w-full hover:opacity-95 cursor-pointer"
+        >
+          {mutation.isPending ? 'Mendaftarkan...' : 'Daftar Sekarang'}
         </Button>
         <p className="text-center text-[10px] opacity-65">
           Sudah punya team?{' '}

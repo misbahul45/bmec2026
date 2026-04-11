@@ -11,18 +11,23 @@ enum CompetitionType {
   LKTI
   INFOGRAFIS
 }
+enum MemberRole {
+  KETUA
+  ANGGOTA
+}
 
 model User {
   id        String   @id @default(uuid())
 
-  name      String
+  name      String   @unique
   code      String   @unique
   password  String
-  email     String
+  email     String   @unique
   
   phone     String 
   schoolName    String
   schoolAddress String
+  documentUrl String?
 
   members Member[]
 
@@ -30,6 +35,7 @@ model User {
 
   submissions Submission[]
   competitionType CompetitionType
+  abstract AbstractSubmission?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -37,13 +43,29 @@ model User {
   @@map("team")
 }
 
+model AbstractSubmission {
+  id String @id @default(uuid())
+
+  teamId String @unique
+  fileUrl String
+
+  status SubmissionStatus @default(PENDING)
+
+  reviewedBy String?
+  admin Admin? @relation(fields: [reviewedBy], references: [id])
+
+  team User @relation(fields: [teamId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Member {
   id String @id @default(uuid())
 
   name String
-  nis  String
-
-  documentUrl String?
+  studentId  String    @unique
+  role MemberRole 
 
   teamId String
   team   User @relation(fields: [teamId], references: [id], onDelete: Cascade)
@@ -61,6 +83,7 @@ model Admin {
 
   registrations Registration[]
   submissions Submission[]
+  abstracts AbstractSubmission[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -71,8 +94,7 @@ model Admin {
 model Competition {
   id        String   @id @default(uuid())
 
-  name      String
-  description String?
+  name      String  @unique
 
   batches   Batch[]
   stages    Stage[]
@@ -90,6 +112,8 @@ model Batch {
   startDate DateTime
   endDate   DateTime
   price     Decimal
+
+  module_bacth String
 
   competitionId String
   competition Competition @relation(fields: [competitionId], references: [id])
@@ -131,6 +155,7 @@ model Registration {
 
   approvedBy String?
   admin      Admin? @relation(fields: [approvedBy], references: [id])
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,7 +1,7 @@
 import { Controller, UseFormReturn } from "react-hook-form"
 import { z } from "zod"
 
-import { createMembersSchema } from "~/schemas/team.schema"
+import { createMembersSchema } from "~/schemas/team.member.schema"
 import {
   Field,
   FieldError,
@@ -16,12 +16,15 @@ type FormValues = z.infer<typeof createMembersSchema>
 type Props = {
   form: UseFormReturn<FormValues>
   index: number
+  educationLevel: "SMA" | "MAHASISWA"
 }
 
-const FormMember = ({ form, index }: Props) => {
+const FormMember = ({ form, index, educationLevel }: Props) => {
+  const studentLabel =
+  educationLevel === "MAHASISWA" ? "NIM" : "NIS"
+
   return (
     <div className="mt-6">
-
       <FieldGroup>
         <Controller
           name={`members.${index}.name`}
@@ -29,7 +32,9 @@ const FormMember = ({ form, index }: Props) => {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>
-                Nama Member {index + 1}
+                {index === 0
+                  ? 'Nama Ketua'
+                  : `Nama Anggota ${index}`}
               </FieldLabel>
 
               <Input
@@ -46,17 +51,17 @@ const FormMember = ({ form, index }: Props) => {
         />
 
         <Controller
-          name={`members.${index}.nis`}
+          name={`members.${index}.studentId`}
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>
-                NIS
+                {studentLabel}
               </FieldLabel>
 
               <Input
                 {...field}
-                placeholder="Masukkan NIS"
+                placeholder={`Masukkan ${studentLabel}`}
                 aria-invalid={fieldState.invalid}
               />
 
@@ -66,29 +71,6 @@ const FormMember = ({ form, index }: Props) => {
             </Field>
           )}
         />
-        <Controller
-          name={`members.${index}.documentUrl`}
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>
-                Dokumen
-              </FieldLabel>
-
-                <Input
-                {...field}
-                value={field.value ?? ""}
-                placeholder="Upload / URL Dokumen"
-                aria-invalid={fieldState.invalid}
-                />
-
-              {fieldState.invalid && (
-                <FieldError errors={[fieldState.error]} />
-              )}
-            </Field>
-          )}
-        />
-
       </FieldGroup>
 
     </div>

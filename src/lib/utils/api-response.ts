@@ -2,9 +2,8 @@ export type ApiSuccess<T = unknown> = {
   success: true
   message?: string
   data?: T
-  meta?: Record<string, unknown>
+  meta?: Record<string, any>
 }
-
 export type ApiError = {
   success: false
   message: string

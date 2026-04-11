@@ -253,3 +253,16 @@
   initial-value: 0deg;
   syntax: "<angle>";
 }
+
+@layer components {
+  .card {
+    @apply bg-card text-card-foreground
+    rounded-2xl border
+    shadow-md
+    px-6 py-5
+    backdrop-blur-md
+    transition-all duration-300
+    hover:scale-[1.03]
+    hover:shadow-xl;
+  }
+}

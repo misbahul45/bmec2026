@@ -1,11 +1,13 @@
-/// <reference types="vite/client" />
+
 import {
   HeadContent,
-  Link,
   Scripts,
-  createRootRoute,
+  createRootRouteWithContext,
   useLocation,
+  Outlet,
 } from '@tanstack/react-router'
+import { QueryClient } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import * as React from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
@@ -14,21 +16,26 @@ import Footer from '~/components/layout/Footer'
 import Header from '~/components/layout/Header'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/lib/utils/seo'
+import { Toaster } from "~/components/ui/sonner"
 
-export const Route = createRootRoute({
+
+
+
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient
+}>()({
   head: () => ({
     meta: [
-      {
-        charSet: 'utf-8',
-      },
+      { charSet: 'utf-8' },
       {
         name: 'viewport',
         content: 'width=device-width, initial-scale=1',
       },
       ...seo({
         title:
-          'TanStack Start | Type-Safe, Client-First, Full-Stack React Framework',
-        description: `TanStack Start is a type-safe, client-first, full-stack React framework. `,
+          'BMEC 2026 - Biomedical Engineering Competition Universitas Airlangga',
+        description:
+          'Kompetisi nasional Teknik Biomedis dengan 3 cabang lomba: Olimpiade, LKTI, dan Infografis.',
       }),
     ],
     links: [
@@ -50,7 +57,7 @@ export const Route = createRootRoute({
         sizes: '16x16',
         href: '/favicon-16x16.png',
       },
-      { rel: 'manifest', href: '/site.webmanifest', color: '#fffff' },
+      { rel: 'manifest', href: '/site.webmanifest' },
       { rel: 'icon', href: '/favicon.ico' },
     ],
     scripts: [
@@ -60,24 +67,51 @@ export const Route = createRootRoute({
       },
     ],
   }),
-  errorComponent: DefaultCatchBoundary,
+
+  errorComponent: (props) => (
+    <RootDocument>
+      <DefaultCatchBoundary {...props} />
+    </RootDocument>
+  ),
+
   notFoundComponent: () => <NotFound />,
-  shellComponent: RootDocument,
+
+  component: RootComponent,
 })
 
-function RootDocument({ children }: { children: React.ReactNode }) {
-  const router= useLocation()
+function RootComponent() {
   return (
-    <html>
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  )
+}
+
+
+function RootDocument({ children }: { children: React.ReactNode }) {
+  const location = useLocation()
+  const isAuthPage = location.pathname.startsWith('/auth')
+
+  return (
+    <html lang="id">
       <head>
         <HeadContent />
       </head>
-      <body className='bg-background'>
-        {router.pathname.includes('/auth') ? null : <Header />}
+      <body className="bg-background">
+        {!isAuthPage && <Header />}
+
         {children}
-        <TanStackRouterDevtools position="bottom-right" />
+
+        {!isAuthPage && <Footer />}
+        {import.meta.env.DEV && (
+          <>
+            <TanStackRouterDevtools position="bottom-right" />
+            <ReactQueryDevtools buttonPosition="bottom-left" />
+          </>
+        )}
+        <Toaster />
+
         <Scripts />
-        <Footer />
       </body>
     </html>
   )
