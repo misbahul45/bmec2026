@@ -23,6 +23,7 @@ import { uploadToImageKit } from '~/lib/api/uploads/service'
 import CompetitionPriceCard from './CompetitionPriceCard'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { useNavigate } from '@tanstack/react-router'
 
 type Props = {
   type: CompetitionType
@@ -31,6 +32,8 @@ type Props = {
 const FormSiswa: React.FC<Props> = ({ type }) => {
   const fetchCompetition = useServerFn(getCompetition)
   const { teamId } = useParams({ strict: false })
+
+  const navigate=useNavigate()
 
   const [competition, setCompetition] =
     useState<CompetitionWithActiveBatch | null>(null)
@@ -43,7 +46,6 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
     mutationFn: async (data: CreateCompetitionRegistrationData) => {
       let imageUrl: string | null = null
 
-      // ⬅️ upload dipindah ke sini
       if (data.paymentProof) {
         imageUrl = await uploadToImageKit(data.paymentProof)
       }
@@ -61,6 +63,9 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
     },
     onSuccess: (res) => {
       toast.success(res.message)
+      navigate({
+        to:'/dashboard/team'
+      })
     },
   })
 

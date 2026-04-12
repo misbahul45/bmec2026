@@ -1,12 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { MemberRole } from '@prisma/client'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { z } from 'zod'
-
 import FormMember from '~/components/auth/FormMember'
-import { NotFound } from '~/components/NotFound'
 import { TeamNotFound } from '~/components/errors/TeamNotFound'
 import { Button } from '~/components/ui/button'
 import {
@@ -24,12 +22,24 @@ import {
 } from '~/components/ui/tabs'
 import { teamQueryOptions } from '~/lib/api/teams/team.query-options'
 import { mapCompetitionToEducation } from '~/lib/utils'
-
 import { CreateMemberData, createMembersSchema } from '~/schemas/team.member.schema'
 import { createTeamMember } from '~/server/team'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/auth/register/$teamId/')({
+  beforeLoad: async ({ context, location }) => {
+    if (!context.user) {
+      throw redirect({
+        to: "/auth/login",
+      })
+    }
+
+    if(context.user.redirect !== location.pathname){
+      throw redirect({
+        to:context.user.redirect
+      })
+    }
+  },
   component: RouteComponent,
   loader: async ({ params: { teamId }, context }) => {
     const data = await context.queryClient.ensureQueryData(
@@ -51,7 +61,6 @@ function RouteComponent() {
   const educationLevel: "SMA" | "MAHASISWA" =
     mapCompetitionToEducation(team.competitionType)
 
-
   const members: FormValues["members"] = [
     MemberRole.KETUA,
     MemberRole.ANGGOTA,
@@ -70,8 +79,8 @@ function RouteComponent() {
       members,
     },
   })
-  
-  const navigate = useNavigate()
+
+  const navigate=useNavigate()
 
   const mutation = useMutation({
     mutationFn: async (formData: CreateMemberData) => {
@@ -80,19 +89,17 @@ function RouteComponent() {
       })
     },
     onError: (error: any) => {
-      console.log(error)
       toast.error(error.message)
     },
     onSuccess: (res) => {
       toast.success(res.message)
-      navigate({
-        to: '/auth/register/$teamId/completed',
-        params: {
-          teamId
-        },
-      })
-
       form.reset()
+      navigate({
+        to:`/auth/register/$teamId/completed`,
+        params:{
+          teamId:teamId
+        }
+      })
     },
   })
 

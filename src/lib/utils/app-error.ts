@@ -1,18 +1,41 @@
 
 export class AppError extends Error {
-  statusCode: number
-  code?: string
-
   constructor(
     message: string,
-    statusCode = 500,
-    code?: string
+    public statusCode = 400,
+    public code = "APP_ERROR",
   ) {
     super(message)
+  }
 
-    this.statusCode = statusCode
-    this.code = code
+  static unauthorized(msg = "Unauthorized") {
+    return new AppError(msg, 401, "UNAUTHORIZED")
+  }
 
-    Error.captureStackTrace(this, this.constructor)
+  static forbidden(msg = "Forbidden") {
+    return new AppError(msg, 403, "FORBIDDEN")
+  }
+
+  static notFound(msg = "Not Found") {
+    return new AppError(msg, 404, "NOT_FOUND")
+  }
+}
+
+
+export class UnauthorizedError extends Error {
+  status = 401
+
+  constructor(message = "Unauthorized") {
+    super(message)
+    this.name = "UnauthorizedError"
+  }
+}
+
+export class ForbiddenError extends Error {
+  status = 403
+
+  constructor(message = "Forbidden") {
+    super(message)
+    this.name = "ForbiddenError"
   }
 }

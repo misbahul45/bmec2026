@@ -11,6 +11,9 @@ export const createCompetitionRegistrationSchema = z.object({
     .instanceof(File)
     .nullable()
     .optional(),
+  abstractFile: z
+    .instanceof(File)
+    .optional(),
 })
 
 export type CreateCompetitionRegistrationData = z.infer<typeof createCompetitionRegistrationSchema>

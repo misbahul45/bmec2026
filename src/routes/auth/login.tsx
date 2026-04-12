@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import FormSignin from '~/components/auth/FormSignin'
 
 export const Route = createFileRoute('/auth/login')({
@@ -12,7 +12,7 @@ function RouteComponent() {
         <FormSignin />
       </div>
 
-      <div className="lg:flex-1 bg-secondary/30 relative overflow-hidden flex items-center justify-center px-8 py-16 order-1 lg:order-2 min-h-50 lg:min-h-screen">
+      <div className="hidden lg:flex flex-1 bg-secondary/30 relative overflow-hidden  items-center justify-center px-8 py-16 order-1 lg:order-2 min-h-50 lg:min-h-screen">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-[60%_40%_55%_45%/55%_60%_40%_45%] bg-primary/40 blur-3xl animate-pulse" />
           <div className="absolute top-1/4 right-1/4 w-40 h-40 rounded-full bg-accent/30 blur-2xl" />

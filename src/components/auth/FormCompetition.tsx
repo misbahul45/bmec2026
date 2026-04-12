@@ -11,7 +11,7 @@ const FormCompetition: React.FC<Props> = ({ type }) => {
 
   return (
     <div>
-      {type === "LKTI" ? <FormMahasiswa /> : <FormSiswa type={type} />}
+      {type === "LKTI" ? <FormMahasiswa type="LKTI" /> : <FormSiswa type={type} />}
     </div>
   )
 }

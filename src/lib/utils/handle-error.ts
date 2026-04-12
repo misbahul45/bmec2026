@@ -1,33 +1,55 @@
-// lib/utils/handle-error.ts
 import { errorResponse } from "./api-response"
 import { AppError } from "./app-error"
-import { notFound } from "@tanstack/react-router"
+import { notFound, isNotFound, isRedirect } from "@tanstack/react-router"
 
-export function handleError(error: any) {
+type ErrorResult = {
+  body: unknown
+  status: number
+}
+
+export function handleError(error: unknown): ErrorResult {
   console.error("ERROR:", error)
 
-  // TanStack notFound passthrough
-  if (error?.status === 404 || error?.response?.status === 404) {
-    throw notFound()
+  if (isNotFound(error)) {
+    throw error
+  }
+
+  if (isRedirect(error)) {
+    throw error
   }
 
   if (error instanceof AppError) {
+    if (error.statusCode === 404) {
+      throw notFound()
+    }
+
     return {
+      status: error.statusCode,
       body: errorResponse(
         error.message,
         process.env.NODE_ENV === "development" ? error : undefined,
-        error.code
+        error.code,
       ),
-      status: error.statusCode,
+    }
+  }
+
+  if (error instanceof Error) {
+    return {
+      status: 500,
+      body: errorResponse(
+        error.message,
+        process.env.NODE_ENV === "development" ? error : undefined,
+        "INTERNAL_SERVER_ERROR",
+      ),
     }
   }
 
   return {
-    body: errorResponse(
-      error?.message ?? "Internal Server Error",
-      process.env.NODE_ENV === "development" ? error : undefined,
-      "INTERNAL_SERVER_ERROR"
-    ),
     status: 500,
+    body: errorResponse(
+      "Internal Server Error",
+      process.env.NODE_ENV === "development" ? error : undefined,
+      "INTERNAL_SERVER_ERROR",
+    ),
   }
 }

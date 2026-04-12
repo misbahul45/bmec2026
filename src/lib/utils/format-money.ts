@@ -8,3 +8,5 @@ export const formatMoney = (value: number | string) => {
     minimumFractionDigits: 0,
   }).format(amount)
 }
+
+

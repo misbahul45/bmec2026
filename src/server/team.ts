@@ -8,10 +8,9 @@ import { createMembersSchema, queryTeam } from "~/schemas/team.member.schema"
 import { Uuid } from "~/schemas/general.schema"
 import { SafeTeam, TeamsResponse } from "~/types/team.type"
 import { updateTeamSchema } from "~/schemas/team,schema"
-
+import { loginFn } from "./auth"
 
 const teamService = new TeamService()
-
 
 export const getTeams = createServerFn({ method: "GET" })
   .inputValidator(queryTeam)
@@ -36,6 +35,12 @@ export const createTeam = createServerFn({ method: "POST" })
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<SafeTeam>> => {
       const result = await teamService.create(data)
+      await loginFn({
+        data:{
+          email:data.email,
+          password:data.password
+        }
+      })
       return successResponse<SafeTeam>(result.data, result.message)
     })
   )

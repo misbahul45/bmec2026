@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import CompetitionService from "~/lib/api/competitions/competition.service";
 import { ApiSuccess, successResponse } from "~/lib/utils/api-response";
 import { withErrorHandling } from "~/lib/utils/server-wrapper";
-import { RegistrationCompetitionData, registrationCompetitionSchema } from "~/schemas/competition.schema";
+import { registrationCompetitionSchema } from "~/schemas/competition.schema";
 import { CompetitionTypeSchema } from "~/schemas/general.schema";
 import { CompetitionWithActiveBatch } from "~/types/competition.type";
 

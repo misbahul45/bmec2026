@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Upload, X } from "lucide-react"
+import { Upload, X, Eye } from "lucide-react"
 import { Button } from "./button"
 
 type Props = {
@@ -8,21 +8,39 @@ type Props = {
   disabled?: boolean
 }
 
-const UploadImage: React.FC<Props> = ({ value, onChange, disabled }) => {
+const UploadImage: React.FC<Props> = ({
+  value,
+  onChange,
+  disabled,
+}) => {
   const inputRef = React.useRef<HTMLInputElement>(null)
+
+  const [preview, setPreview] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    if (!value) {
+      setPreview(null)
+      return
+    }
+
+    const url = URL.createObjectURL(value)
+    setPreview(url)
+
+    return () => URL.revokeObjectURL(url)
+  }, [value])
 
   const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null
-    onChange?.(file)
+    onChange(file)
   }
 
   const removeFile = () => {
-    onChange?.(null)
+    onChange(null)
     if (inputRef.current) inputRef.current.value = ""
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-2">
       {!value && (
         <div
           onClick={() => inputRef.current?.click()}
@@ -31,38 +49,55 @@ const UploadImage: React.FC<Props> = ({ value, onChange, disabled }) => {
           <div className="rounded-full border p-3">
             <Upload className="size-6 text-muted-foreground" />
           </div>
-          <p className="text-sm font-medium">Upload bukti pembayaran</p>
+
+          <p className="text-sm font-medium">
+            Upload bukti pembayaran
+          </p>
+
           <p className="text-xs text-muted-foreground">
             PNG / JPG maksimal 5MB
           </p>
         </div>
       )}
 
-      {value && (
+      {value && preview && (
         <div className="flex items-center justify-between rounded-lg border p-3">
           <div className="flex items-center gap-3 overflow-hidden">
             <img
-              src={URL.createObjectURL(value)}
+              src={preview}
               className="size-14 rounded object-cover"
             />
+
             <div className="overflow-hidden">
               <p className="text-sm font-medium truncate">
                 {value.name}
               </p>
+
               <p className="text-xs text-muted-foreground">
                 {(value.size / 1024 / 1024).toFixed(2)} MB
               </p>
             </div>
           </div>
 
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={removeFile}
-          >
-            <X className="size-4" />
-          </Button>
+          <div className="flex gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => window.open(preview, "_blank")}
+            >
+              <Eye className="size-4" />
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={removeFile}
+            >
+              <X className="size-4" />
+            </Button>
+          </div>
         </div>
       )}
 

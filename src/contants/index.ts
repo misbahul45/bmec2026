@@ -77,3 +77,8 @@ export const ABOUT_IMAGES =  [
     className: "rounded-xl overflow-hidden bg-card border border-border shadow-sm"
   }
 ]
+
+export const allowedRegisterPaths = (id: string) => [
+  `/auth/register/${id}`,
+  `/auth/register/${id}/completed`,
+]

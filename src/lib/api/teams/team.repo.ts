@@ -17,6 +17,7 @@ export default class TeamRepo {
   findByEmail(email: string) {
     return prisma.team.findUnique({
       where: { email },
+    include: { members: true },
     })
   }
 

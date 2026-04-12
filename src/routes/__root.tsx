@@ -5,6 +5,7 @@ import {
   createRootRouteWithContext,
   useLocation,
   Outlet,
+  redirect,
 } from '@tanstack/react-router'
 import { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -17,13 +18,37 @@ import Header from '~/components/layout/Header'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/lib/utils/seo'
 import { Toaster } from "~/components/ui/sonner"
-
-
-
+import { fetchUser } from '~/server/auth'
+import { allowedRegisterPaths } from '~/contants'
+import { SessionData } from '~/lib/utils/session'
 
 export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient
+  queryClient: QueryClient,
+  user: SessionData | null
 }>()({
+  beforeLoad: async ({ location }) => {
+    const user = await fetchUser()
+    if (user) {
+      const allowedPaths = [
+        ...allowedRegisterPaths(user.userId!),
+        '/dashboard',
+      ]
+
+      const isAllowed = allowedPaths.some((path) =>
+        location.pathname.startsWith(path)
+      )
+
+      if (!isAllowed) {
+        throw redirect({
+          to: user.redirect,
+        })
+      }
+    }
+
+    return {
+      user
+    }
+  },
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
@@ -91,6 +116,7 @@ function RootComponent() {
 function RootDocument({ children }: { children: React.ReactNode }) {
   const location = useLocation()
   const isAuthPage = location.pathname.startsWith('/auth')
+
 
   return (
     <html lang="id">
