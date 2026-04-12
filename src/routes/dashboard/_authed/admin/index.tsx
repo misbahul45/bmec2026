@@ -5,5 +5,5 @@ export const Route = createFileRoute('/dashboard/_authed/admin/')({
 })
 
 function RouteComponent() {
-  return <div>Hello "/dashboard/admin/"!</div>
+  return <div className='h-screen px-4 pt-16'>Hello "/dashboard/admin/"!</div>
 }

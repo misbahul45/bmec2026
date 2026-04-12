@@ -123,6 +123,8 @@ model Batch {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([name, competitionId]) 
 }
 
 model Stage {

@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "postinstall": "prisma generate",
     "start": "node .output/server/index.mjs",
-    "prepare": "husky"
+    "prepare": "husky",
+    "reset": "pnpm prisma migrate reset && pnpm prisma db seed"
   },
   "dependencies": {
     "@auth/core": "^0.41.1",

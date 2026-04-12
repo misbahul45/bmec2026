@@ -34,6 +34,8 @@ export const Route = createRootRouteWithContext<{
         '/dashboard',
       ]
 
+      console.log(user.redirect)
+
       const isAllowed = allowedPaths.some((path) =>
         location.pathname.startsWith(path)
       )

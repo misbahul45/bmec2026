@@ -12,6 +12,7 @@ import gsap from "gsap"
 import { useMutation } from "@tanstack/react-query"
 import { loginFn } from "~/server/auth"
 import { toast } from "sonner"
+import { useRouteContext } from "@tanstack/react-router"
 
 type LoginForm = z.infer<typeof loginSchema>
 
@@ -21,7 +22,11 @@ const FormSignin = () => {
     defaultValues: { email: "", password: "" },
   })
 
+
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const { user } = useRouteContext({ from:'__root__' })
+
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -61,7 +66,7 @@ const FormSignin = () => {
       },
       onSuccess: (res) => { 
         navigate({
-          to:res.data.role==='ADMIN'?'/dashboard/admin':'/dashboard/team'
+          to:user?.redirect
         })
         toast.success(res.message)
       },
@@ -141,9 +146,9 @@ const FormSignin = () => {
         >
           {mutation.isPending?'signin to your account...':'Masuk'}
         </Button>
-        <p className="text-center text-[10px] opacity-60">
-          Belum daftar lomba?{" "}
-          <Link to="/auth/register" className="text-primary hover:underline">
+        <p className="text-center text-[10px]">
+          <span className="opacity-90">Belum daftar lomba?{" "}</span>
+          <Link to="/auth/register" className="text-primary font-semibold hover:underline">
             Ayo daftar
           </Link>
         </p>

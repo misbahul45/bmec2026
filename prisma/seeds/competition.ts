@@ -1,6 +1,6 @@
 import { prisma } from "~/lib/utils/prisma";
 
-async function main() {
+export async function seedCompetition() {
   const competitions = ["OLIMPIADE", "LKTI", "INFOGRAFIS"] as const;
 
   const baseStartDate = new Date();
@@ -14,38 +14,32 @@ async function main() {
       },
     });
 
-    const batches = Array.from({ length: 3 }).map((_, i) => {
+    for (let i = 0; i < 3; i++) {
       const startDate = new Date(baseStartDate);
       startDate.setDate(baseStartDate.getDate() + i * 10);
 
       const endDate = new Date(startDate);
       endDate.setDate(startDate.getDate() + 5);
 
-      return {
-        name: `Batch ${i + 1}`,
-        startDate,
-        endDate,
-        price: 100000 + i * 25000,
-        module_bacth: `module-${compName.toLowerCase()}-${i + 1}`,
-        competitionId: competition.id,
-      };
-    });
-
-    for (const batch of batches) {
-      await prisma.batch.create({
-        data: batch,
+      await prisma.batch.upsert({
+        where: {
+          name_competitionId: {
+            name: `Batch ${i + 1}`,
+            competitionId: competition.id,
+          },
+        },
+        update: {},
+        create: {
+          name: `Batch ${i + 1}`,
+          startDate,
+          endDate,
+          price: 100000 + i * 25000,
+          module_bacth: `module-${compName.toLowerCase()}-${i + 1}`,
+          competitionId: competition.id,
+        },
       });
     }
   }
 
-  console.log("Seed completed 🚀");
+  console.log("✅ Competition + Batch seeded");
 }
-
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
