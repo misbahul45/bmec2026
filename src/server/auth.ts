@@ -23,14 +23,14 @@ export const loginFn = createServerFn({ method: "POST" })
       ])
 
       if (!team && !admin) {
-        throw new AppError("User not found")
+        throw new AppError("Account not found")
       }
 
       const user = admin ?? team
       const role = admin ? "ADMIN" : "TEAM"
 
       if (!user) {
-        throw new AppError("User not found")
+        throw new AppError("Account not found")
       }
 
       const isValidPassword = await bcrypt.compare(
@@ -49,9 +49,6 @@ export const loginFn = createServerFn({ method: "POST" })
      if(role === 'TEAM'){
       registrationTeam = await competitionRepo.findRegistrationByTeamid(user.id);
      }
-
-      const redirect = role === 'ADMIN'?'/dashboad/admin'
-      : registrationTeam ? '/dashboard/team': team && team?.members?.length>0?`/auth/register/${user.id}/completed`:`/auth/register/${user.id}`
 
       await session.update({
         userId: user.id,

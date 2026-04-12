@@ -1,3 +1,4 @@
+import { AppError } from "./app-error"
 import { handleError } from "./handle-error"
 import { isNotFound, isRedirect } from "@tanstack/react-router"
 
@@ -16,12 +17,11 @@ export function withErrorHandling<TInput, TOutput>(
 
       const { body, status } = handleError(error)
 
-      throw new Response(JSON.stringify(body), {
+      throw new AppError(
+        (body as any).message,
         status,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+        (body as any).code
+      )
     }
   }
 }

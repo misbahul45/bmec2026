@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react"
 import { CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card"
 import { loginSchema } from "~/schemas/auth.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -6,7 +7,11 @@ import { z } from "zod"
 import { Field, FieldGroup, FieldError, FieldLabel } from "../ui/field"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
+import gsap from "gsap"
+import { useMutation } from "@tanstack/react-query"
+import { loginFn } from "~/server/auth"
+import { toast } from "sonner"
 
 type LoginForm = z.infer<typeof loginSchema>
 
@@ -16,28 +21,78 @@ const FormSignin = () => {
     defaultValues: { email: "", password: "" },
   })
 
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(".fade-up", {
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.out",
+        stagger: 0.1,
+      })
+
+      gsap.from(".input-anim", {
+        scale: 0.95,
+        opacity: 0,
+        duration: 0.6,
+        delay: 0.3,
+        ease: "power2.out",
+        stagger: 0.1,
+      })
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
+
+
+  const navigate=useNavigate()
+
+  const mutation = useMutation({
+      mutationFn: async (formData: LoginForm) => {
+        return await loginFn({
+          data: formData,
+        })
+      },
+      onError: (error: any) => {
+        console.log(error)
+        toast.error(error.message)
+      },
+      onSuccess: (res) => { 
+        navigate({
+          to:res.data.role==='ADMIN'?'/dashboard/admin':'/dashboard/team'
+        })
+        toast.success(res.message)
+      },
+    })
+
   const onSubmit = (data: LoginForm) => {
-    console.log(data)
+     mutation.mutate(data)
   }
 
   return (
-    <div className="w-full max-w-sm">
-      <CardHeader className="mb-4 px-0">
-        <CardTitle className="text-center font-bold">BMEC</CardTitle>
-        <CardDescription className="text-center text-xs">
+    <div ref={containerRef} className="w-full max-w-sm">
+      <CardHeader className="mb-6 px-0 fade-up">
+        <CardTitle className="text-center text-xl tracking-tight">
+          BMEC
+        </CardTitle>
+        <CardDescription className="text-center text-xs opacity-70">
           Silakan masuk ke akun Tim
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="px-0">
+      <CardContent className="px-0 fade-up">
         <form id="form-login" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
+          <FieldGroup className="gap-4">
             <Controller
               name="email"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Field data-invalid={fieldState.invalid} className="input-anim">
+                  <FieldLabel htmlFor="email" className="text-xs">
+                    Email
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="email"
@@ -45,7 +100,7 @@ const FormSignin = () => {
                     placeholder="bmec@email.com"
                     autoComplete="email"
                     aria-invalid={fieldState.invalid}
-                    className="rounded text-xs"
+                    className="rounded-md text-xs h-9 focus:ring-2 focus:ring-primary/40 transition-all"
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -56,8 +111,10 @@ const FormSignin = () => {
               name="password"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                <Field data-invalid={fieldState.invalid} className="input-anim">
+                  <FieldLabel htmlFor="password" className="text-xs">
+                    Password
+                  </FieldLabel>
                   <Input
                     {...field}
                     id="password"
@@ -65,7 +122,7 @@ const FormSignin = () => {
                     placeholder="********"
                     autoComplete="current-password"
                     aria-invalid={fieldState.invalid}
-                    className="rounded text-xs"
+                    className="rounded-md text-xs h-9 focus:ring-2 focus:ring-primary/40 transition-all"
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -75,13 +132,20 @@ const FormSignin = () => {
         </form>
       </CardContent>
 
-      <CardFooter className="px-0 flex-col gap-2">
-        <Button type="submit" className="rounded w-full" form="form-login">
-          Masuk
+      <CardFooter className="px-0 flex-col gap-3 mt-4 fade-up">
+        <Button
+          type="submit"
+          form="form-login"
+          disabled={mutation.isPending}
+          className="rounded-md w-full h-9 text-xs transition-all hover:scale-[1.02] active:scale-[0.98]"
+        >
+          {mutation.isPending?'signin to your account...':'Masuk'}
         </Button>
-        <p className="text-center text-[10px] opacity-65">
-          Belum daftar lomba?{' '}
-          <Link to="/auth/register" className="text-primary hover:underline">Ayo daftar</Link>
+        <p className="text-center text-[10px] opacity-60">
+          Belum daftar lomba?{" "}
+          <Link to="/auth/register" className="text-primary hover:underline">
+            Ayo daftar
+          </Link>
         </p>
       </CardFooter>
     </div>

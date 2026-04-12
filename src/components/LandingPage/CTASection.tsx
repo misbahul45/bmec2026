@@ -43,7 +43,7 @@ const CTASection = () => {
           {stats.map((s) => (
             <div
               key={s.label}
-              className="flex flex-col items-center bg-accent-foreground/10 border border-accent-foreground/20 rounded-2xl px-5 py-3 min-w-[90px]"
+              className="flex flex-col items-center bg-secondary/80 border border-accent-foreground/20 rounded-2xl px-5 py-3 min-w-22.5"
             >
               <span className="text-xl font-bold text-accent-foreground">{s.value}</span>
               <span className="text-[10px] text-accent-foreground/55 uppercase tracking-wide mt-0.5">{s.label}</span>
