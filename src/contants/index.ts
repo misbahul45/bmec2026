@@ -81,4 +81,5 @@ export const ABOUT_IMAGES =  [
 export const allowedRegisterPaths = (id: string) => [
   `/auth/register/${id}`,
   `/auth/register/${id}/completed`,
+  '/'
 ]

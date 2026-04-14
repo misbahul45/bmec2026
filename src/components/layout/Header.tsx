@@ -4,7 +4,7 @@ import { NAV_ITEMS } from '~/contants'
 import { Link, useLocation, useRouteContext, useRouter } from '@tanstack/react-router'
 import gsap from 'gsap'
 import { cn, toggleHome } from '~/lib/utils'
-import { Menu, X, LayoutDashboard, LogOut, ChevronDown, Loader2 } from 'lucide-react'
+import { Menu, X, LayoutDashboard, LogOut, ChevronDown, Loader2, Users, ClipboardList, Trophy } from 'lucide-react'
 import MobileMenu from './MobileMenu'
 import RibbonSVG from '../ui/RibbonSVG'
 import NavIndicator from './NavIndicator'
@@ -194,23 +194,82 @@ const UserDropdown = ({
         </div>
 
         <div className="p-1.5 flex flex-col gap-0.5">
-          <Link
-            to={user?.role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/team'}
-            onClick={closeDropdown}
-            data-menu-item
-            onMouseEnter={(e) => handleItemHover(e.currentTarget, true)}
-            onMouseLeave={(e) => handleItemHover(e.currentTarget, false)}
-            className={cn(
-              'flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs',
-              'text-foreground/70 hover:text-foreground',
-              'hover:bg-foreground/5 transition-colors duration-150',
-              'focus:outline-none focus-visible:ring-1 focus-visible:ring-primary/40',
-            )}
-            style={{ willChange: 'transform' }}
-          >
-            <LayoutDashboard size={14} strokeWidth={2} className="text-primary/70 shrink-0" />
-            <span className="font-medium">Dashboard</span>
-          </Link>
+          {user?.role === 'ADMIN' ? (
+            <>
+              <p className="px-3 pt-1 pb-0.5 text-[9px] font-semibold uppercase tracking-widest text-foreground/30">
+                Management
+              </p>
+              <Link
+                to="/dashboard/admin/teams"
+                onClick={closeDropdown}
+                data-menu-item
+                onMouseEnter={(e) => handleItemHover(e.currentTarget, true)}
+                onMouseLeave={(e) => handleItemHover(e.currentTarget, false)}
+                className={cn(
+                  'flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs',
+                  'text-foreground/70 hover:text-foreground',
+                  'hover:bg-foreground/5 transition-colors duration-150',
+                  'focus:outline-none focus-visible:ring-1 focus-visible:ring-primary/40',
+                )}
+                style={{ willChange: 'transform' }}
+              >
+                <Users size={14} strokeWidth={2} className="text-primary/70 shrink-0" />
+                <span className="font-medium">Teams</span>
+              </Link>
+              <Link
+                to="/dashboard/admin/tryouts"
+                onClick={closeDropdown}
+                data-menu-item
+                onMouseEnter={(e) => handleItemHover(e.currentTarget, true)}
+                onMouseLeave={(e) => handleItemHover(e.currentTarget, false)}
+                className={cn(
+                  'flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs',
+                  'text-foreground/70 hover:text-foreground',
+                  'hover:bg-foreground/5 transition-colors duration-150',
+                  'focus:outline-none focus-visible:ring-1 focus-visible:ring-primary/40',
+                )}
+                style={{ willChange: 'transform' }}
+              >
+                <ClipboardList size={14} strokeWidth={2} className="text-primary/70 shrink-0" />
+                <span className="font-medium">Tryouts</span>
+              </Link>
+              <Link
+                to="/dashboard/admin/olympiads"
+                onClick={closeDropdown}
+                data-menu-item
+                onMouseEnter={(e) => handleItemHover(e.currentTarget, true)}
+                onMouseLeave={(e) => handleItemHover(e.currentTarget, false)}
+                className={cn(
+                  'flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs',
+                  'text-foreground/70 hover:text-foreground',
+                  'hover:bg-foreground/5 transition-colors duration-150',
+                  'focus:outline-none focus-visible:ring-1 focus-visible:ring-primary/40',
+                )}
+                style={{ willChange: 'transform' }}
+              >
+                <Trophy size={14} strokeWidth={2} className="text-primary/70 shrink-0" />
+                <span className="font-medium">Olympiads</span>
+              </Link>
+            </>
+          ) : (
+            <Link
+              to="/dashboard/team"
+              onClick={closeDropdown}
+              data-menu-item
+              onMouseEnter={(e) => handleItemHover(e.currentTarget, true)}
+              onMouseLeave={(e) => handleItemHover(e.currentTarget, false)}
+              className={cn(
+                'flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs',
+                'text-foreground/70 hover:text-foreground',
+                'hover:bg-foreground/5 transition-colors duration-150',
+                'focus:outline-none focus-visible:ring-1 focus-visible:ring-primary/40',
+              )}
+              style={{ willChange: 'transform' }}
+            >
+              <LayoutDashboard size={14} strokeWidth={2} className="text-primary/70 shrink-0" />
+              <span className="font-medium">Dashboard</span>
+            </Link>
+          )}
 
           <div className="my-1 border-t border-foreground/6" />
 

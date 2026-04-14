@@ -17,6 +17,9 @@ import { Route as DashboardAuthedTeamIndexRouteImport } from './routes/dashboard
 import { Route as DashboardAuthedAdminIndexRouteImport } from './routes/dashboard/_authed/admin/index'
 import { Route as AuthRegisterTeamIdIndexRouteImport } from './routes/auth/register/$teamId/index'
 import { Route as AuthRegisterTeamIdCompletedRouteImport } from './routes/auth/register/$teamId/completed'
+import { Route as DashboardAuthedAdminTryoutsIndexRouteImport } from './routes/dashboard/_authed/admin/tryouts/index'
+import { Route as DashboardAuthedAdminTeamsIndexRouteImport } from './routes/dashboard/_authed/admin/teams/index'
+import { Route as DashboardAuthedAdminOlympiadsIndexRouteImport } from './routes/dashboard/_authed/admin/olympiads/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -61,6 +64,24 @@ const AuthRegisterTeamIdCompletedRoute =
     path: '/auth/register/$teamId/completed',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DashboardAuthedAdminTryoutsIndexRoute =
+  DashboardAuthedAdminTryoutsIndexRouteImport.update({
+    id: '/admin/tryouts/',
+    path: '/admin/tryouts/',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
+const DashboardAuthedAdminTeamsIndexRoute =
+  DashboardAuthedAdminTeamsIndexRouteImport.update({
+    id: '/admin/teams/',
+    path: '/admin/teams/',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
+const DashboardAuthedAdminOlympiadsIndexRoute =
+  DashboardAuthedAdminOlympiadsIndexRouteImport.update({
+    id: '/admin/olympiads/',
+    path: '/admin/olympiads/',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -71,6 +92,9 @@ export interface FileRoutesByFullPath {
   '/auth/register/$teamId/': typeof AuthRegisterTeamIdIndexRoute
   '/dashboard/admin/': typeof DashboardAuthedAdminIndexRoute
   '/dashboard/team/': typeof DashboardAuthedTeamIndexRoute
+  '/dashboard/admin/olympiads/': typeof DashboardAuthedAdminOlympiadsIndexRoute
+  '/dashboard/admin/teams/': typeof DashboardAuthedAdminTeamsIndexRoute
+  '/dashboard/admin/tryouts/': typeof DashboardAuthedAdminTryoutsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -81,6 +105,9 @@ export interface FileRoutesByTo {
   '/auth/register/$teamId': typeof AuthRegisterTeamIdIndexRoute
   '/dashboard/admin': typeof DashboardAuthedAdminIndexRoute
   '/dashboard/team': typeof DashboardAuthedTeamIndexRoute
+  '/dashboard/admin/olympiads': typeof DashboardAuthedAdminOlympiadsIndexRoute
+  '/dashboard/admin/teams': typeof DashboardAuthedAdminTeamsIndexRoute
+  '/dashboard/admin/tryouts': typeof DashboardAuthedAdminTryoutsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -92,6 +119,9 @@ export interface FileRoutesById {
   '/auth/register/$teamId/': typeof AuthRegisterTeamIdIndexRoute
   '/dashboard/_authed/admin/': typeof DashboardAuthedAdminIndexRoute
   '/dashboard/_authed/team/': typeof DashboardAuthedTeamIndexRoute
+  '/dashboard/_authed/admin/olympiads/': typeof DashboardAuthedAdminOlympiadsIndexRoute
+  '/dashboard/_authed/admin/teams/': typeof DashboardAuthedAdminTeamsIndexRoute
+  '/dashboard/_authed/admin/tryouts/': typeof DashboardAuthedAdminTryoutsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -104,6 +134,9 @@ export interface FileRouteTypes {
     | '/auth/register/$teamId/'
     | '/dashboard/admin/'
     | '/dashboard/team/'
+    | '/dashboard/admin/olympiads/'
+    | '/dashboard/admin/teams/'
+    | '/dashboard/admin/tryouts/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -114,6 +147,9 @@ export interface FileRouteTypes {
     | '/auth/register/$teamId'
     | '/dashboard/admin'
     | '/dashboard/team'
+    | '/dashboard/admin/olympiads'
+    | '/dashboard/admin/teams'
+    | '/dashboard/admin/tryouts'
   id:
     | '__root__'
     | '/'
@@ -124,6 +160,9 @@ export interface FileRouteTypes {
     | '/auth/register/$teamId/'
     | '/dashboard/_authed/admin/'
     | '/dashboard/_authed/team/'
+    | '/dashboard/_authed/admin/olympiads/'
+    | '/dashboard/_authed/admin/teams/'
+    | '/dashboard/_authed/admin/tryouts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -193,17 +232,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterTeamIdCompletedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/_authed/admin/tryouts/': {
+      id: '/dashboard/_authed/admin/tryouts/'
+      path: '/admin/tryouts'
+      fullPath: '/dashboard/admin/tryouts/'
+      preLoaderRoute: typeof DashboardAuthedAdminTryoutsIndexRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
+    '/dashboard/_authed/admin/teams/': {
+      id: '/dashboard/_authed/admin/teams/'
+      path: '/admin/teams'
+      fullPath: '/dashboard/admin/teams/'
+      preLoaderRoute: typeof DashboardAuthedAdminTeamsIndexRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
+    '/dashboard/_authed/admin/olympiads/': {
+      id: '/dashboard/_authed/admin/olympiads/'
+      path: '/admin/olympiads'
+      fullPath: '/dashboard/admin/olympiads/'
+      preLoaderRoute: typeof DashboardAuthedAdminOlympiadsIndexRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
   }
 }
 
 interface DashboardAuthedRouteChildren {
   DashboardAuthedAdminIndexRoute: typeof DashboardAuthedAdminIndexRoute
   DashboardAuthedTeamIndexRoute: typeof DashboardAuthedTeamIndexRoute
+  DashboardAuthedAdminOlympiadsIndexRoute: typeof DashboardAuthedAdminOlympiadsIndexRoute
+  DashboardAuthedAdminTeamsIndexRoute: typeof DashboardAuthedAdminTeamsIndexRoute
+  DashboardAuthedAdminTryoutsIndexRoute: typeof DashboardAuthedAdminTryoutsIndexRoute
 }
 
 const DashboardAuthedRouteChildren: DashboardAuthedRouteChildren = {
   DashboardAuthedAdminIndexRoute: DashboardAuthedAdminIndexRoute,
   DashboardAuthedTeamIndexRoute: DashboardAuthedTeamIndexRoute,
+  DashboardAuthedAdminOlympiadsIndexRoute:
+    DashboardAuthedAdminOlympiadsIndexRoute,
+  DashboardAuthedAdminTeamsIndexRoute: DashboardAuthedAdminTeamsIndexRoute,
+  DashboardAuthedAdminTryoutsIndexRoute: DashboardAuthedAdminTryoutsIndexRoute,
 }
 
 const DashboardAuthedRouteWithChildren = DashboardAuthedRoute._addFileChildren(

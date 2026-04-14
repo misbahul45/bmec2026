@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react"
 import { NAV_ITEMS } from "~/contants"
 import { cn } from "~/lib/utils"
 import gsap from "gsap"
-import { LayoutDashboard, LogOut, Loader2 } from "lucide-react"
+import { LayoutDashboard, LogOut, Loader2, Users, ClipboardList, Trophy } from "lucide-react"
 import { useMutation } from "@tanstack/react-query"
 import { logoutFn } from "~/server/auth"
 
@@ -26,6 +26,7 @@ const MobileUserSection = ({
 
   const email = user?.email ?? ''
   const initial = email.charAt(0).toUpperCase() || 'U'
+  const isAdmin = user?.role === 'ADMIN'
 
   return (
     <div className="flex flex-col gap-1">
@@ -39,14 +40,48 @@ const MobileUserSection = ({
         </div>
       </div>
 
-      <Link
-        to={user?.role === 'ADMIN' ? '/dashboard/admin' : '/dashboard/team'}
-        onClick={onClose}
-        className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors font-medium"
-      >
-        <LayoutDashboard size={15} strokeWidth={2} className="text-primary/70 shrink-0" />
-        <span>Dashboard</span>
-      </Link>
+      {isAdmin ? (
+        <>
+          <p className="px-3 pt-2 pb-0.5 text-[9px] font-semibold uppercase tracking-widest text-foreground/30">
+            Management
+          </p>
+          <Link
+            to="/dashboard/admin/teams"
+            onClick={onClose}
+            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors font-medium"
+          >
+            <Users size={15} strokeWidth={2} className="text-primary/70 shrink-0" />
+            <span>Teams</span>
+          </Link>
+          <Link
+            to="/dashboard/admin/tryouts"
+            onClick={onClose}
+            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors font-medium"
+          >
+            <ClipboardList size={15} strokeWidth={2} className="text-primary/70 shrink-0" />
+            <span>Tryouts</span>
+          </Link>
+          <Link
+            to="/dashboard/admin/olympiads"
+            onClick={onClose}
+            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors font-medium"
+          >
+            <Trophy size={15} strokeWidth={2} className="text-primary/70 shrink-0" />
+            <span>Olympiads</span>
+          </Link>
+        </>
+      ) : (
+        <Link
+          to="/dashboard/team"
+          onClick={onClose}
+          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors font-medium"
+        >
+          <LayoutDashboard size={15} strokeWidth={2} className="text-primary/70 shrink-0" />
+          <span>Dashboard</span>
+        </Link>
+      )}
+
+      <div className="my-1 border-t border-foreground/6" />
 
       <button
         onClick={() => logout()}
