@@ -17,9 +17,11 @@ import { Route as DashboardAuthedTeamIndexRouteImport } from './routes/dashboard
 import { Route as DashboardAuthedAdminIndexRouteImport } from './routes/dashboard/_authed/admin/index'
 import { Route as AuthRegisterTeamIdIndexRouteImport } from './routes/auth/register/$teamId/index'
 import { Route as AuthRegisterTeamIdCompletedRouteImport } from './routes/auth/register/$teamId/completed'
-import { Route as DashboardAuthedAdminTryoutsIndexRouteImport } from './routes/dashboard/_authed/admin/tryouts/index'
 import { Route as DashboardAuthedAdminTeamsIndexRouteImport } from './routes/dashboard/_authed/admin/teams/index'
-import { Route as DashboardAuthedAdminOlympiadsIndexRouteImport } from './routes/dashboard/_authed/admin/olympiads/index'
+import { Route as DashboardAuthedAdminSubmissionsIndexRouteImport } from './routes/dashboard/_authed/admin/submissions/index'
+import { Route as DashboardAuthedAdminScoreboardIndexRouteImport } from './routes/dashboard/_authed/admin/scoreboard/index'
+import { Route as DashboardAuthedAdminExamsIndexRouteImport } from './routes/dashboard/_authed/admin/exams/index'
+import { Route as DashboardAuthedAdminTeamsTeamIdRouteImport } from './routes/dashboard/_authed/admin/teams/$teamId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,22 +66,34 @@ const AuthRegisterTeamIdCompletedRoute =
     path: '/auth/register/$teamId/completed',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DashboardAuthedAdminTryoutsIndexRoute =
-  DashboardAuthedAdminTryoutsIndexRouteImport.update({
-    id: '/admin/tryouts/',
-    path: '/admin/tryouts/',
-    getParentRoute: () => DashboardAuthedRoute,
-  } as any)
 const DashboardAuthedAdminTeamsIndexRoute =
   DashboardAuthedAdminTeamsIndexRouteImport.update({
     id: '/admin/teams/',
     path: '/admin/teams/',
     getParentRoute: () => DashboardAuthedRoute,
   } as any)
-const DashboardAuthedAdminOlympiadsIndexRoute =
-  DashboardAuthedAdminOlympiadsIndexRouteImport.update({
-    id: '/admin/olympiads/',
-    path: '/admin/olympiads/',
+const DashboardAuthedAdminSubmissionsIndexRoute =
+  DashboardAuthedAdminSubmissionsIndexRouteImport.update({
+    id: '/admin/submissions/',
+    path: '/admin/submissions/',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
+const DashboardAuthedAdminScoreboardIndexRoute =
+  DashboardAuthedAdminScoreboardIndexRouteImport.update({
+    id: '/admin/scoreboard/',
+    path: '/admin/scoreboard/',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
+const DashboardAuthedAdminExamsIndexRoute =
+  DashboardAuthedAdminExamsIndexRouteImport.update({
+    id: '/admin/exams/',
+    path: '/admin/exams/',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
+const DashboardAuthedAdminTeamsTeamIdRoute =
+  DashboardAuthedAdminTeamsTeamIdRouteImport.update({
+    id: '/admin/teams/$teamId',
+    path: '/admin/teams/$teamId',
     getParentRoute: () => DashboardAuthedRoute,
   } as any)
 
@@ -92,9 +106,11 @@ export interface FileRoutesByFullPath {
   '/auth/register/$teamId/': typeof AuthRegisterTeamIdIndexRoute
   '/dashboard/admin/': typeof DashboardAuthedAdminIndexRoute
   '/dashboard/team/': typeof DashboardAuthedTeamIndexRoute
-  '/dashboard/admin/olympiads/': typeof DashboardAuthedAdminOlympiadsIndexRoute
+  '/dashboard/admin/teams/$teamId': typeof DashboardAuthedAdminTeamsTeamIdRoute
+  '/dashboard/admin/exams/': typeof DashboardAuthedAdminExamsIndexRoute
+  '/dashboard/admin/scoreboard/': typeof DashboardAuthedAdminScoreboardIndexRoute
+  '/dashboard/admin/submissions/': typeof DashboardAuthedAdminSubmissionsIndexRoute
   '/dashboard/admin/teams/': typeof DashboardAuthedAdminTeamsIndexRoute
-  '/dashboard/admin/tryouts/': typeof DashboardAuthedAdminTryoutsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -105,9 +121,11 @@ export interface FileRoutesByTo {
   '/auth/register/$teamId': typeof AuthRegisterTeamIdIndexRoute
   '/dashboard/admin': typeof DashboardAuthedAdminIndexRoute
   '/dashboard/team': typeof DashboardAuthedTeamIndexRoute
-  '/dashboard/admin/olympiads': typeof DashboardAuthedAdminOlympiadsIndexRoute
+  '/dashboard/admin/teams/$teamId': typeof DashboardAuthedAdminTeamsTeamIdRoute
+  '/dashboard/admin/exams': typeof DashboardAuthedAdminExamsIndexRoute
+  '/dashboard/admin/scoreboard': typeof DashboardAuthedAdminScoreboardIndexRoute
+  '/dashboard/admin/submissions': typeof DashboardAuthedAdminSubmissionsIndexRoute
   '/dashboard/admin/teams': typeof DashboardAuthedAdminTeamsIndexRoute
-  '/dashboard/admin/tryouts': typeof DashboardAuthedAdminTryoutsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -119,9 +137,11 @@ export interface FileRoutesById {
   '/auth/register/$teamId/': typeof AuthRegisterTeamIdIndexRoute
   '/dashboard/_authed/admin/': typeof DashboardAuthedAdminIndexRoute
   '/dashboard/_authed/team/': typeof DashboardAuthedTeamIndexRoute
-  '/dashboard/_authed/admin/olympiads/': typeof DashboardAuthedAdminOlympiadsIndexRoute
+  '/dashboard/_authed/admin/teams/$teamId': typeof DashboardAuthedAdminTeamsTeamIdRoute
+  '/dashboard/_authed/admin/exams/': typeof DashboardAuthedAdminExamsIndexRoute
+  '/dashboard/_authed/admin/scoreboard/': typeof DashboardAuthedAdminScoreboardIndexRoute
+  '/dashboard/_authed/admin/submissions/': typeof DashboardAuthedAdminSubmissionsIndexRoute
   '/dashboard/_authed/admin/teams/': typeof DashboardAuthedAdminTeamsIndexRoute
-  '/dashboard/_authed/admin/tryouts/': typeof DashboardAuthedAdminTryoutsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -134,9 +154,11 @@ export interface FileRouteTypes {
     | '/auth/register/$teamId/'
     | '/dashboard/admin/'
     | '/dashboard/team/'
-    | '/dashboard/admin/olympiads/'
+    | '/dashboard/admin/teams/$teamId'
+    | '/dashboard/admin/exams/'
+    | '/dashboard/admin/scoreboard/'
+    | '/dashboard/admin/submissions/'
     | '/dashboard/admin/teams/'
-    | '/dashboard/admin/tryouts/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -147,9 +169,11 @@ export interface FileRouteTypes {
     | '/auth/register/$teamId'
     | '/dashboard/admin'
     | '/dashboard/team'
-    | '/dashboard/admin/olympiads'
+    | '/dashboard/admin/teams/$teamId'
+    | '/dashboard/admin/exams'
+    | '/dashboard/admin/scoreboard'
+    | '/dashboard/admin/submissions'
     | '/dashboard/admin/teams'
-    | '/dashboard/admin/tryouts'
   id:
     | '__root__'
     | '/'
@@ -160,9 +184,11 @@ export interface FileRouteTypes {
     | '/auth/register/$teamId/'
     | '/dashboard/_authed/admin/'
     | '/dashboard/_authed/team/'
-    | '/dashboard/_authed/admin/olympiads/'
+    | '/dashboard/_authed/admin/teams/$teamId'
+    | '/dashboard/_authed/admin/exams/'
+    | '/dashboard/_authed/admin/scoreboard/'
+    | '/dashboard/_authed/admin/submissions/'
     | '/dashboard/_authed/admin/teams/'
-    | '/dashboard/_authed/admin/tryouts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -232,13 +258,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterTeamIdCompletedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/_authed/admin/tryouts/': {
-      id: '/dashboard/_authed/admin/tryouts/'
-      path: '/admin/tryouts'
-      fullPath: '/dashboard/admin/tryouts/'
-      preLoaderRoute: typeof DashboardAuthedAdminTryoutsIndexRouteImport
-      parentRoute: typeof DashboardAuthedRoute
-    }
     '/dashboard/_authed/admin/teams/': {
       id: '/dashboard/_authed/admin/teams/'
       path: '/admin/teams'
@@ -246,11 +265,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAuthedAdminTeamsIndexRouteImport
       parentRoute: typeof DashboardAuthedRoute
     }
-    '/dashboard/_authed/admin/olympiads/': {
-      id: '/dashboard/_authed/admin/olympiads/'
-      path: '/admin/olympiads'
-      fullPath: '/dashboard/admin/olympiads/'
-      preLoaderRoute: typeof DashboardAuthedAdminOlympiadsIndexRouteImport
+    '/dashboard/_authed/admin/submissions/': {
+      id: '/dashboard/_authed/admin/submissions/'
+      path: '/admin/submissions'
+      fullPath: '/dashboard/admin/submissions/'
+      preLoaderRoute: typeof DashboardAuthedAdminSubmissionsIndexRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
+    '/dashboard/_authed/admin/scoreboard/': {
+      id: '/dashboard/_authed/admin/scoreboard/'
+      path: '/admin/scoreboard'
+      fullPath: '/dashboard/admin/scoreboard/'
+      preLoaderRoute: typeof DashboardAuthedAdminScoreboardIndexRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
+    '/dashboard/_authed/admin/exams/': {
+      id: '/dashboard/_authed/admin/exams/'
+      path: '/admin/exams'
+      fullPath: '/dashboard/admin/exams/'
+      preLoaderRoute: typeof DashboardAuthedAdminExamsIndexRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
+    '/dashboard/_authed/admin/teams/$teamId': {
+      id: '/dashboard/_authed/admin/teams/$teamId'
+      path: '/admin/teams/$teamId'
+      fullPath: '/dashboard/admin/teams/$teamId'
+      preLoaderRoute: typeof DashboardAuthedAdminTeamsTeamIdRouteImport
       parentRoute: typeof DashboardAuthedRoute
     }
   }
@@ -259,18 +299,23 @@ declare module '@tanstack/react-router' {
 interface DashboardAuthedRouteChildren {
   DashboardAuthedAdminIndexRoute: typeof DashboardAuthedAdminIndexRoute
   DashboardAuthedTeamIndexRoute: typeof DashboardAuthedTeamIndexRoute
-  DashboardAuthedAdminOlympiadsIndexRoute: typeof DashboardAuthedAdminOlympiadsIndexRoute
+  DashboardAuthedAdminTeamsTeamIdRoute: typeof DashboardAuthedAdminTeamsTeamIdRoute
+  DashboardAuthedAdminExamsIndexRoute: typeof DashboardAuthedAdminExamsIndexRoute
+  DashboardAuthedAdminScoreboardIndexRoute: typeof DashboardAuthedAdminScoreboardIndexRoute
+  DashboardAuthedAdminSubmissionsIndexRoute: typeof DashboardAuthedAdminSubmissionsIndexRoute
   DashboardAuthedAdminTeamsIndexRoute: typeof DashboardAuthedAdminTeamsIndexRoute
-  DashboardAuthedAdminTryoutsIndexRoute: typeof DashboardAuthedAdminTryoutsIndexRoute
 }
 
 const DashboardAuthedRouteChildren: DashboardAuthedRouteChildren = {
   DashboardAuthedAdminIndexRoute: DashboardAuthedAdminIndexRoute,
   DashboardAuthedTeamIndexRoute: DashboardAuthedTeamIndexRoute,
-  DashboardAuthedAdminOlympiadsIndexRoute:
-    DashboardAuthedAdminOlympiadsIndexRoute,
+  DashboardAuthedAdminTeamsTeamIdRoute: DashboardAuthedAdminTeamsTeamIdRoute,
+  DashboardAuthedAdminExamsIndexRoute: DashboardAuthedAdminExamsIndexRoute,
+  DashboardAuthedAdminScoreboardIndexRoute:
+    DashboardAuthedAdminScoreboardIndexRoute,
+  DashboardAuthedAdminSubmissionsIndexRoute:
+    DashboardAuthedAdminSubmissionsIndexRoute,
   DashboardAuthedAdminTeamsIndexRoute: DashboardAuthedAdminTeamsIndexRoute,
-  DashboardAuthedAdminTryoutsIndexRoute: DashboardAuthedAdminTryoutsIndexRoute,
 }
 
 const DashboardAuthedRouteWithChildren = DashboardAuthedRoute._addFileChildren(

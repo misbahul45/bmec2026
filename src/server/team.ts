@@ -4,10 +4,10 @@ import { successResponse, ApiSuccess } from "~/lib/utils/api-response"
 import TeamService from "~/lib/api/teams/team.service"
 import { z } from "zod"
 import { registerSchema } from "~/schemas/auth.schema"
-import { createMembersSchema, queryTeam } from "~/schemas/team.member.schema"
+import { createMembersSchema, } from "~/schemas/team.member.schema"
 import { Uuid } from "~/schemas/general.schema"
 import { SafeTeam, TeamsResponse } from "~/types/team.type"
-import { updateTeamSchema } from "~/schemas/team,schema"
+import { queryTeam, updateTeamSchema } from "~/schemas/team,schema"
 import { loginFn } from "./auth"
 
 const teamService = new TeamService()
@@ -75,3 +75,4 @@ export const deleteTeam = createServerFn({ method: "POST" })
       return successResponse<any>(result.data, result.message)
     })
   )
+

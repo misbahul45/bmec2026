@@ -27,7 +27,7 @@ export default class TeamRepo {
       skip,
       take,
       orderBy: { createdAt: "desc" },
-      include: { members: true },
+      include: { members: true, abstract:true, registration:true },
     })
   }
 

@@ -111,14 +111,6 @@ function RouteComponent() {
 
     return () => ctx.revert()
   }, [])
-
-  useEffect(() => {
-    const hasError = Object.keys(errors).length > 0
-    if (hasError) {
-      toast.error('Lengkapi seluruh data anggota terlebih dahulu')
-    }
-  }, [errors])
-
   const mutation = useMutation({
     mutationFn: async (formData: CreateMemberData) => {
       return await createTeamMember({
@@ -216,5 +208,3 @@ function RouteComponent() {
     </div>
   )
 }
-
-export default RouteComponent

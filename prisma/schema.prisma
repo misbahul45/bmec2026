@@ -37,6 +37,7 @@ model Team {
   submissions Submission[]
   competitionType CompetitionType
   abstract AbstractSubmission?
+  attempts ExamAttempt[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -85,6 +86,7 @@ model Admin {
   registrations Registration[]
   submissions Submission[]
   abstracts AbstractSubmission[]
+  attempts ExamAttempt[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -139,6 +141,8 @@ model Stage {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  exams Exam[]
+  @@unique([name, competitionId])
 }
 
 model Registration {
@@ -172,6 +176,9 @@ model Submission {
   title String?
   fileUrl String?
 
+  score Int?
+  feedback String?
+
   status SubmissionStatus @default(PENDING)
 
   team Team @relation(fields: [teamId], references: [id])
@@ -182,8 +189,9 @@ model Submission {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
 
+  @@unique([teamId, stageId])
+}
 
 model File {
   url     String
@@ -192,6 +200,90 @@ model File {
   @@index([url])
 }
 
+
+model Exam {
+  id String @id @default(uuid())
+
+  title String
+  type ExamType
+
+  startDate DateTime
+  endDate DateTime
+
+  stageId String
+  stage Stage @relation(fields: [stageId], references: [id])
+
+  questions ExamQuestion[]
+  attempts ExamAttempt[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExamQuestion {
+  id String @id @default(uuid())
+
+  question String
+
+  optionA String
+  optionB String
+  optionC String
+  optionD String
+  optionE String
+
+  correctAnswer String
+  score Int @default(5)
+
+  examId String
+  exam Exam @relation(fields: [examId], references: [id])
+
+  answers ExamAnswer[]
+
+  createdAt DateTime @default(now())
+}
+
+model ExamAttempt {
+  id String @id @default(uuid())
+
+  teamId String
+  examId String
+
+  totalScore Int @default(0)
+
+  startTime DateTime @default(now())
+  endTime DateTime?
+
+  finished Boolean @default(false)
+
+  team Team @relation(fields: [teamId], references: [id])
+  exam Exam @relation(fields: [examId], references: [id])
+
+  answers ExamAnswer[]
+
+  reviewedBy String?
+  admin Admin? @relation(fields: [reviewedBy], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([teamId, examId])
+}
+
+model ExamAnswer {
+  id String @id @default(uuid())
+
+  attemptId String
+  questionId String
+
+  answer String
+  isCorrect Boolean
+
+  attempt ExamAttempt @relation(fields: [attemptId], references: [id])
+  question ExamQuestion @relation(fields: [questionId], references: [id])
+
+  answeredAt DateTime @default(now())
+
+  @@unique([attemptId, questionId])
+}
 enum PaymentStatus {
   PENDING
   APPROVED
@@ -208,4 +300,9 @@ enum StageType {
   PENYISIHAN
   SEMIFINAL
   FINAL
+}
+
+enum ExamType {
+  TRYOUT
+  OLYMPIAD
 }

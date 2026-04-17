@@ -29,3 +29,13 @@ export const registrationCompetitionSchema = z.object({
 export type RegistrationCompetitionData = z.infer<
   typeof registrationCompetitionSchema
 >
+
+
+export const registrationActionSchema = z.object({
+  teamId: z.string().uuid(),
+  action: z.enum(["APPROVED", "REJECTED"]),
+  adminId: z.string().uuid(),
+})
+
+export type RegistrationAction =
+  z.infer<typeof registrationActionSchema>

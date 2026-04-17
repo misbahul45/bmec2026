@@ -1,9 +1,8 @@
-import { CompetitionType } from "@prisma/client";
+import { CompetitionType, PaymentStatus } from "@prisma/client";
 import { prisma } from "~/lib/utils/prisma";
-import { CreateCompetitionRegistrationData, RegistrationCompetitionData } from "~/schemas/competition.schema";
+import { RegistrationCompetitionData } from "~/schemas/competition.schema";
 
 export default class CompetitionRepo{
-
     findByName(name: CompetitionType) {
         const now = new Date()
 
@@ -42,6 +41,30 @@ export default class CompetitionRepo{
         return prisma.registration.findUnique({
             where:{
                 teamId
+            }
+        })
+    }
+
+    approveRegistration(teamId:string, adminId:string){
+        return prisma.registration.update({
+            where:{
+                teamId
+            },
+            data:{
+                status:PaymentStatus.APPROVED,
+                approvedBy:adminId
+            }
+        })
+    }
+
+    rejectRegistration(teamId:string, adminId:string){
+        return prisma.registration.update({
+            where:{
+                teamId
+            },
+            data:{
+                status:PaymentStatus.REJECTED,
+                approvedBy:adminId
             }
         })
     }

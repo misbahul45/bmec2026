@@ -53,14 +53,6 @@ export const updateMembersSchema = z.object({
   members: z.array(memberSchema).length(3),
 })
 
-export const queryTeam = createPaginationQuerySchema(
-  z.object({
-    competitionType: z.enum(["OLIMPIADE", "LKTI", "INFOGRAFIS"]).optional(),
-  })
-)
-
-
-export type QueryTeam = z.infer<typeof queryTeam>
 export type MemberData = z.infer<typeof memberSchema>
 export type CreateMemberData = z.infer<typeof createMembersSchema>
 export type  UpdateMemberDara = z.infer<typeof updateMembersSchema>

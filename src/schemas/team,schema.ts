@@ -1,5 +1,11 @@
 import { z } from "zod"
 import { CompetitionType } from "@prisma/client"
+import {
+  parseAsInteger,
+  parseAsString,
+  createLoader,
+} from "nuqs/server"
+import { createPaginationQuerySchema } from "./pagination.schema"
 
 export const updateTeamSchema = z.object({
   name: z
@@ -19,7 +25,7 @@ export const updateTeamSchema = z.object({
 
   password: z
     .string()
-    .min(6, "Password minimal 6 karakter")
+    .min(8, "Password minimal 8 karakter")
     .optional(),
 
   phone: z
@@ -47,3 +53,50 @@ export const updateTeamSchema = z.object({
     .nativeEnum(CompetitionType)
     .optional(),
 })
+
+
+export const teamsSearchParams = {
+  page: parseAsInteger.withDefault(1),
+  limit: parseAsInteger.withDefault(10),
+  search: parseAsString.withDefault(""),
+  competitionType: parseAsString.withDefault("ALL"),
+}
+export const loadTeamsSearchParams =
+  createLoader(teamsSearchParams)
+
+export function normalizeTeamQuery(
+  q: {
+    page: number
+    limit: number
+    search: string
+    competitionType: string | null
+  }
+): QueryTeam {
+  return {
+    page: q.page,
+    limit: q.limit,
+    search: q.search,
+    competitionType:
+      q.competitionType === null
+        ? undefined
+        : (q.competitionType as QueryTeam["competitionType"]),
+  }
+}
+
+export const queryTeam = createPaginationQuerySchema(
+  z.object({
+    competitionType: z.preprocess(
+      (val) => {
+        if (val === "ALL" || val === "" || val == null) {
+          return undefined
+        }
+        return val
+      },
+      z.enum(["OLIMPIADE", "LKTI", "INFOGRAFIS"]).optional()
+    ),
+  })
+)
+
+
+export type QueryTeamInput = z.input<typeof queryTeam>
+export type QueryTeam = z.output<typeof queryTeam>

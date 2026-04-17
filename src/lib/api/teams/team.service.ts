@@ -2,11 +2,12 @@ import { RegisterFormData } from "~/schemas/auth.schema"
 import { AppError } from "../../utils/app-error"
 import { PaginationMeta } from "../../types/pagination"
 import { ServiceResponse } from "../../types/service-response"
-import { CreateMemberData, QueryTeam } from "~/schemas/team.member.schema"
+import { CreateMemberData } from "~/schemas/team.member.schema"
 import { CompetitionType, Prisma } from "@prisma/client"
 import * as bcrypt from "bcrypt"
 import TeamRepo from "./team.repo"
 import MemberRepo from "../members/member.repo"
+import { QueryTeam } from "~/schemas/team,schema"
 
 export default class TeamService {
   private repo = new TeamRepo()
@@ -83,9 +84,6 @@ export default class TeamService {
           message: "Team created successfully",
         }
       } catch (error: any) {
-        /**
-         * Prisma Unique Constraint Error
-         */
         if (
           error.code === "P2002" &&
           error.meta?.target?.includes("code")

@@ -35,8 +35,6 @@ export const Route = createRootRouteWithContext<{
         '/dashboard',
       ]
 
-      console.log(user.redirect)
-
       const isAllowed = allowedPaths.some((path) =>
         location.pathname.startsWith(path)
       )
@@ -109,11 +107,11 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
   return (
-    <RootDocument>
-      <NuqsAdapter>
-        <Outlet />
-      </NuqsAdapter>
-    </RootDocument>
+    <NuqsAdapter>
+      <RootDocument>
+          <Outlet />
+      </RootDocument>
+    </NuqsAdapter>
   )
 }
 
@@ -121,7 +119,6 @@ function RootComponent() {
 function RootDocument({ children }: { children: React.ReactNode }) {
   const location = useLocation()
   const isAuthPage = location.pathname.startsWith('/auth')
-
 
   return (
     <html lang="id">

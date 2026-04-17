@@ -100,6 +100,34 @@
   .using-mouse * {
     outline: none !important;
   }
+
+    * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklch, var(--primary) 50%, transparent) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: color-mix(
+      in oklch,
+      var(--primary) 60%,
+      transparent
+    );
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+  }
 }
 
 @theme inline {
