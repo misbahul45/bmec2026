@@ -3,16 +3,20 @@ import { seedCompetition } from "./seeds/competition";
 import { seedAdmin } from "./seeds/admin";
 import { seedTeams } from "./seeds/team";
 import { seedStage } from "./seeds/stage";
-import { seedExam } from "./seeds/exxam";
+import { seedExam } from "./seeds/exam";
+
+const seeds = [
+  seedCompetition,
+  seedStage,
+  seedAdmin,
+  seedTeams,
+  seedExam,
+]
 
 async function main() {
-    await Promise.all([
-        seedAdmin(),
-        seedCompetition(),
-        seedTeams(),
-        seedStage(),
-        seedExam()
-    ])
+  for (const seed of seeds) {
+    await seed()
+  }
 }
 
 main()
