@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from "react"
-import { TeamWithMembers } from "~/types/team.type"
 import TeamTree from "./TeamTree"
 import { School, Mail, Phone, Hash, Users } from "lucide-react"
 import gsap from "gsap"
 import { Badge } from "./badge"
+import { TeamWithRelations } from "~/types/team.type"
 
 type Props = {
-  data: TeamWithMembers
+  data: TeamWithRelations
 }
 
 const ProfileTeam: React.FC<Props> = ({ data }) => {
