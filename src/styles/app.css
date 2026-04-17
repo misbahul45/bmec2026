@@ -128,6 +128,29 @@
   *::-webkit-scrollbar-thumb:hover {
     background: var(--primary);
   }
+
+  .ql-editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  .image-loading {
+    opacity: 0.6;
+    filter: blur(2px);
+    position: relative;
+  }
+  .image-loading::after {
+    content: "Uploading...";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: black;
+    color: white;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
 }
 
 @theme inline {

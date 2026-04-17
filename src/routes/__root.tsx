@@ -22,6 +22,7 @@ import { fetchUser } from '~/server/auth'
 import { allowedRegisterPaths } from '~/contants'
 import { SessionData } from '~/lib/utils/session'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
+import "quill/dist/quill.core.css";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient,

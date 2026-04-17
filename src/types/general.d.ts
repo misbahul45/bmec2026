@@ -4,3 +4,5 @@ interface MetaData {
     total: number
     totalPages: number
   }
+
+declare module "quill-image-resize-module";
