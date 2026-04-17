@@ -1,5 +1,6 @@
 import { prisma } from "~/lib/utils/prisma";
 import { ExamType } from "@prisma/client";
+import { ExamQuestionData } from "~/schemas/exam";
 
 export default class ExamRepo {
   getExams() {
@@ -50,6 +51,26 @@ export default class ExamRepo {
       where:{
         examId
       }
+    })
+  }
+
+  createExamQuestion(data:ExamQuestionData){
+    return prisma.examQuestion.create({
+      data:{
+        ...data
+      }
+    })
+  }
+  updateExamQuestion(id: string, data: ExamQuestionData) {
+    return prisma.examQuestion.update({
+      where: { id },
+      data,
+    })
+  }
+
+  deleteExamQuestion(id: string) {
+    return prisma.examQuestion.delete({
+      where: { id },
     })
   }
 }

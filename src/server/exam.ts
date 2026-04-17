@@ -5,6 +5,7 @@ import { ApiSuccess, successResponse } from "~/lib/utils/api-response";
 import { withErrorHandling } from "~/lib/utils/server-wrapper";
 import { z } from "zod";
 import { Uuid } from "~/schemas/general.schema";
+import { examQuestionSchema } from "~/schemas/exam";
 
 const examService = new ExamService();
 
@@ -30,7 +31,34 @@ export const getExamQuestion = createServerFn({ method: "GET" })
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<ExamQuestion[]>> => {
       const result = await examService.getExamQuestionByExamId(data)
-
       return successResponse<ExamQuestion[]>(result.data!, result.message)
+    })
+  )
+
+
+export const createExamQuestion = createServerFn({ method:'POST' })
+.inputValidator(examQuestionSchema)
+.handler(
+  withErrorHandling(async ({ data }): Promise<ApiSuccess<ExamQuestion>> => {
+    const result = await examService.createExamQuestion(data)
+    return successResponse<ExamQuestion>(result.data!, result.message)
+  })
+)
+
+export const updateExamQuestion = createServerFn({ method: 'POST' })
+  .inputValidator(examQuestionSchema)
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<ExamQuestion>> => {
+      const result = await examService.updateExamQuestion(data)
+      return successResponse<ExamQuestion>(result.data!, result.message)
+    })
+  )
+
+export const deleteExamQuestion = createServerFn({ method: 'POST' })
+  .inputValidator(Uuid)
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<null>> => {
+      const result = await examService.deleteExamQuestion(data)
+      return successResponse<null>(result.data, result.message)
     })
   )
