@@ -46,12 +46,10 @@ export const uploadPdfToImageKit = async (file: File) => {
   const auth = await imagekitAuth()
 
   const formData = new FormData()
-
   formData.append("file", file)
   formData.append("fileName", file.name)
-  formData.append("folder", "/pdf") 
+  formData.append("folder", "/pdf")
   formData.append("useUniqueFileName", "true")
-
   formData.append("token", auth.token)
   formData.append("expire", auth.expire.toString())
   formData.append("signature", auth.signature)

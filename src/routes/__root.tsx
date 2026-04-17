@@ -149,8 +149,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               success: "bg-green-500 text-white border-green-600",
               error: "bg-red-500 text-white border-red-600",
               warning: "bg-yellow-400 text-black border-yellow-500",
-              info: "bg-blue-500 text-white border-blue-600",
-            },
+              loading:'bg-yellow-400 text-black border-yellow-500',
+            }
           }}
         />
 

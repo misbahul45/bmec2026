@@ -13,6 +13,7 @@ import { useMutation } from "@tanstack/react-query"
 import { loginFn } from "~/server/auth"
 import { toast } from "sonner"
 import { useRouteContext } from "@tanstack/react-router"
+import { useRouter } from "@tanstack/react-router"
 
 type LoginForm = z.infer<typeof loginSchema>
 
@@ -21,6 +22,9 @@ const FormSignin = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   })
+
+  const navigate=useNavigate()
+  const router = useRouter()
 
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -52,8 +56,6 @@ const FormSignin = () => {
   }, [])
 
 
-  const navigate=useNavigate()
-
   const mutation = useMutation({
       mutationFn: async (formData: LoginForm) => {
         return await loginFn({
@@ -64,12 +66,21 @@ const FormSignin = () => {
         console.log(error)
         toast.error(error.message)
       },
-      onSuccess: (res) => { 
+      onSuccess: async (res) => {
+        await router.invalidate()
+
+        const rootMatch = router.state.matches.find(
+          (m) => m.routeId === "__root__"
+        )
+
+        const newUser = rootMatch?.context?.user
+
         navigate({
-          to:user?.redirect
+          to: newUser?.redirect ?? "/dashboard",
         })
+
         toast.success(res.message)
-      },
+      }
     })
 
   const onSubmit = (data: LoginForm) => {

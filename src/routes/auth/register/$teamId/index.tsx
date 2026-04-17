@@ -4,6 +4,8 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
 import FormMember from '~/components/auth/FormMember'
 import { TeamNotFound } from '~/components/errors/TeamNotFound'
 import { Button } from '~/components/ui/button'
@@ -34,9 +36,9 @@ export const Route = createFileRoute('/auth/register/$teamId/')({
       })
     }
 
-    if(context.user.redirect !== location.pathname){
+    if (context.user.redirect !== location.pathname) {
       throw redirect({
-        to:context.user.redirect
+        to: context.user.redirect
       })
     }
   },
@@ -45,9 +47,9 @@ export const Route = createFileRoute('/auth/register/$teamId/')({
     const data = await context.queryClient.ensureQueryData(
       teamQueryOptions(teamId),
     )
-    return data;
+    return data
   },
-  errorComponent:TeamNotFound
+  errorComponent: TeamNotFound
 })
 
 type FormValues = z.infer<typeof createMembersSchema>
@@ -55,6 +57,8 @@ type FormValues = z.infer<typeof createMembersSchema>
 function RouteComponent() {
   const { teamId } = Route.useParams()
   const { data: res } = useSuspenseQuery(teamQueryOptions(teamId))
+  const navigate = useNavigate()
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const team = res.data!
 
@@ -78,9 +82,42 @@ function RouteComponent() {
     defaultValues: {
       members,
     },
+    mode: 'onChange'
   })
 
-  const navigate=useNavigate()
+  const {
+    formState: { errors },
+  } = form
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from('.fade-up', {
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        stagger: 0.1,
+      })
+
+      gsap.from('.tab-anim', {
+        scale: 0.96,
+        opacity: 0,
+        duration: 0.6,
+        delay: 0.2,
+        ease: 'power2.out',
+        stagger: 0.08,
+      })
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  useEffect(() => {
+    const hasError = Object.keys(errors).length > 0
+    if (hasError) {
+      toast.error('Lengkapi seluruh data anggota terlebih dahulu')
+    }
+  }, [errors])
 
   const mutation = useMutation({
     mutationFn: async (formData: CreateMemberData) => {
@@ -95,37 +132,38 @@ function RouteComponent() {
       toast.success(res.message)
       form.reset()
       navigate({
-        to:`/auth/register/$teamId/completed`,
-        params:{
-          teamId:teamId
+        to: `/auth/register/$teamId/completed`,
+        params: {
+          teamId
         }
       })
     },
   })
 
-
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     mutation.mutate(data)
   }
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div
+      ref={containerRef}
+      className="min-h-screen flex items-center justify-center p-6"
+    >
+      <Card className="w-full max-w-4xl shadow-3xl shadow-primary/20 rounded-2xl fade-up">
 
-      <Card className="w-full max-w-4xl shadow-3xl shadow-primray/80 rounded-2xl s">
-
-        <CardHeader className="space-y-2">
+        <CardHeader className="space-y-2 fade-up">
           <CardTitle className="text-base sm:text-lg md:text-2xl lg:text-4xl font-semibold text-center">
-            Lengkapi Data Anggota Tim <span className='text-primary'>{team.name}</span>
+            Lengkapi Data Anggota Tim <span className="text-primary">{team.name}</span>
           </CardTitle>
 
-          <CardDescription className='text-sm md:text-base'>
+          <CardDescription className="text-sm md:text-base text-center">
             Lengkapi seluruh data tim dengan benar.
             Pastikan setiap anggota mengisi informasi yang valid sebelum
             melanjutkan ke tahap berikutnya.
           </CardDescription>
         </CardHeader>
 
-
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 fade-up">
 
           <Tabs defaultValue="member-0">
 
@@ -140,17 +178,15 @@ function RouteComponent() {
               ))}
             </TabsList>
 
-
             <form
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-6"
             >
-
               {[0, 1, 2].map((index) => (
                 <TabsContent
                   key={index}
                   value={`member-${index}`}
-                  className="mt-6"
+                  className="mt-6 tab-anim"
                 >
                   <FormMember
                     form={form}
@@ -160,14 +196,13 @@ function RouteComponent() {
                 </TabsContent>
               ))}
 
-
               <div className="flex justify-end">
                 <Button
                   type="submit"
                   className="active:scale-95 rounded-md hover:opacity-95"
                   disabled={mutation.isPending}
                 >
-                  {mutation.isPending ? 'Menyimpan...':'Simpan & Lanjutkan'}
+                  {mutation.isPending ? 'Menyimpan...' : 'Simpan & Lanjutkan'}
                 </Button>
               </div>
 
@@ -178,7 +213,8 @@ function RouteComponent() {
         </CardContent>
 
       </Card>
-
     </div>
   )
 }
+
+export default RouteComponent

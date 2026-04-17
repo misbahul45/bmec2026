@@ -19,7 +19,21 @@ export default class TeamService {
       ? "ifs"
       : "lk"
   }
+  private async generateNextCode(type: CompetitionType) {
+    const prefix = this.generateCodeTeam(type)
 
+    const latest = await this.repo.findLatestCodeByType(prefix)
+
+    if (!latest) {
+      return `${prefix}-001`
+    }
+
+    const lastNumber = parseInt(latest.code.split("-")[1])
+
+    const nextNumber = lastNumber + 1
+
+    return `${prefix}-${String(nextNumber).padStart(3, "0")}`
+  }
   private sanitizeTeam(team: any) {
     const { password, ...rest } = team
     return rest
@@ -42,32 +56,53 @@ export default class TeamService {
       throw new AppError("Nama team sudah digunakan", 400)
     }
 
-    const count = await this.repo.countApprovedTeams()
-
-    const code =
-      this.generateCodeTeam(payload.competitionType) +
-      "-" +
-      String(count + 1).padStart(3, "0")
-
     const hashedPassword = await bcrypt.hash(payload.password, 10)
 
-    const team = await this.repo.create({
-      schoolAddress: payload.address,
-      schoolName: payload.institution,
-      password: hashedPassword,
-      email: payload.email,
-      competitionType: payload.competitionType,
-      name: payload.teamName,
-      phone: payload.phone,
-      code,
-    })
+    let attempt = 0
+    const MAX_RETRY = 3
 
-    return {
-      data: this.sanitizeTeam(team),
-      message: "Team created successfully",
+    while (attempt < MAX_RETRY) {
+      try {
+        const code = await this.generateNextCode(
+          payload.competitionType
+        )
+
+        const team = await this.repo.create({
+          schoolAddress: payload.address,
+          schoolName: payload.institution,
+          password: hashedPassword,
+          email: payload.email,
+          competitionType: payload.competitionType,
+          name: payload.teamName,
+          phone: payload.phone,
+          code,
+        })
+
+        return {
+          data: this.sanitizeTeam(team),
+          message: "Team created successfully",
+        }
+      } catch (error: any) {
+        /**
+         * Prisma Unique Constraint Error
+         */
+        if (
+          error.code === "P2002" &&
+          error.meta?.target?.includes("code")
+        ) {
+          attempt++
+          continue
+        }
+
+        throw error
+      }
     }
-  }
 
+    throw new AppError(
+      "Gagal membuat kode tim. Silakan coba lagi.",
+      500
+    )
+  }
   async findAll(
     query: QueryTeam
   ): Promise<ServiceResponse<{ teams: any[]; meta: PaginationMeta }>> {

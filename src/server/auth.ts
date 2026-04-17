@@ -8,10 +8,12 @@ import AdminRepo from "~/lib/api/admins/admin.repo"
 import * as bcrypt from "bcrypt"
 import { useAppSession } from "~/lib/utils/session"
 import CompetitionRepo from "~/lib/api/competitions/competition.repo"
+import AbstractRepo from "~/lib/api/abstracts/abstract.repo"
 
 const teamRepo = new TeamRepo()
 const adminRepo = new AdminRepo()
 const competitionRepo = new CompetitionRepo()
+const abstractRepo = new AbstractRepo()
 
 export const loginFn = createServerFn({ method: "POST" })
   .inputValidator(loginSchema)
@@ -99,16 +101,22 @@ export const fetchUser = createServerFn({ method: "GET" })
     const registration =
       await competitionRepo.findRegistrationByTeamid(team.id)
 
+    const abstractTeam = await abstractRepo.findByTeamId(team.id)
+
     let redirect: string
 
     if (!team.members || team.members.length === 0) {
       redirect = `/auth/register/${team.id}`
+
+    } else if (abstractTeam) {
+      redirect = "/dashboard/team"
+
     } else if (!registration) {
       redirect = `/auth/register/${team.id}/completed`
+
     } else {
       redirect = "/dashboard/team"
     }
-
     return {
       ...session.data,
       redirect,

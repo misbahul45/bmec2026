@@ -4,20 +4,10 @@ import { Prisma } from "@prisma/client"
 
 export default class TeamRepo {
 
-  countApprovedTeams() {
-    return prisma.team.count({
-      where: {
-        registration: {
-          status: "APPROVED",
-        },
-      },
-    })
-  }
-
   findByEmail(email: string) {
     return prisma.team.findUnique({
       where: { email },
-    include: { members: true },
+      include: { members: true },
     })
   }
 
@@ -71,6 +61,22 @@ export default class TeamRepo {
         teamId: t.teamId!,
         name: t.name,
       })),
+    })
+  }
+
+  findLatestCodeByType(prefix: string) {
+    return prisma.team.findFirst({
+      where: {
+        code: {
+          startsWith: prefix,
+        },
+      },
+      orderBy: {
+        code: "desc",
+      },
+      select: {
+        code: true,
+      },
     })
   }
 }

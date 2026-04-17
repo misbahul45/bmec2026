@@ -11,7 +11,7 @@ import {
   createCompetitionRegistrationSchema,
 } from '~/schemas/competition.schema'
 import UploadImage from '../ui/UploadImage'
-import { useParams } from '@tanstack/react-router'
+import { useParams, useNavigate } from '@tanstack/react-router'
 import {
   Field,
   FieldGroup,
@@ -23,7 +23,6 @@ import { uploadToImageKit } from '~/lib/api/uploads/service'
 import CompetitionPriceCard from './CompetitionPriceCard'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { useNavigate } from '@tanstack/react-router'
 
 type Props = {
   type: CompetitionType
@@ -32,8 +31,7 @@ type Props = {
 const FormSiswa: React.FC<Props> = ({ type }) => {
   const fetchCompetition = useServerFn(getCompetition)
   const { teamId } = useParams({ strict: false })
-
-  const navigate=useNavigate()
+  const navigate = useNavigate()
 
   const [competition, setCompetition] =
     useState<CompetitionWithActiveBatch | null>(null)
@@ -44,28 +42,35 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
 
   const mutation = useMutation({
     mutationFn: async (data: CreateCompetitionRegistrationData) => {
-      let imageUrl: string | null = null
+      const toastId = toast.loading('Mengunggah Bukti Pembayaran...')
 
-      if (data.paymentProof) {
-        imageUrl = await uploadToImageKit(data.paymentProof)
+      try {
+        let imageUrl: string | null = null
+
+        if (data.paymentProof) {
+          imageUrl = await uploadToImageKit(data.paymentProof)
+        }
+
+        const res = await registrationCompetition({
+          data: {
+            ...data,
+            paymentProof: imageUrl ?? '',
+          },
+        })
+
+        toast.dismiss(toastId)
+        return res
+      } catch (err) {
+        toast.dismiss(toastId)
+        throw err
       }
-
-      return await registrationCompetition({
-        data: {
-          ...data,
-          paymentProof: imageUrl ?? '',
-        },
-      })
     },
     onError: (error: any) => {
-      console.error(error)
       toast.error(error.message || 'Terjadi kesalahan')
     },
     onSuccess: (res) => {
       toast.success(res.message)
-      navigate({
-        to:'/dashboard/team'
-      })
+      navigate({ to: '/dashboard/team' })
     },
   })
 
@@ -82,7 +87,7 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
         })
       }
     })
-  }, [type, teamId])
+  }, [type, teamId, fetchCompetition, form])
 
   const activeBatch = competition?.batches?.[0]
 
@@ -104,7 +109,6 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
-
             <Controller
               name="paymentProof"
               control={form.control}
@@ -132,7 +136,6 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
             >
               {mutation.isPending ? 'Menyimpan...' : 'Simpan data'}
             </Button>
-
           </FieldGroup>
         </form>
       </CardContent>
