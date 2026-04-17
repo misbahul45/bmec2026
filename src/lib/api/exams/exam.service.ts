@@ -30,4 +30,19 @@ export default class ExamService {
     };
   }
 
+
+  async getExamQuestionByExamId(examId:string){
+    const exam = await this.repo.getExamById(examId);
+
+    if (!exam) {
+      throw new AppError("Exam not found");
+    }
+
+    const examQuestions=await this.repo.getExamQuestionById(examId)
+
+    return{
+      data:examQuestions,
+      message:'get all exams data'
+    }
+  }
 }

@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getExam, getExams } from "~/server/exam";
+import { getExam, getExamQuestion, getExams } from "~/server/exam";
 
 export const examsQueryOptions = () =>
   queryOptions({
@@ -15,3 +15,9 @@ export const examQueryOptions = (examId: string) =>
         data: examId,
       }),
   });
+
+export const examQuestionsQueryOptions = (examId: string) =>
+  queryOptions({
+    queryKey: ["exam-questions", examId],
+    queryFn: () => getExamQuestion({ data: examId }),
+  })

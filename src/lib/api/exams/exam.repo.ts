@@ -44,4 +44,12 @@ export default class ExamRepo {
       },
     });
   }
+
+  getExamQuestionById(examId:string){
+    return prisma.examQuestion.findMany({
+      where:{
+        examId
+      }
+    })
+  }
 }

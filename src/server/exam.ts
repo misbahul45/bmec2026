@@ -1,4 +1,4 @@
-import { Exam } from "@prisma/client";
+import { Exam, ExamQuestion } from "@prisma/client";
 import { createServerFn } from "@tanstack/react-start";
 import ExamService from "~/lib/api/exams/exam.service";
 import { ApiSuccess, successResponse } from "~/lib/utils/api-response";
@@ -23,3 +23,14 @@ export const getExam = createServerFn({ method: "GET" })
       return successResponse<Exam>(result.data, result.message);
     })
   );
+
+
+export const getExamQuestion = createServerFn({ method: "GET" })
+  .inputValidator(Uuid)
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<ExamQuestion[]>> => {
+      const result = await examService.getExamQuestionByExamId(data)
+
+      return successResponse<ExamQuestion[]>(result.data!, result.message)
+    })
+  )
