@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useQueryStates } from "nuqs"
-import { teamsSearchParams } from "~/schemas/team,schema"
+import { teamsSearchParams } from "~/schemas/team.schema"
 
 import { Input } from "~/components/ui/input"
 import { Button } from "~/components/ui/button"

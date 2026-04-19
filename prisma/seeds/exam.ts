@@ -1,10 +1,37 @@
 import { prisma } from "~/lib/utils/prisma"
-import { StageType, ExamType } from "@prisma/client"
+import { StageType, ExamType, CompetitionType } from "@prisma/client"
 
 export async function seedExam() {
+  console.log("🌱 Seeding Exam (OLIMPIADE only)...")
+
+  // 🔥 ambil competition yang dipakai team OLIMPIADE
+  const olimpTeams = await prisma.team.findMany({
+    where: {
+      competitionType: CompetitionType.OLIMPIADE,
+    },
+    include: {
+      registration: true,
+    },
+  })
+
+  const competitionIds = [
+    ...new Set(
+      olimpTeams
+        .map((t) => t.registration?.competitionId)
+        .filter(Boolean)
+    ),
+  ] as string[]
+
+  if (!competitionIds.length) {
+    console.log("❌ Tidak ada competition untuk OLIMPIADE")
+    return
+  }
+
+  // 🔥 ambil stage PENYISIHAN dari competition tersebut
   const stages = await prisma.stage.findMany({
     where: {
       name: StageType.PENYISIHAN,
+      competitionId: { in: competitionIds },
     },
     include: {
       competition: true,
@@ -45,5 +72,5 @@ export async function seedExam() {
     })
   }
 
-  console.log("✅ Exam seeded")
+  console.log("✅ Exam OLIMPIADE seeded")
 }

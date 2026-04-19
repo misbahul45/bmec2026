@@ -106,7 +106,7 @@ export const fetchUser = createServerFn({ method: "GET" })
     let redirect: string
 
     if (!team.members || team.members.length === 0) {
-      redirect = `/auth/register/${team.id}`
+      redirect = `/auth/register/${team.id}/`
 
     } else if (abstractTeam) {
       redirect = "/dashboard/team"

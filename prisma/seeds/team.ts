@@ -49,6 +49,19 @@ export async function seedTeams() {
         Math.floor(Math.random() * competitionsType.length)
       ]
 
+    // 🔥 ambil stage pertama (order = 1)
+    const firstStage = await prisma.stage.findFirst({
+      where: {
+        competitionId: competition.id,
+        order: 1,
+      },
+    })
+
+    if (!firstStage) {
+      console.log(`❌ No stage order=1 for ${competition.name}`)
+      continue
+    }
+
     const team = await prisma.team.create({
       data: {
         name: `Team ${i}`,
@@ -64,7 +77,9 @@ export async function seedTeams() {
 
         competitionType,
 
-        // ✅ INI YANG PENTING
+        // 🔥 SET STAGE AWAL
+        currentStageId: firstStage.id,
+
         registration: {
           create: {
             competitionId: competition.id,
@@ -91,7 +106,7 @@ export async function seedTeams() {
     })
 
     console.log(
-      `✅ Team ${team.name} → ${competition.name} (${batch.name})`
+      `✅ ${team.name} → ${competition.name} | Stage: ${firstStage.name}`
     )
   }
 

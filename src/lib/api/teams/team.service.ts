@@ -7,7 +7,8 @@ import { CompetitionType, Prisma } from "@prisma/client"
 import * as bcrypt from "bcrypt"
 import TeamRepo from "./team.repo"
 import MemberRepo from "../members/member.repo"
-import { QueryTeam } from "~/schemas/team,schema"
+import { QueryTeam } from "~/schemas/team.schema"
+import { prisma } from "~/lib/utils/prisma"
 
 export default class TeamService {
   private repo = new TeamRepo()
@@ -78,6 +79,17 @@ export default class TeamService {
           phone: payload.phone,
           code,
         })
+
+        const competition = await prisma.competition.findFirst({
+          where: { name: payload.competitionType as any },
+        })
+
+        if (competition) {
+          const firstStage = await this.repo.getFirstStageByCompetitionId(competition.id)
+          if (firstStage) {
+            await this.repo.updateStage(team.id, firstStage.id)
+          }
+        }
 
         return {
           data: this.sanitizeTeam(team),
@@ -240,5 +252,30 @@ export default class TeamService {
       data: result,
       message: "Team members have been successfully added"
     };
+  }
+
+  async updateStage(teamId: string, stageId: string): Promise<ServiceResponse<any>> {
+    const team = await this.repo.findById(teamId)
+    if (!team) throw new AppError('Team not found', 404)
+
+    const stage = await prisma.stage.findUnique({ where: { id: stageId } })
+    if (!stage) throw new AppError('Stage not found', 404)
+
+    const updated = await this.repo.updateStage(teamId, stageId)
+    return { data: this.sanitizeTeam(updated), message: 'Stage updated' }
+  }
+
+  async getStagesForTeam(teamId: string): Promise<ServiceResponse<any>> {
+    const team = await this.repo.findById(teamId)
+    if (!team) throw new AppError('Team not found', 404)
+
+    const competition = await prisma.competition.findFirst({
+      where: { name: team.competitionType as any },
+    })
+
+    if (!competition) return { data: [] }
+
+    const stages = await this.repo.getStagesByCompetitionId(competition.id)
+    return { data: stages }
   }
 }

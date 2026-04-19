@@ -19,7 +19,7 @@ import {
 } from "~/components/ui/field"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { updateTeamSchema } from "~/schemas/team,schema"
+import { updateTeamSchema } from "~/schemas/team.schema"
 import { updateTeam } from "~/server/team"
 
 type Props = {

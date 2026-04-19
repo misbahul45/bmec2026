@@ -31,19 +31,21 @@ model Team {
   documentUrl String?
 
   members Member[]
-
   registration Registration?
 
   submissions Submission[]
   competitionType CompetitionType
   abstract AbstractSubmission?
   attempts ExamAttempt[]
+    currentStageId String?
+  currentStage Stage? @relation("TeamCurrentStage", fields: [currentStageId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("team")
 }
+
 
 model AbstractSubmission {
   id String @id @default(uuid())
@@ -133,16 +135,21 @@ model Stage {
   id String @id @default(uuid())
 
   name StageType
+  order Int
 
   competitionId String
   competition Competition @relation(fields: [competitionId], references: [id])
 
   submissions Submission[]
+  exams Exam[]
+
+  teamsCurrent Team[] @relation("TeamCurrentStage")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  exams Exam[]
+
   @@unique([name, competitionId])
+  @@unique([competitionId, order])
 }
 
 model Registration {

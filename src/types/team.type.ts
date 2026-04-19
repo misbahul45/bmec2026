@@ -5,7 +5,14 @@ export type TeamWithRelations =
     include: {
       members: true
       abstract: true
-      registration: true
+      registration: {
+        include: {
+          competition: {
+            include: { stages: true }
+          }
+        }
+      }
+      currentStage: true
     }
   }>
 

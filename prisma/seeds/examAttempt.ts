@@ -1,10 +1,24 @@
 import { prisma } from "~/lib/utils/prisma"
 
 export async function seedExamAttempts() {
-  console.log("🌱 Seeding Exam Attempts (with anti-cheat)...")
+  console.log("🌱 Seeding Exam Attempts (Olimpiade Only)...")
 
-  const teams = await prisma.team.findMany()
+  const teams = await prisma.team.findMany({
+    where: {
+      competitionType: "OLIMPIADE",
+    },
+  })
+
   const exams = await prisma.exam.findMany({
+    where: {
+      stage: {
+        competition: {
+          name: {
+            contains: "Olimpiade",
+          },
+        },
+      },
+    },
     include: { questions: true },
   })
 
@@ -14,7 +28,6 @@ export async function seedExamAttempts() {
         let totalScore = 0
         let suspiciousScore = 0
 
-        // 🔥 30% kemungkinan curang
         const isCheater = Math.random() < 0.3
 
         const startTime = new Date(
@@ -33,15 +46,11 @@ export async function seedExamAttempts() {
             ipAddress: `192.168.1.${Math.floor(Math.random() * 255)}`,
             userAgent: "Mozilla/5.0",
             deviceId: `device-${team.id}`,
-
-            cheatCount: 0,
-            suspiciousScore: 0,
-            flagged: false,
           },
         })
 
         // ======================
-        // 1. JAWAB SOAL
+        // ANSWERS
         // ======================
         for (const question of exam.questions) {
           const options = ["A", "B", "C", "D", "E"]
@@ -67,10 +76,9 @@ export async function seedExamAttempts() {
         }
 
         // ======================
-        // 2. GENERATE EVENT LOG
+        // EVENTS
         // ======================
         const eventsData: any[] = []
-
         const eventTypes = [
           "TAB_SWITCH",
           "COPY",
@@ -80,7 +88,7 @@ export async function seedExamAttempts() {
         ] as const
 
         const eventCount = isCheater
-          ? Math.floor(Math.random() * 6) + 3 // 3–8 event
+          ? Math.floor(Math.random() * 6) + 3
           : Math.random() < 0.2
           ? 1
           : 0
@@ -94,12 +102,9 @@ export async function seedExamAttempts() {
           eventsData.push({
             attemptId: attempt.id,
             type,
-            metadata: {
-              note: "auto-generated",
-            },
+            metadata: { note: "auto-generated" },
           })
 
-          // 🔥 scoring kecurangan
           switch (type) {
             case "TAB_SWITCH":
               suspiciousScore += 10
@@ -117,7 +122,6 @@ export async function seedExamAttempts() {
           }
         }
 
-        // simpan event
         if (eventsData.length > 0) {
           await prisma.examEventLog.createMany({
             data: eventsData,
@@ -126,22 +130,15 @@ export async function seedExamAttempts() {
 
         const cheatCount = eventsData.length
 
-        // ======================
-        // 3. FLAGGING
-        // ======================
         const duration =
           (endTime.getTime() - startTime.getTime()) / 1000
 
-        // terlalu cepat → mencurigakan
         if (duration < exam.questions.length * 5) {
           suspiciousScore += 20
         }
 
         const flagged = suspiciousScore >= 50
 
-        // ======================
-        // 4. FINAL UPDATE
-        // ======================
         await prisma.examAttempt.update({
           where: { id: attempt.id },
           data: {
@@ -153,15 +150,15 @@ export async function seedExamAttempts() {
         })
 
         console.log(
-          `🧠 ${team.name} | Score: ${totalScore} | Cheat: ${cheatCount} | Suspicious: ${suspiciousScore} | ${
+          `🧠 ${team.name} | Score: ${totalScore} | ${
             flagged ? "🚨 CHEATER" : "✅ NORMAL"
           }`
         )
-      } catch (err) {
+      } catch {
         continue
       }
     }
   }
 
-  console.log("✅ Exam Attempts Seeded (with anti-cheat)")
+  console.log("✅ Exam Attempts Seeded")
 }

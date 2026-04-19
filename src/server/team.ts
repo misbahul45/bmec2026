@@ -7,7 +7,7 @@ import { registerSchema } from "~/schemas/auth.schema"
 import { createMembersSchema, } from "~/schemas/team.member.schema"
 import { Uuid } from "~/schemas/general.schema"
 import { SafeTeam, TeamsResponse } from "~/types/team.type"
-import { queryTeam, updateTeamSchema } from "~/schemas/team,schema"
+import { queryTeam, updateTeamSchema } from "~/schemas/team.schema"
 import { loginFn } from "./auth"
 
 const teamService = new TeamService()
@@ -47,12 +47,13 @@ export const createTeam = createServerFn({ method: "POST" })
 
 export const updateTeam = createServerFn({ method: "POST" })
   .inputValidator(z.object({
-    id:Uuid,
-    body:updateTeamSchema
+    id: Uuid,
+    body: updateTeamSchema
   }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<SafeTeam>> => {
-      const result = await teamService.update(data.id, data.body)
+      const { id, body } = data as { id: string; body: typeof updateTeamSchema._type }
+      const result = await teamService.update(id, body)
       return successResponse<SafeTeam>(result.data, result.message)
     })
   )
@@ -72,6 +73,24 @@ export const deleteTeam = createServerFn({ method: "POST" })
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
       const result=await teamService.createMember(data)
+      return successResponse<any>(result.data, result.message)
+    })
+  )
+
+export const updateTeamStage = createServerFn({ method: 'POST' })
+  .inputValidator(z.object({ teamId: z.string().uuid(), stageId: z.string().uuid() }))
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      const result = await teamService.updateStage(data.teamId, data.stageId)
+      return successResponse<any>(result.data, result.message)
+    })
+  )
+
+export const getStagesForTeam = createServerFn({ method: 'GET' })
+  .inputValidator(Uuid)
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      const result = await teamService.getStagesForTeam(data)
       return successResponse<any>(result.data, result.message)
     })
   )

@@ -5,7 +5,7 @@ import SearchTeam from '~/components/dashboard/admin/teams/SearchTeam'
 import TableTeams from '~/components/dashboard/admin/teams/TableTeams'
 import TableTeamsSkeleton from '~/components/dashboard/admin/teams/TableTeamsSkeleton'
 import { teamsQueryOptions } from '~/lib/api/teams/team.query-options'
-import { loadTeamsSearchParams, normalizeTeamQuery, queryTeam } from '~/schemas/team,schema'
+import { loadTeamsSearchParams, normalizeTeamQuery, queryTeam } from '~/schemas/team.schema'
 
 export const Route = createFileRoute(
   "/dashboard/_authed/admin/teams/"
@@ -32,10 +32,13 @@ function TeamsContent() {
     teamsQueryOptions(query)
   )
 
+  const queryKey = teamsQueryOptions(query).queryKey
+
   return (
     <TableTeams
       teams={res.data?.teams!}
       meta={res.data?.meta!}
+      queryKey={queryKey}
     />
   )
 }

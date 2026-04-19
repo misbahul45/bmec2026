@@ -27,7 +27,12 @@ export default class TeamRepo {
       skip,
       take,
       orderBy: { createdAt: "desc" },
-      include: { members: true, abstract:true, registration:true },
+      include: {
+        members: true,
+        abstract: true,
+        registration: { include: { competition: { include: { stages: { orderBy: { order: 'asc' } } } } } },
+        currentStage: true,
+      },
     })
   }
 
@@ -61,6 +66,29 @@ export default class TeamRepo {
         teamId: t.teamId!,
         name: t.name,
       })),
+    })
+  }
+
+  updateStage(teamId: string, stageId: string) {
+    return prisma.team.update({
+      where: { id: teamId },
+      data: { currentStageId: stageId },
+    })
+  }
+
+  getStagesByCompetitionId(competitionId: string) {
+    return prisma.stage.findMany({
+      where: { competitionId },
+      orderBy: { order: 'asc' },
+      select: { id: true, name: true, order: true },
+    })
+  }
+
+  getFirstStageByCompetitionId(competitionId: string) {
+    return prisma.stage.findFirst({
+      where: { competitionId },
+      orderBy: { order: 'asc' },
+      select: { id: true },
     })
   }
 
