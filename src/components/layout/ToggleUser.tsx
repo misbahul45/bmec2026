@@ -41,7 +41,11 @@ const ToggleUser = () => {
 
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuItem onClick={handleGoToDashboard}>
+          <LayoutDashboard size={14} />
           Dashboard
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate({ to: '/dashboard/admin' })}>
+          Home
         </DropdownMenuItem>
         <DropdownMenuItem onClick={toLogout} variant='destructive' className="text-red-500 gap-2">
           <LogOut size={16} />

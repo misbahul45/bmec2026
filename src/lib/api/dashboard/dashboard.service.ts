@@ -9,10 +9,8 @@ export default class DashboardService {
       regByStatus,
       subByStatus,
       absByStatus,
-      regByComp,
-      allComps,
-      subByStage,
-      allStages,
+      teamsByCompType,
+      subByStageType,
       attemptDates,
       [flagged, normal, cheatAgg],
       avgScore,
@@ -21,17 +19,12 @@ export default class DashboardService {
       this.repo.getRegistrationByStatus(),
       this.repo.getSubmissionByStatus(),
       this.repo.getAbstractByStatus(),
-      this.repo.getRegistrationByCompetition(),
-      this.repo.getCompetitions(),
-      this.repo.getSubmissionByStage(),
-      this.repo.getStages(),
+      this.repo.getTeamsByCompetitionType(),
+      this.repo.getSubmissionCountByStageType(),
       this.repo.getExamAttemptsByDate(),
       this.repo.getCheatStats(),
       this.repo.getAvgScore(),
     ])
-
-    const compMap = Object.fromEntries(allComps.map((c) => [c.id, c.name]))
-    const stageMap = Object.fromEntries(allStages.map((s) => [s.id, s.name]))
 
     const toStatusMap = (arr: { status: string; _count: { _all: number } }[]) =>
       Object.fromEntries(arr.map((r) => [r.status, r._count._all]))
@@ -65,13 +58,13 @@ export default class DashboardService {
       registrationByStatus: toStatusMap(regByStatus as any),
       submissionByStatus: toStatusMap(subByStatus as any),
       abstractByStatus: toStatusMap(absByStatus as any),
-      registrationByCompetition: regByComp.map((r) => ({
-        name: compMap[r.competitionId] ?? r.competitionId,
-        count: r._count._all,
+      registrationByCompetition: teamsByCompType.map((t) => ({
+        name: t.competitionType,
+        count: t._count._all,
       })),
-      submissionByStage: subByStage.map((s) => ({
-        name: stageMap[s.stageId] ?? s.stageId,
-        count: s._count._all,
+      submissionByStage: subByStageType.map((s) => ({
+        name: s.stage_name,
+        count: Number(s.count),
       })),
       attemptsByDate: Object.entries(dateCountMap).map(([date, count]) => ({ date, count })),
       cheat: {

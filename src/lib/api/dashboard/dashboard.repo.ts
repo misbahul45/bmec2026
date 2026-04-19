@@ -26,26 +26,32 @@ export default class DashboardRepo {
     return prisma.abstractSubmission.groupBy({ by: ['status'], _count: { _all: true } })
   }
 
-  getRegistrationByCompetition() {
-    return prisma.registration.groupBy({
-      by: ['competitionId'],
+  getTeamsByCompetitionType() {
+    return prisma.team.groupBy({
+      by: ['competitionType'],
       _count: { _all: true },
     })
-  }
-
-  getCompetitions() {
-    return prisma.competition.findMany({ select: { id: true, name: true } })
   }
 
   getSubmissionByStage() {
     return prisma.submission.groupBy({
       by: ['stageId'],
+      where: { fileUrl: { not: null } },
       _count: { _all: true },
     })
   }
 
   getStages() {
     return prisma.stage.findMany({ select: { id: true, name: true } })
+  }
+
+  getSubmissionCountByStageType() {
+    return prisma.$queryRaw<{ stage_name: string; count: bigint }[]>`
+      SELECT s.name AS stage_name, COUNT(sub.id) AS count
+      FROM "Stage" s
+      LEFT JOIN "Submission" sub ON sub."stageId" = s.id AND sub."fileUrl" IS NOT NULL
+      GROUP BY s.name
+    `
   }
 
   getExamAttemptsByDate() {

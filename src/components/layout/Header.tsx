@@ -201,6 +201,22 @@ const UserDropdown = ({
               </p>
 
               <Link
+                to="/dashboard/admin"
+                onClick={closeDropdown}
+                data-menu-item
+                onMouseEnter={(e) => handleItemHover(e.currentTarget, true)}
+                onMouseLeave={(e) => handleItemHover(e.currentTarget, false)}
+                className={cn(
+                  'flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs',
+                  'text-foreground/70 hover:text-foreground',
+                  'hover:bg-foreground/5 transition-colors duration-150',
+                )}
+              >
+                <LayoutDashboard size={14} className="text-primary/70 shrink-0" />
+                <span className="font-medium">Home</span>
+              </Link>
+
+              <Link
                 to="/dashboard/admin/teams"
                 onClick={closeDropdown}
                 data-menu-item
