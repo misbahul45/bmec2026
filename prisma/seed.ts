@@ -5,14 +5,18 @@ import { seedTeams } from "./seeds/team";
 import { seedStage } from "./seeds/stage";
 import { seedExam } from "./seeds/exam";
 import { seedExamQuestions } from "./seeds/seedExamQuestion";
+import { seedExamAttempts } from "./seeds/examAttempt";
+import { seedSubmissionsWithoutScore } from "./seeds/submission";
 
 const seeds = [
   seedCompetition,
   seedStage,
   seedAdmin,
-  seedTeams,
+  seedTeams, 
   seedExam,
-  seedExamQuestions
+  seedExamQuestions,
+  seedExamAttempts,
+  seedSubmissionsWithoutScore,
 ]
 
 async function main() {

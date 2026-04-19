@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "ExamAttempt" ADD COLUMN     "cheatCount" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "flagged" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "suspiciousScore" INTEGER NOT NULL DEFAULT 0;

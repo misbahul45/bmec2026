@@ -4,7 +4,7 @@ import { examQuestionsQueryOptions } from '~/lib/api/exams/exam.query-options'
 import QuestionCard from '~/components/dashboard/admin/exams/QuestionCard'
 import FormAddQuestion from '~/components/dashboard/admin/exams/FormAddQuestion'
 
-export const Route = createFileRoute('/dashboard/_authed/admin/exams/$examId')({
+export const Route = createFileRoute('/dashboard/_authed/admin/exams/$examId/')({
   component: RouteComponent,
   loader: async ({ params, context }) => {
     return context.queryClient.ensureQueryData(

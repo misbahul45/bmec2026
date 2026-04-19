@@ -63,7 +63,16 @@ const ExamCard: React.FC<Props> = ({ exam }) => {
         </div>
       </CardContent>
 
-      <CardFooter className="justify-end">
+      <CardFooter className="justify-end gap-3">
+        <Link
+          to="/dashboard/admin/exams/$examId/reviews"
+          params={{ examId: exam.id }}
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+        >
+          Lihat Hasil
+          <ArrowRight size={14} />
+        </Link>
         <Link
           to="/dashboard/admin/exams/$examId"
           params={{ examId: exam.id }}

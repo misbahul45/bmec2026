@@ -11,11 +11,14 @@ import {
 import Pagination from "~/components/ui/Pagination"
 import { TeamWithRelations } from "~/types/team.type"
 import { Badge } from "~/components/ui/badge"
+import { Button } from "~/components/ui/button"
 import { useQueryStates } from "nuqs"
 import { teamsSearchParams } from "~/schemas/team,schema"
 import CompetitionBadge from "~/components/ui/CompetitionBadge"
 import TeamActions from "./TeamAction"
 import ImageDialog from "~/components/ui/ImageDialog"
+import { exportToExcel } from "~/lib/utils/export-excel"
+import { Download } from "lucide-react"
 
 type Props = {
   teams: TeamWithRelations[]
@@ -35,8 +38,34 @@ const TableTeams: React.FC<Props> = ({
   const [selectedTitle, setSelectedTitle] =
     useState("")
 
+  const handleExport = () => {
+    exportToExcel(
+      teams.map((team, i) => ({
+        No: (meta.page - 1) * meta.limit + i + 1,
+        'Nama Tim': team.name,
+        Email: team.email,
+        'Nama Sekolah': team.schoolName,
+        'Alamat Sekolah': team.schoolAddress,
+        Kompetisi: team.competitionType,
+        'Jumlah Member': team.members?.length ?? 0,
+        Registrasi: team.registration ? team.registration.status : 'Belum Mendaftar',
+        Dokumen: team.documentUrl ? 'Ada' : 'Belum Upload',
+        Abstract: team.abstract ? 'Ada' : team.competitionType === 'LKTI' ? 'Belum Upload' : 'Tidak Perlu',
+        'Tanggal Daftar': new Date(team.createdAt).toLocaleDateString('id-ID'),
+      })),
+      `data-tim-${new Date().toISOString().slice(0, 10)}`,
+      'Data Tim'
+    )
+  }
+
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button size="sm" variant="outline" className="gap-1.5 rounded" onClick={handleExport}>
+          <Download className="size-3" />
+          Export Excel
+        </Button>
+      </div>
       <div className="border rounded-xl overflow-hidden">
         <Table>
           <TableHeader>

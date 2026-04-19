@@ -132,7 +132,7 @@ const QuestionCard = ({ data, number }: Props) => {
       </Card>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Soal {number}</DialogTitle>
           </DialogHeader>

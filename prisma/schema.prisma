@@ -258,7 +258,16 @@ model ExamAttempt {
   team Team @relation(fields: [teamId], references: [id])
   exam Exam @relation(fields: [examId], references: [id])
 
+  ipAddress String?
+  userAgent String?
+  deviceId String?
+
+  cheatCount Int @default(0)          // jumlah event
+  suspiciousScore Int @default(0)     // tingkat kecurangan
+  flagged Boolean @default(false)     // status
+
   answers ExamAnswer[]
+  events ExamEventLog[]
 
   reviewedBy String?
   admin Admin? @relation(fields: [reviewedBy], references: [id])
@@ -266,6 +275,32 @@ model ExamAttempt {
   createdAt DateTime @default(now())
 
   @@unique([teamId, examId])
+}
+
+model ExamEventLog {
+  id String @id @default(uuid())
+
+  attemptId String
+  attempt ExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  type ExamEventType
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([attemptId])
+}
+
+enum ExamEventType {
+  TAB_SWITCH
+  WINDOW_BLUR
+  WINDOW_FOCUS
+  COPY
+  PASTE
+  FULLSCREEN_EXIT
+  MULTIPLE_LOGIN
+  NETWORK_CHANGE
+  DEVTOOLS_OPEN
 }
 
 model ExamAnswer {
