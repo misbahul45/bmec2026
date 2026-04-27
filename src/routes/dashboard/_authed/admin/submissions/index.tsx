@@ -8,6 +8,10 @@ import { SubmissionFilters } from '~/components/dashboard/admin/submissions/Subm
 const DEFAULT_FILTERS = { search: '', status: 'ALL', limit: 10 }
 
 export const Route = createFileRoute('/dashboard/_authed/admin/submissions/')({
+  loader: async ({ context }) => {
+    const query = { status: 'ALL' as const, limit: 10, page: 1 }
+    await context.queryClient.ensureQueryData(submissionsQueryOptions(query))
+  },
   component: RouteComponent,
 })
 
@@ -20,7 +24,8 @@ function SubmissionsContent({ filters, page, adminId }: { filters: typeof DEFAUL
   }
 
   const { data: res } = useSuspenseQuery(submissionsQueryOptions(query))
-  const { submissions, meta } = res?.data ?? { submissions: [], meta: { page: 1, limit: 10, total: 0, totalPages: 1 } }
+  const submissions = res?.data?.submissions ?? []
+  const meta = res?.data?.meta ?? { page: 1, limit: 10, total: 0, totalPages: 1 }
 
   return (
     <TableSubmissions

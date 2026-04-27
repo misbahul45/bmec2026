@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getTeam, getTeams } from "../../../server/team";
+import { getTeam, getTeamDashboard, getTeams } from "../../../server/team";
 import { QueryTeam } from "~/schemas/team.schema";
 
 
@@ -7,6 +7,12 @@ export const teamQueryOptions = (teamId: string) =>
   queryOptions({
     queryKey: ['teams', teamId],
     queryFn: () => getTeam({ data: teamId }),
+  })
+
+export const teamDashboardQueryOptions = (teamId: string) =>
+  queryOptions({
+    queryKey: ['teams', teamId, 'dashboard'],
+    queryFn: () => getTeamDashboard({ data: teamId }),
   })
 
 export const teamsQueryOptions = (query: QueryTeam) => {

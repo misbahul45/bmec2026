@@ -10,8 +10,8 @@ const submissionQuerySchema = z.object({
   search: z.string().optional(),
   stageId: z.string().optional(),
   status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'ALL']).optional(),
-  page: z.number().optional(),
-  limit: z.number().optional(),
+  page: z.coerce.number().optional(),
+  limit: z.coerce.number().optional(),
 })
 
 const reviewSchema = z.object({
@@ -72,6 +72,35 @@ export const getSubmissionLeaderboard = createServerFn({ method: 'GET' })
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
       const result = await submissionService.getLeaderboard(data.competitionType, data.stageType)
+      return successResponse(result.data, result.message)
+    })
+  )
+
+export const upsertSubmission = createServerFn({ method: 'POST' })
+  .inputValidator(z.object({
+    teamId: z.string().uuid(),
+    stageId: z.string().uuid(),
+    fileUrl: z.string().url(),
+    title: z.string().optional(),
+  }))
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      const result = await submissionService.upsertSubmission(data)
+      return successResponse(result.data, result.message)
+    })
+  )
+
+export const submitWithPayment = createServerFn({ method: 'POST' })
+  .inputValidator(z.object({
+    teamId: z.string().uuid(),
+    stageId: z.string().uuid(),
+    fileUrl: z.string().url(),
+    paymentProof: z.string().url(),
+    title: z.string().optional(),
+  }))
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      const result = await submissionService.submitWithPayment(data)
       return successResponse(result.data, result.message)
     })
   )

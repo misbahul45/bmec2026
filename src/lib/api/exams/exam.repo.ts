@@ -33,17 +33,23 @@ export default class ExamRepo {
 
     return prisma.exam.findMany({
       where: {
-        startDate: {
-          lte: now,
-        },
-        endDate: {
-          gte: now,
-        },
+        startDate: { lte: now },
+        endDate: { gte: now },
       },
-      include: {
-        stage: true,
-      },
+      include: { stage: true },
     });
+  }
+
+  getExamsByStageCompetitionType(competitionType: string) {
+    return prisma.exam.findMany({
+      where: {
+        stage: {
+          competition: { name: competitionType as any },
+        },
+      },
+      include: { stage: true },
+      orderBy: { startDate: 'asc' },
+    })
   }
 
   getExamQuestionById(examId:string){

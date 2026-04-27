@@ -67,4 +67,46 @@ export default class SubmissionService {
     const data = await this.repo.findLeaderboard(competitionType, stageType)
     return { data, message: 'Leaderboard fetched' }
   }
+
+  async upsertSubmission(data: { teamId: string; stageId: string; fileUrl: string; title?: string }) {
+    const result = await this.repo.upsert(data)
+    return { data: result, message: 'Submission saved' }
+  }
+
+  async submitWithPayment(data: { teamId: string; stageId: string; fileUrl: string; paymentProof: string; title?: string }) {
+    const { paymentProof, ...submissionData } = data
+
+    const existing = await this.repo.findRegistrationByTeamId(data.teamId)
+
+    if (existing) {
+      const [submission] = await Promise.all([
+        this.repo.upsert(submissionData),
+        this.repo.updatePaymentProof(data.teamId, paymentProof),
+      ])
+      return { data: submission, message: 'Submission and payment saved' }
+    }
+
+    const competition = await this.repo.findActiveLKTIBatch()
+    if (!competition) throw new AppError('Kompetisi LKTI tidak ditemukan', 404)
+
+    const batch = competition.batches?.[0]
+    if (!batch) throw new AppError('Tidak ada batch LKTI aktif saat ini', 400)
+
+    const [submission] = await Promise.all([
+      this.repo.upsert(submissionData),
+      this.repo.createRegistration({
+        teamId: data.teamId,
+        competitionId: competition.id,
+        batchId: batch.id,
+        paymentProof,
+      }),
+    ])
+
+    return { data: submission, message: 'Submission, registration, and payment saved' }
+  }
+
+  async getByTeamAndStage(teamId: string, stageId: string) {
+    const data = await this.repo.findByTeamAndStage(teamId, stageId)
+    return { data, message: 'Submission fetched' }
+  }
 }

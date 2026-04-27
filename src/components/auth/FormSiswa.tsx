@@ -35,29 +35,34 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
 
   const [competition, setCompetition] =
     useState<CompetitionWithActiveBatch | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   const form = useForm<CreateCompetitionRegistrationData>({
     resolver: zodResolver(createCompetitionRegistrationSchema),
+    defaultValues: {
+      teamId: teamId ?? '',
+      competitionId: '',
+      batchId: '',
+      paymentProof: null,
+    },
   })
 
   const mutation = useMutation({
     mutationFn: async (data: CreateCompetitionRegistrationData) => {
       const toastId = toast.loading('Mengunggah Bukti Pembayaran...')
-
       try {
         let imageUrl: string | null = null
-
         if (data.paymentProof) {
           imageUrl = await uploadToImageKit(data.paymentProof)
         }
-
         const res = await registrationCompetition({
           data: {
-            ...data,
+            teamId: data.teamId,
+            competitionId: data.competitionId,
+            batchId: data.batchId,
             paymentProof: imageUrl ?? '',
           },
         })
-
         toast.dismiss(toastId)
         return res
       } catch (err) {
@@ -75,24 +80,41 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
   })
 
   useEffect(() => {
+    if (!teamId) return
     fetchCompetition({ data: type }).then((res) => {
       const comp = res.data ?? null
       setCompetition(comp)
 
-      if (comp) {
-        form.reset({
-          batchId: comp.batches[0]?.id,
-          competitionId: comp.id,
-          teamId,
-        })
+      if (!comp) {
+        setLoadError('Kompetisi tidak ditemukan')
+        return
       }
+
+      const batch = comp.batches?.[0]
+      if (!batch) {
+        setLoadError('Tidak ada batch pendaftaran yang aktif saat ini')
+        return
+      }
+
+      form.setValue('competitionId', comp.id)
+      form.setValue('batchId', batch.id)
+      form.setValue('teamId', teamId)
     })
-  }, [type, teamId, fetchCompetition, form])
+  }, [type, teamId])
 
   const activeBatch = competition?.batches?.[0]
 
   const onSubmit = (data: CreateCompetitionRegistrationData) => {
+    if (!data.paymentProof) {
+      toast.error('Upload bukti pembayaran terlebih dahulu')
+      return
+    }
     mutation.mutate(data)
+  }
+
+  const onInvalid = (errors: any) => {
+    const firstError = Object.values(errors)[0] as any
+    toast.error(firstError?.message ?? 'Lengkapi form terlebih dahulu')
   }
 
   return (
@@ -104,10 +126,13 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
             batch={activeBatch}
           />
         )}
+        {loadError && (
+          <p className="text-sm text-destructive text-center">{loadError}</p>
+        )}
       </CardHeader>
 
       <CardContent>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
           <FieldGroup>
             <Controller
               name="paymentProof"
@@ -115,13 +140,11 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel>Upload Bukti Pembayaran</FieldLabel>
-
                   <UploadImage
                     value={field.value}
                     onChange={field.onChange}
-                    disabled={mutation.isPending}
+                    disabled={mutation.isPending || !!loadError}
                   />
-
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -131,7 +154,7 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
 
             <Button
               type="submit"
-              disabled={mutation.isPending}
+              disabled={mutation.isPending || !!loadError}
               className="w-full rounded-xl hover:opacity-90 cursor-pointer active:scale-95"
             >
               {mutation.isPending ? 'Menyimpan...' : 'Simpan data'}

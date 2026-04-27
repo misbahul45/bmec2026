@@ -75,4 +75,51 @@ export default class SubmissionRepo {
       },
     })
   }
+
+  create(data: { teamId: string; stageId: string; fileUrl: string; title?: string }) {
+    return prisma.submission.create({ data })
+  }
+
+  upsert(data: { teamId: string; stageId: string; fileUrl: string; title?: string }) {
+    return prisma.submission.upsert({
+      where: { teamId_stageId: { teamId: data.teamId, stageId: data.stageId } },
+      update: { fileUrl: data.fileUrl, title: data.title, status: 'PENDING' },
+      create: data,
+    })
+  }
+
+  findByTeamAndStage(teamId: string, stageId: string) {
+    return prisma.submission.findUnique({
+      where: { teamId_stageId: { teamId, stageId } },
+    })
+  }
+
+  updatePaymentProof(teamId: string, paymentProof: string) {
+    return prisma.registration.update({
+      where: { teamId },
+      data: { paymentProof },
+    })
+  }
+
+  findRegistrationByTeamId(teamId: string) {
+    return prisma.registration.findUnique({ where: { teamId } })
+  }
+
+  createRegistration(data: { teamId: string; competitionId: string; batchId: string; paymentProof: string }) {
+    return prisma.registration.create({ data })
+  }
+
+  findActiveLKTIBatch() {
+    const now = new Date()
+    return prisma.competition.findUnique({
+      where: { name: 'LKTI' },
+      include: {
+        batches: {
+          where: { startDate: { lte: now }, endDate: { gte: now } },
+          orderBy: { startDate: 'asc' },
+          take: 1,
+        },
+      },
+    })
+  }
 }

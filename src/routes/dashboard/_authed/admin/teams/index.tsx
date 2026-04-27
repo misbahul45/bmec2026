@@ -27,6 +27,7 @@ export const Route = createFileRoute(
 })
 function TeamsContent() {
   const query = Route.useSearch()
+  const { user } = Route.useRouteContext()
 
   const { data: res } = useSuspenseQuery(
     teamsQueryOptions(query)
@@ -39,6 +40,7 @@ function TeamsContent() {
       teams={res.data?.teams!}
       meta={res.data?.meta!}
       queryKey={queryKey}
+      adminId={user?.userId!}
     />
   )
 }

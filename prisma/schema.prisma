@@ -18,27 +18,28 @@ enum MemberRole {
 }
 
 model Team {
-  id        String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  name      String   @unique
-  code      String   @unique
-  password  String
-  email     String   @unique
-  
-  phone     String
+  name     String @unique
+  code     String @unique
+  password String
+  email    String @unique
+
+  phone         String
   schoolName    String
   schoolAddress String
-  documentUrl String?
+  documentUrl   String?
+  twibbonUrl    String?
 
-  members Member[]
+  members      Member[]
   registration Registration?
 
-  submissions Submission[]
+  submissions     Submission[]
   competitionType CompetitionType
-  abstract AbstractSubmission?
-  attempts ExamAttempt[]
-    currentStageId String?
-  currentStage Stage? @relation("TeamCurrentStage", fields: [currentStageId], references: [id])
+  abstract        AbstractSubmission?
+  attempts        ExamAttempt[]
+  currentStageId  String?
+  currentStage    Stage?              @relation("TeamCurrentStage", fields: [currentStageId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -46,17 +47,16 @@ model Team {
   @@map("team")
 }
 
-
 model AbstractSubmission {
   id String @id @default(uuid())
 
-  teamId String @unique
+  teamId  String @unique
   fileUrl String
 
   status SubmissionStatus @default(PENDING)
 
   reviewedBy String?
-  admin Admin? @relation(fields: [reviewedBy], references: [id])
+  admin      Admin?  @relation(fields: [reviewedBy], references: [id])
 
   team Team @relation(fields: [teamId], references: [id])
 
@@ -67,28 +67,28 @@ model AbstractSubmission {
 model Member {
   id String @id @default(uuid())
 
-  name String
-  studentId String @unique
-  role MemberRole 
+  name      String
+  studentId String     @unique
+  role      MemberRole
 
   teamId String
-  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Admin {
-  id        String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  name      String
-  email     String   @unique
-  password  String
+  name     String
+  email    String @unique
+  password String
 
   registrations Registration[]
-  submissions Submission[]
-  abstracts AbstractSubmission[]
-  attempts ExamAttempt[]
+  submissions   Submission[]
+  abstracts     AbstractSubmission[]
+  attempts      ExamAttempt[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -97,12 +97,12 @@ model Admin {
 }
 
 model Competition {
-  id        String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  name      String  @unique
+  name String @unique
 
-  batches   Batch[]
-  stages    Stage[]
+  batches Batch[]
+  stages  Stage[]
 
   registrations Registration[]
 
@@ -111,7 +111,7 @@ model Competition {
 }
 
 model Batch {
-  id        String   @id @default(uuid())
+  id String @id @default(uuid())
 
   name      String
   startDate DateTime
@@ -121,27 +121,27 @@ model Batch {
   module_bacth String
 
   competitionId String
-  competition Competition @relation(fields: [competitionId], references: [id])
+  competition   Competition @relation(fields: [competitionId], references: [id])
 
   registrations Registration[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([name, competitionId]) 
+  @@unique([name, competitionId])
 }
 
 model Stage {
   id String @id @default(uuid())
 
-  name StageType
+  name  StageType
   order Int
 
   competitionId String
-  competition Competition @relation(fields: [competitionId], references: [id])
+  competition   Competition @relation(fields: [competitionId], references: [id])
 
   submissions Submission[]
-  exams Exam[]
+  exams       Exam[]
 
   teamsCurrent Team[] @relation("TeamCurrentStage")
 
@@ -155,20 +155,20 @@ model Stage {
 model Registration {
   id String @id @default(uuid())
 
-  teamId String @unique
+  teamId        String @unique
   competitionId String
-  batchId String
+  batchId       String
 
   paymentProof String?
 
   status PaymentStatus @default(PENDING)
 
-  team Team @relation(fields: [teamId], references: [id])
+  team        Team        @relation(fields: [teamId], references: [id])
   competition Competition @relation(fields: [competitionId], references: [id])
-  batch Batch @relation(fields: [batchId], references: [id])
+  batch       Batch       @relation(fields: [batchId], references: [id])
 
   approvedBy String?
-  admin Admin? @relation(fields: [approvedBy], references: [id])
+  admin      Admin?  @relation(fields: [approvedBy], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -177,22 +177,22 @@ model Registration {
 model Submission {
   id String @id @default(uuid())
 
-  teamId String
+  teamId  String
   stageId String
 
-  title String?
+  title   String?
   fileUrl String?
 
-  score Int?
+  score    Int?
   feedback String?
 
   status SubmissionStatus @default(PENDING)
 
-  team Team @relation(fields: [teamId], references: [id])
+  team  Team  @relation(fields: [teamId], references: [id])
   stage Stage @relation(fields: [stageId], references: [id])
 
   reviewedBy String?
-  admin Admin? @relation(fields: [reviewedBy], references: [id])
+  admin      Admin?  @relation(fields: [reviewedBy], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -201,28 +201,28 @@ model Submission {
 }
 
 model File {
-  url     String
+  url    String
   fileId String @unique
 
   @@index([url])
 }
 
-
 model Exam {
   id String @id @default(uuid())
 
   title String
-  type ExamType
+  type  ExamType
 
   startDate DateTime
-  endDate DateTime
+  endDate   DateTime
+  duration  Int      @default(90)
 
   stageId String
-  stage Stage @relation(fields: [stageId], references: [id])
+  stage   Stage  @relation(fields: [stageId], references: [id])
 
   questions ExamQuestion[]
-  attempts ExamAttempt[]
-
+  attempts  ExamAttempt[]
+ u
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -239,10 +239,10 @@ model ExamQuestion {
   optionE String
 
   correctAnswer String
-  score Int @default(5)
+  score         Int    @default(5)
 
   examId String
-  exam Exam @relation(fields: [examId], references: [id])
+  exam   Exam   @relation(fields: [examId], references: [id])
 
   answers ExamAnswer[]
 
@@ -257,8 +257,8 @@ model ExamAttempt {
 
   totalScore Int @default(0)
 
-  startTime DateTime @default(now())
-  endTime DateTime?
+  startTime DateTime  @default(now())
+  endTime   DateTime?
 
   finished Boolean @default(false)
 
@@ -267,17 +267,17 @@ model ExamAttempt {
 
   ipAddress String?
   userAgent String?
-  deviceId String?
+  deviceId  String?
 
-  cheatCount Int @default(0)          // jumlah event
-  suspiciousScore Int @default(0)     // tingkat kecurangan
-  flagged Boolean @default(false)     // status
+  cheatCount      Int     @default(0) // jumlah event
+  suspiciousScore Int     @default(0) // tingkat kecurangan
+  flagged         Boolean @default(false) // status
 
   answers ExamAnswer[]
-  events ExamEventLog[]
+  events  ExamEventLog[]
 
   reviewedBy String?
-  admin Admin? @relation(fields: [reviewedBy], references: [id])
+  admin      Admin?  @relation(fields: [reviewedBy], references: [id])
 
   createdAt DateTime @default(now())
 
@@ -288,9 +288,9 @@ model ExamEventLog {
   id String @id @default(uuid())
 
   attemptId String
-  attempt ExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attempt   ExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 
-  type ExamEventType
+  type     ExamEventType
   metadata Json?
 
   createdAt DateTime @default(now())
@@ -313,19 +313,20 @@ enum ExamEventType {
 model ExamAnswer {
   id String @id @default(uuid())
 
-  attemptId String
+  attemptId  String
   questionId String
 
-  answer String
+  answer    String
   isCorrect Boolean
 
-  attempt ExamAttempt @relation(fields: [attemptId], references: [id])
+  attempt  ExamAttempt  @relation(fields: [attemptId], references: [id])
   question ExamQuestion @relation(fields: [questionId], references: [id])
 
   answeredAt DateTime @default(now())
 
   @@unique([attemptId, questionId])
 }
+
 enum PaymentStatus {
   PENDING
   APPROVED

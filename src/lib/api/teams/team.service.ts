@@ -203,18 +203,12 @@ export default class TeamService {
     }
 
     const updated = await this.repo.update(id, {
-      ...(payload.teamName && {
-        name: payload.teamName,
-      }),
-      ...(payload.institution && {
-        schoolName: payload.institution,
-      }),
-      ...(payload.address && {
-        schoolAddress: payload.address,
-      }),
-      ...(payload.competitionType && {
-        competitionType: payload.competitionType,
-      }),
+      ...(payload.teamName && { name: payload.teamName }),
+      ...(payload.institution && { schoolName: payload.institution }),
+      ...(payload.address && { schoolAddress: payload.address }),
+      ...(payload.competitionType && { competitionType: payload.competitionType }),
+      ...('documentUrl' in payload && { documentUrl: payload.documentUrl as string | null }),
+      ...('twibbonUrl' in payload && { twibbonUrl: payload.twibbonUrl as string | null }),
     })
 
     return {
@@ -277,5 +271,15 @@ export default class TeamService {
 
     const stages = await this.repo.getStagesByCompetitionId(competition.id)
     return { data: stages }
+  }
+
+  async getDashboard(teamId: string): Promise<ServiceResponse<any>> {
+    const team = await this.repo.findDashboard(teamId)
+    if (!team) throw new AppError('Team not found', 404)
+    const { password, ...rest } = team as any
+    if (rest.registration?.batch?.price) {
+      rest.registration.batch.price = Number(rest.registration.batch.price)
+    }
+    return { data: rest }
   }
 }

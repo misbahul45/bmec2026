@@ -95,3 +95,12 @@ export const getStagesForTeam = createServerFn({ method: 'GET' })
     })
   )
 
+export const getTeamDashboard = createServerFn({ method: 'GET' })
+  .inputValidator(Uuid)
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      const result = await teamService.getDashboard(data)
+      return successResponse<any>(result.data, result.message)
+    })
+  )
+

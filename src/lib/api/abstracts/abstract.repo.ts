@@ -1,5 +1,6 @@
 import { SubmissionStatus } from "@prisma/client"
 import { prisma } from "~/lib/utils/prisma"
+import { RegistrationCompetitionData } from "~/schemas/competition.schema"
 
 export default class AbstractRepo {
   findById(id: string) {
@@ -46,6 +47,28 @@ export default class AbstractRepo {
       data: {
         status: SubmissionStatus.REJECTED,
         reviewedBy: adminId,
+      },
+    })
+  }
+
+  createRegistration(data: RegistrationCompetitionData) {
+    return prisma.registration.create({ data })
+  }
+
+  findRegistrationByTeamId(teamId: string) {
+    return prisma.registration.findUnique({ where: { teamId } })
+  }
+
+  findActiveBatchByCompetitionName(name: string) {
+    const now = new Date()
+    return prisma.competition.findUnique({
+      where: { name: name as any },
+      include: {
+        batches: {
+          where: { startDate: { lte: now }, endDate: { gte: now } },
+          orderBy: { startDate: 'asc' },
+          take: 1,
+        },
       },
     })
   }

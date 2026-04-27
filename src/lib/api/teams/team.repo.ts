@@ -47,6 +47,26 @@ export default class TeamRepo {
     })
   }
 
+  findDashboard(id: string) {
+    return prisma.team.findUnique({
+      where: { id },
+      include: {
+        members: true,
+        abstract: true,
+        currentStage: true,
+        submissions: true,
+        registration: {
+          include: {
+            batch: true,
+            competition: {
+              include: { stages: { orderBy: { order: 'asc' } } },
+            },
+          },
+        },
+      },
+    })
+  }
+
   delete(id: string) {
     return prisma.team.delete({ where: { id } })
   }

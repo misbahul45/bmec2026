@@ -66,31 +66,38 @@ export default class CompetitionService {
         "Successfully registered competition",
     };
   }
-
-  async approveRegistration(
-    data: RegistrationAction,
-  ) {
+  async approveRegistration(data: RegistrationAction) {
     const registration =
       await this.repo.findRegistrationByTeamid(
         data.teamId
       );
 
     if (!registration) {
-      throw new AppError(
-        "Registration not found"
-      );
+      throw new AppError("Registration not found");
     }
-
     const updated =
       await this.repo.approveRegistration(
         data.teamId,
         data.adminId
       );
 
+    const firstStage =
+      await this.repo.findFirstStageByCompetition(
+        registration.competitionId
+      );
+
+    if (!firstStage) {
+      throw new AppError("Stage not found");
+    }
+
+    await this.repo.updateTeamStage(
+      data.teamId,
+      firstStage.id
+    );
+
     return {
       data: updated,
-      message:
-        "Registration approved successfully",
+      message: "Registration approved successfully",
     };
   }
 

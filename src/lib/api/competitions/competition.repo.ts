@@ -57,6 +57,22 @@ export default class CompetitionRepo{
         })
     }
 
+
+        findFirstStageByCompetition(competitionId: string) {
+            return prisma.stage.findFirst({
+                where: { competitionId },
+                orderBy: { order: "asc" },
+            })
+        }
+
+        updateTeamStage(teamId: string, stageId: string) {
+            return prisma.team.update({
+                where: { id: teamId },
+                data: {
+                currentStageId: stageId,
+                },
+            })
+        }
     rejectRegistration(teamId:string, adminId:string){
         return prisma.registration.update({
             where:{

@@ -83,3 +83,9 @@ export const allowedRegisterPaths = (id: string) => [
   `/auth/register/${id}/completed`,
   '/'
 ]
+
+export const WA_GROUP_LINKS: Record<'OLIMPIADE' | 'LKTI' | 'INFOGRAFIS', string> = {
+  OLIMPIADE: 'https://chat.whatsapp.com/OLIMPIADE_LINK_HERE',
+  LKTI: 'https://chat.whatsapp.com/LKTI_LINK_HERE',
+  INFOGRAFIS: 'https://chat.whatsapp.com/INFOGRAFIS_LINK_HERE',
+}

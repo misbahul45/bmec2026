@@ -15,22 +15,28 @@ export function TimelineCard({ process, dotId }: Props) {
 
   const onMouseEnter = () => {
     gsap.to(cardRef.current, {
-      y: -6,
-      scale: 1.02,
-      boxShadow: '0 16px 40px color-mix(in srgb, var(--primary) 12%, transparent)',
+      y: -5,
+      scale: 1.015,
       duration: 0.3,
       ease: 'power2.out',
     })
+    const dot = document.getElementById(dotId)
+    if (dot) {
+      gsap.to(dot, { scale: 1.4, duration: 0.25, ease: 'back.out(2)' })
+    }
   }
 
   const onMouseLeave = () => {
     gsap.to(cardRef.current, {
       y: 0,
       scale: 1,
-      boxShadow: 'none',
       duration: 0.4,
       ease: 'power3.out',
     })
+    const dot = document.getElementById(dotId)
+    if (dot) {
+      gsap.to(dot, { scale: 1, duration: 0.3, ease: 'power2.out' })
+    }
   }
 
   return (
@@ -38,23 +44,22 @@ export function TimelineCard({ process, dotId }: Props) {
       ref={cardRef}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className={`timeline-card relative rounded-2xl border bg-card shadow-sm cursor-default overflow-hidden ${colors.border}`}
-      style={{ transformStyle: 'preserve-3d' }}
+      className={`timeline-card relative rounded-2xl border bg-card/80 backdrop-blur-sm shadow-sm cursor-default overflow-hidden ${colors.border}`}
     >
-      <div className={`h-1 w-full ${colors.line}`} />
+      <div className={`h-0.5 w-full ${colors.line}`} />
 
-      <div className="p-4">
-        <div className="flex items-center gap-2.5 mb-3">
-          <div className={`w-7 h-7 rounded-lg ${colors.iconBg} flex items-center justify-center shrink-0`}>
-            <Icon size={14} className={colors.iconText} />
+      <div className="p-5">
+        <div className="flex items-center gap-3 mb-4">
+          <div className={`w-9 h-9 rounded-xl ${colors.iconBg} flex items-center justify-center shrink-0`}>
+            <Icon size={16} className={colors.iconText} />
           </div>
-          <div>
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block leading-none">
-              Process {process.processNum}
+          <div className="flex-1 min-w-0">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block leading-none mb-0.5">
+              Kompetisi {process.processNum}
             </span>
             <h3 className="text-sm font-bold text-card-foreground leading-tight">{process.title}</h3>
           </div>
-          <span className={`ml-auto text-[10px] font-bold uppercase tracking-wide border rounded-full px-2 py-0.5 shrink-0 ${colors.badge}`}>
+          <span className={`text-[10px] font-bold uppercase tracking-wide border rounded-full px-2 py-0.5 shrink-0 ${colors.badge}`}>
             {process.events.length} tahap
           </span>
         </div>
@@ -63,13 +68,13 @@ export function TimelineCard({ process, dotId }: Props) {
           {process.events.map((ev, i) => (
             <div
               key={i}
-              className="flex items-center gap-2.5 rounded-xl bg-muted/50 border border-border px-3 py-2"
+              className="flex items-center gap-2.5 rounded-lg bg-muted/40 border border-border/60 px-3 py-2 group/ev hover:bg-muted/70 transition-colors"
             >
               <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${colors.dot}`} />
-              <span className="text-[11px] font-semibold text-muted-foreground shrink-0">
+              <span className="text-[11px] font-semibold text-muted-foreground shrink-0 tabular-nums">
                 {ev.date}
               </span>
-              <span className="text-[11px] font-medium text-card-foreground leading-tight flex-1">
+              <span className="text-[11px] font-medium text-card-foreground leading-tight flex-1 truncate">
                 {ev.label}
               </span>
               <span className={`text-[9px] font-bold uppercase border rounded-full px-1.5 py-0.5 shrink-0 ${phaseColors[ev.phase]}`}>

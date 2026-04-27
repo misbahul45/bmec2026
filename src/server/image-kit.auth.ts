@@ -3,6 +3,7 @@ import crypto from "crypto"
 import { prisma } from "~/lib/utils/prisma"
 import { authMiddleware } from "~/middleware/auth.middleware"
 import { fileSchema } from "~/schemas/general.schema"
+import { z } from "zod"
 
 export const imagekitAuth = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
@@ -37,4 +38,24 @@ export const saveUpload = createServerFn({ method: "POST" })
     })
 
     return file
+  })
+
+export const deleteUpload = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(z.object({ url: z.string() }))
+  .handler(async ({ data }) => {
+    const file = await prisma.file.findFirst({ where: { url: data.url } })
+
+    if (!file) return { success: false }
+
+    await fetch(`https://api.imagekit.io/v1/files/${file.fileId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Basic ${Buffer.from(process.env.IMAGEKIT_PRIVATE_KEY! + ":").toString("base64")}`,
+      },
+    })
+
+    await prisma.file.delete({ where: { fileId: file.fileId } })
+
+    return { success: true }
   })

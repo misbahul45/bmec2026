@@ -100,6 +100,11 @@ export async function seedTeams() {
               studentId: `ANGGOTA1-${i}`,
               role: "ANGGOTA",
             },
+            {
+              name: `Anggota 2 Team ${i}`,
+              studentId: `ANGGOTA2-${i}`,
+              role: "ANGGOTA",
+            },
           ],
         },
       },

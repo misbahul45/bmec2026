@@ -1,29 +1,27 @@
-import { useState } from "react"
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "~/components/ui/table"
+import { useQueryStates } from "nuqs"
 import Pagination from "~/components/ui/Pagination"
 import { TeamWithRelations } from "~/types/team.type"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
-import { useQueryStates } from "nuqs"
 import { teamsSearchParams } from "~/schemas/team.schema"
 import CompetitionBadge from "~/components/ui/CompetitionBadge"
 import TeamActions from "./TeamAction"
-import ImageDialog from "~/components/ui/ImageDialog"
 import { exportToExcel } from "~/lib/utils/export-excel"
 import { Download } from "lucide-react"
 import { StageCell } from "./StageCell"
+import { AbstractActions } from "./AbstractActions"
+import { RegistrationActions } from "./RegistrationActions"
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "~/components/ui/table"
 
 type Props = {
   teams: TeamWithRelations[]
   meta: MetaData
   queryKey: unknown[]
+  adminId: string
 }
 
-const TableTeams = ({ teams, meta, queryKey }: Props) => {
+const TableTeams = ({ teams, meta, queryKey, adminId }: Props) => {
   const [query, setQuery] = useQueryStates(teamsSearchParams)
-  const [open, setOpen] = useState(false)
-  const [selectedImage, setSelectedImage] = useState("")
-  const [selectedTitle, setSelectedTitle] = useState("")
 
   const handleExport = () => {
     exportToExcel(
@@ -38,6 +36,7 @@ const TableTeams = ({ teams, meta, queryKey }: Props) => {
         'Jumlah Member': team.members?.length ?? 0,
         Registrasi: team.registration ? team.registration.status : 'Belum Mendaftar',
         Dokumen: team.documentUrl ? 'Ada' : 'Belum Upload',
+        Twibbon: team.twibbonUrl ? team.twibbonUrl : 'Belum Upload',
         Abstract: team.abstract ? 'Ada' : team.competitionType === 'LKTI' ? 'Belum Upload' : 'Tidak Perlu',
         'Tanggal Daftar': new Date(team.createdAt).toLocaleDateString('id-ID'),
       })),
@@ -65,8 +64,9 @@ const TableTeams = ({ teams, meta, queryKey }: Props) => {
               <TableHead className="text-center">Kompetisi</TableHead>
               <TableHead className="text-center">Stage</TableHead>
               <TableHead className="text-center">Member</TableHead>
-              <TableHead className="text-center">Registrasi</TableHead>
+              <TableHead className="text-center">Payment Proof</TableHead>
               <TableHead className="text-center">Document</TableHead>
+              <TableHead className="text-center">Twibbon</TableHead>
               <TableHead className="text-center">Abstract</TableHead>
               <TableHead className="text-center">Created</TableHead>
               <TableHead className="text-center">Action</TableHead>
@@ -76,7 +76,7 @@ const TableTeams = ({ teams, meta, queryKey }: Props) => {
           <TableBody>
             {teams.length === 0 && (
               <TableRow>
-                <TableCell colSpan={11} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={12} className="text-center py-10 text-muted-foreground">
                   Tidak ada data tim
                 </TableCell>
               </TableRow>
@@ -119,16 +119,14 @@ const TableTeams = ({ teams, meta, queryKey }: Props) => {
 
                 <TableCell>
                   {team.registration ? (
-                    <Badge
-                      className="cursor-pointer"
-                      onClick={() => {
-                        setSelectedImage(team.registration?.paymentProof || "")
-                        setSelectedTitle(`Bukti Pembayaran - ${team.name}`)
-                        setOpen(true)
-                      }}
-                    >
-                      Lihat Bukti
-                    </Badge>
+                    <RegistrationActions
+                      teamId={team.id}
+                      adminId={adminId}
+                      teamName={team.name}
+                      paymentProof={team.registration.paymentProof}
+                      status={team.registration.status}
+                      queryKey={queryKey}
+                    />
                   ) : (
                     <Badge variant="destructive">Belum Mendaftar</Badge>
                   )}
@@ -145,10 +143,25 @@ const TableTeams = ({ teams, meta, queryKey }: Props) => {
                 </TableCell>
 
                 <TableCell>
-                  {team.abstract ? (
-                    <a href={team.abstract.fileUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline text-sm">
-                      Lihat Abstract
+                  {team.twibbonUrl ? (
+                    <a href={team.twibbonUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline text-sm">
+                      Lihat Twibbon
                     </a>
+                  ) : (
+                    <Badge variant="destructive">Belum Upload</Badge>
+                  )}
+                </TableCell>
+
+                <TableCell>
+                  {team.abstract ? (
+                    <AbstractActions
+                      abstractId={team.abstract.id}
+                      abstractStatus={team.abstract.status}
+                      fileUrl={team.abstract.fileUrl}
+                      adminId={adminId}
+                      teamName={team.name}
+                      queryKey={queryKey}
+                    />
                   ) : team.competitionType === "LKTI" ? (
                     <Badge variant="destructive">Belum Upload</Badge>
                   ) : (
@@ -174,8 +187,6 @@ const TableTeams = ({ teams, meta, queryKey }: Props) => {
         totalPages={meta.totalPages}
         setPage={(page) => setQuery({ ...query, page })}
       />
-
-      <ImageDialog open={open} setOpen={setOpen} url={selectedImage} title={selectedTitle} />
     </div>
   )
 }

@@ -87,4 +87,9 @@ export default class ExamService {
       message: 'Successfully deleted',
     }
   }
+
+  async findByCompetitionType(competitionType: string) {
+    const exams = await this.repo.getExamsByStageCompetitionType(competitionType)
+    return { data: exams, message: 'Successfully fetched exams' }
+  }
 }

@@ -35,8 +35,8 @@ const TimelineSection = () => {
           { scale: 0, opacity: 0 },
           {
             scale: 1, opacity: 1,
-            duration: 0.45,
-            ease: 'back.out(2)',
+            duration: 0.5,
+            ease: 'back.out(2.5)',
             immediateRender: false,
             scrollTrigger: {
               trigger: dot,
@@ -51,10 +51,10 @@ const TimelineSection = () => {
         const fromLeft = sides[i] === 'left'
         gsap.fromTo(
           card,
-          { opacity: 0, x: fromLeft ? -50 : 50, y: 16 },
+          { opacity: 0, x: fromLeft ? -48 : 48, y: 12 },
           {
             opacity: 1, x: 0, y: 0,
-            duration: 0.65,
+            duration: 0.7,
             ease: 'power3.out',
             immediateRender: false,
             scrollTrigger: {
@@ -88,6 +88,7 @@ const TimelineSection = () => {
           </p>
         </div>
 
+        {/* Desktop */}
         <div ref={gridRef} className="hidden md:block relative">
           <TimelinePath containerRef={gridRef} />
 
@@ -103,15 +104,17 @@ const TimelineSection = () => {
                   {isLeft ? (
                     <>
                       <div className="flex-1 flex justify-end pr-10">
-                        <div className="w-[340px]">
+                        <div className="w-[360px]">
                           <TimelineCard process={proc} dotId={dotId} />
                         </div>
                       </div>
-                      <div className="flex flex-col items-center pt-5" style={{ width: '48px' }}>
+                      <div className="flex flex-col items-center pt-6" style={{ width: '48px' }}>
                         <div
                           id={dotId}
-                          className={`tl-dot w-5 h-5 rounded-full ${colors.dot} border-4 border-background z-10 shrink-0`}
-                          style={{ boxShadow: '0 0 14px color-mix(in srgb, var(--primary) 35%, transparent)' }}
+                          className={`tl-dot w-4 h-4 rounded-full ${colors.dot} border-[3px] border-background z-10 shrink-0`}
+                          style={{
+                            boxShadow: '0 0 0 4px color-mix(in srgb, var(--primary) 15%, transparent), 0 0 16px color-mix(in srgb, var(--primary) 30%, transparent)',
+                          }}
                         />
                       </div>
                       <div className="flex-1" />
@@ -119,15 +122,17 @@ const TimelineSection = () => {
                   ) : (
                     <>
                       <div className="flex-1" />
-                      <div className="flex flex-col items-center pt-5" style={{ width: '48px' }}>
+                      <div className="flex flex-col items-center pt-6" style={{ width: '48px' }}>
                         <div
                           id={dotId}
-                          className={`tl-dot w-5 h-5 rounded-full ${colors.dot} border-4 border-background z-10 shrink-0`}
-                          style={{ boxShadow: '0 0 14px color-mix(in srgb, var(--primary) 35%, transparent)' }}
+                          className={`tl-dot w-4 h-4 rounded-full ${colors.dot} border-[3px] border-background z-10 shrink-0`}
+                          style={{
+                            boxShadow: '0 0 0 4px color-mix(in srgb, var(--primary) 15%, transparent), 0 0 16px color-mix(in srgb, var(--primary) 30%, transparent)',
+                          }}
                         />
                       </div>
                       <div className="flex-1 flex justify-start pl-10">
-                        <div className="w-[340px]">
+                        <div className="w-[360px]">
                           <TimelineCard process={proc} dotId={dotId} />
                         </div>
                       </div>
@@ -139,16 +144,19 @@ const TimelineSection = () => {
           </div>
         </div>
 
+        {/* Mobile */}
         <div className="md:hidden relative">
-          <div className="absolute left-5 top-0 bottom-0 w-px bg-primary/20" />
-          <div className="flex flex-col gap-8 pl-14">
+          <div className="absolute left-4 top-0 bottom-0 w-px bg-primary/20" />
+          <div className="flex flex-col gap-8 pl-12">
             {processes.map((proc) => {
               const colors = accentMap[proc.accent]
               return (
                 <div key={proc.id} className="relative">
                   <div
-                    className={`tl-dot absolute -left-[2.35rem] top-5 w-4 h-4 rounded-full ${colors.dot} border-2 border-background shrink-0`}
-                    style={{ boxShadow: '0 0 8px color-mix(in srgb, var(--primary) 35%, transparent)' }}
+                    className={`tl-dot absolute -left-[2.1rem] top-6 w-3.5 h-3.5 rounded-full ${colors.dot} border-2 border-background shrink-0`}
+                    style={{
+                      boxShadow: '0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent), 0 0 10px color-mix(in srgb, var(--primary) 25%, transparent)',
+                    }}
                   />
                   <TimelineCard process={proc} dotId={`tl-dot-mobile-${proc.processNum}`} />
                 </div>

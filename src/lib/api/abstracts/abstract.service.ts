@@ -26,7 +26,7 @@ export default class AbstractService {
 
     return {
       data: createdAbstract,
-      message: "Successfully created abstract",
+      message: "Abstrak berhasil dikirim",
     }
   }
 

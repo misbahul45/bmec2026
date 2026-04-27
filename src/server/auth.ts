@@ -107,13 +107,14 @@ export const fetchUser = createServerFn({ method: "GET" })
 
     if (!team.members || team.members.length === 0) {
       redirect = `/auth/register/${team.id}/`
-
-    } else if (abstractTeam) {
-      redirect = "/dashboard/team"
-
+    } else if (team.competitionType === 'LKTI') {
+      if (!abstractTeam) {
+        redirect = `/auth/register/${team.id}/completed`
+      } else {
+        redirect = "/dashboard/team"
+      }
     } else if (!registration) {
       redirect = `/auth/register/${team.id}/completed`
-
     } else {
       redirect = "/dashboard/team"
     }

@@ -63,3 +63,12 @@ export const deleteExamQuestion = createServerFn({ method: 'POST' })
       return successResponse<null>(result.data, result.message)
     })
   )
+
+export const getExamsByCompetitionType = createServerFn({ method: 'GET' })
+  .inputValidator(z.string())
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      const result = await examService.findByCompetitionType(data)
+      return successResponse<any>(result.data, result.message)
+    })
+  )
