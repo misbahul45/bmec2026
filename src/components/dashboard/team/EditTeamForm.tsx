@@ -182,7 +182,7 @@ export function EditTeamForm({ team, queryKey }: Props) {
                   <LinkIcon size={12} />
                   Link Drive Twibbon
                 </FieldLabel>
-                <Input {...field} placeholder="https://drive.google.com/..." className="h-9 text-xs rounded-lg" />
+                <Input {...field} value={field.value ?? ''} placeholder="https://drive.google.com/..." className="h-9 text-xs rounded-lg" />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}

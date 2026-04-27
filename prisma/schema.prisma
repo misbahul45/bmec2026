@@ -222,7 +222,6 @@ model Exam {
 
   questions ExamQuestion[]
   attempts  ExamAttempt[]
- u
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
