@@ -1,14 +1,12 @@
 import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import ThreeBackground from "../ui/ThreeBackground";
 import ImageShape from "../ui/ImageShape";
 import { ABOUT_IMAGES } from "~/contants";
 import StatCard from "../ui/StatCard";
-import WhySection from "./WhySection";
+import { Users, School, Trophy, Gift } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
-
 
 const AboutSection: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -18,7 +16,6 @@ const AboutSection: React.FC = () => {
   const centerRingRef = useRef<HTMLDivElement>(null);
   const imageRefs = useRef<HTMLDivElement[]>([]);
   const statsRef = useRef<HTMLDivElement[]>([]);
-
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -96,7 +93,7 @@ const AboutSection: React.FC = () => {
 
           <div
             ref={contentRef}
-            className="px-8 w-full lg:px-14 py-16 flex flex-col justify-center"
+            className="px-4 w-full lg:px-8 py-10 flex flex-col justify-center"
           >
             <h2
               ref={titleRef}
@@ -110,26 +107,33 @@ const AboutSection: React.FC = () => {
               className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed text-justify mb-3"
             >
               Biomedical Engineering Competition (BMEC) merupakan ajang
-              kompetisi tahunan yang berfokus pada ilmu Teknik Biomedis Dasar
-              dan diselenggarakan oleh Himpunan Mahasiswa Teknik Biomedis
-              Universitas Airlangga.
+              kompetisi tahunan di bidang Teknik Biomedis yang diselenggarakan
+              oleh Himpunan Mahasiswa Teknik Biomedis Universitas Airlangga.
+              Dengan mengusung tema{" "}
+              <span className="font-medium text-primary">
+                “Splash New Horizons through Biomedical Engineering”
+              </span>
+              , BMEC menjadi wadah bagi pelajar SMA/sederajat dan mahasiswa di
+              seluruh Indonesia untuk mengembangkan kreativitas serta inovasi di
+              bidang kesehatan.
             </p>
 
             <p
               ref={desc2Ref}
-              className="text-xs sm:text-sm md:text-base text-muted-foreground/70  leading-relaxed text-justify mb-8"
+              className="text-xs sm:text-sm md:text-base text-muted-foreground/70 leading-relaxed text-justify mb-8"
             >
-              BMEC 2025 menghadirkan berbagai fasilitas menarik untuk membantu
-              peserta mengembangkan kemampuan akademik dan inovasi di bidang
-              Teknik Biomedis.
+              Melalui berbagai cabang kompetisi, peserta diasah kemampuan
+              berpikir kritis, kerja sama tim, dan problem solving untuk
+              menciptakan solusi nyata yang berdampak bagi masa depan dunia
+              kesehatan.
             </p>
 
             <div className="grid grid-cols-2 gap-3 mt-4">
               {[
-                { number: "500+", label: "Peserta" },
-                { number: "40+", label: "Sekolah" },
-                { number: "3", label: "Kompetisi" },
-                { number: "2026", label: "BMEC Tahun Ini" },
+                { number: "500+", label: "Peserta", icon: Users },
+                { number: "40+", label: "Sekolah", icon: School },
+                { number: "3", label: "Kompetisi", icon: Trophy },
+                { number: "19.5Jt+", label: "Total Hadiah", icon: Gift },
               ].map((stat, i) => (
                 <div
                   key={i}

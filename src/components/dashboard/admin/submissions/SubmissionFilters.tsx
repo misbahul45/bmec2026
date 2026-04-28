@@ -10,11 +10,18 @@ const STATUS_OPTIONS = [
   { label: 'Rejected', value: 'REJECTED' },
 ]
 
+const COMPETITION_OPTIONS = [
+  { label: 'Semua Lomba', value: 'ALL' },
+  { label: 'LKTI', value: 'LKTI' },
+  { label: 'Infografis', value: 'INFOGRAFIS' },
+]
+
 const LIMIT_OPTIONS = [10, 25, 50, 100]
 
 interface Filters {
   search: string
   status: string
+  competitionType: string
   limit: number
 }
 
@@ -36,6 +43,18 @@ export function SubmissionFilters({ filters, onChange, onSearch, onReset }: Prop
           onChange={(e) => onChange({ ...filters, search: e.target.value })}
           onKeyDown={(e) => e.key === 'Enter' && onSearch()}
         />
+      </div>
+
+      <div className="flex flex-col w-44 gap-1">
+        <Label>Kompetisi</Label>
+        <Select value={filters.competitionType} onValueChange={(v) => onChange({ ...filters, competitionType: v })}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {COMPETITION_OPTIONS.map((o) => (
+              <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="flex flex-col w-44 gap-1">

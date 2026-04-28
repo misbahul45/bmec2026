@@ -77,9 +77,6 @@ export function TimelineCard({ process, dotId }: Props) {
               <span className="text-[11px] font-medium text-card-foreground leading-tight flex-1 truncate">
                 {ev.label}
               </span>
-              <span className={`text-[9px] font-bold uppercase border rounded-full px-1.5 py-0.5 shrink-0 ${phaseColors[ev.phase]}`}>
-                {ev.phase}
-              </span>
             </div>
           ))}
         </div>

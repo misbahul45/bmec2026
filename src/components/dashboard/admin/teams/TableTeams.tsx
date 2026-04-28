@@ -9,8 +9,6 @@ import TeamActions from "./TeamAction"
 import { exportToExcel } from "~/lib/utils/export-excel"
 import { Download } from "lucide-react"
 import { StageCell } from "./StageCell"
-import { AbstractActions } from "./AbstractActions"
-import { RegistrationActions } from "./RegistrationActions"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "~/components/ui/table"
 
 type Props = {
@@ -37,7 +35,6 @@ const TableTeams = ({ teams, meta, queryKey, adminId }: Props) => {
         Registrasi: team.registration ? team.registration.status : 'Belum Mendaftar',
         Dokumen: team.documentUrl ? 'Ada' : 'Belum Upload',
         Twibbon: team.twibbonUrl ? team.twibbonUrl : 'Belum Upload',
-        Abstract: team.abstract ? 'Ada' : team.competitionType === 'LKTI' ? 'Belum Upload' : 'Tidak Perlu',
         'Tanggal Daftar': new Date(team.createdAt).toLocaleDateString('id-ID'),
       })),
       `data-tim-${new Date().toISOString().slice(0, 10)}`,
@@ -67,7 +64,6 @@ const TableTeams = ({ teams, meta, queryKey, adminId }: Props) => {
               <TableHead className="text-center">Payment Proof</TableHead>
               <TableHead className="text-center">Document</TableHead>
               <TableHead className="text-center">Twibbon</TableHead>
-              <TableHead className="text-center">Abstract</TableHead>
               <TableHead className="text-center">Created</TableHead>
               <TableHead className="text-center">Action</TableHead>
             </TableRow>
@@ -118,15 +114,12 @@ const TableTeams = ({ teams, meta, queryKey, adminId }: Props) => {
                 <TableCell>{team.members?.length ?? 0} Orang</TableCell>
 
                 <TableCell>
-                  {team.registration ? (
-                    <RegistrationActions
-                      teamId={team.id}
-                      adminId={adminId}
-                      teamName={team.name}
-                      paymentProof={team.registration.paymentProof}
-                      status={team.registration.status}
-                      queryKey={queryKey}
-                    />
+                  {team.registration?.paymentProof ? (
+                    <a href={team.registration.paymentProof} target="_blank" rel="noopener noreferrer" className="text-primary underline text-sm">
+                      Lihat Bukti
+                    </a>
+                  ) : team.registration ? (
+                    <Badge variant="outline" className="text-[10px]">Belum Upload</Badge>
                   ) : (
                     <Badge variant="destructive">Belum Mendaftar</Badge>
                   )}
@@ -149,23 +142,6 @@ const TableTeams = ({ teams, meta, queryKey, adminId }: Props) => {
                     </a>
                   ) : (
                     <Badge variant="destructive">Belum Upload</Badge>
-                  )}
-                </TableCell>
-
-                <TableCell>
-                  {team.abstract ? (
-                    <AbstractActions
-                      abstractId={team.abstract.id}
-                      abstractStatus={team.abstract.status}
-                      fileUrl={team.abstract.fileUrl}
-                      adminId={adminId}
-                      teamName={team.name}
-                      queryKey={queryKey}
-                    />
-                  ) : team.competitionType === "LKTI" ? (
-                    <Badge variant="destructive">Belum Upload</Badge>
-                  ) : (
-                    <Badge variant="ghost">Tidak Perlu</Badge>
                   )}
                 </TableCell>
 

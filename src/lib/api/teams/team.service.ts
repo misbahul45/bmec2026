@@ -47,71 +47,41 @@ export default class TeamService {
     }
 
     const existing = await this.repo.findByEmail(payload.email)
-
-    if (existing) {
-      throw new AppError("Email sudah terdaftar", 400)
-    }
+    if (existing) throw new AppError("Email sudah terdaftar", 400)
 
     const uniqueName = await this.repo.findByName(payload.teamName)
-
-    if (uniqueName) {
-      throw new AppError("Nama team sudah digunakan", 400)
-    }
+    if (uniqueName) throw new AppError("Nama team sudah digunakan", 400)
 
     const hashedPassword = await bcrypt.hash(payload.password, 10)
 
-    let attempt = 0
-    const MAX_RETRY = 3
+    const tempCode = `pending-${Date.now()}`
 
-    while (attempt < MAX_RETRY) {
-      try {
-        const code = await this.generateNextCode(
-          payload.competitionType
-        )
+    const team = await this.repo.create({
+      schoolAddress: payload.address,
+      schoolName: payload.institution,
+      password: hashedPassword,
+      email: payload.email,
+      competitionType: payload.competitionType,
+      name: payload.teamName,
+      phone: payload.phone,
+      code: tempCode,
+    })
 
-        const team = await this.repo.create({
-          schoolAddress: payload.address,
-          schoolName: payload.institution,
-          password: hashedPassword,
-          email: payload.email,
-          competitionType: payload.competitionType,
-          name: payload.teamName,
-          phone: payload.phone,
-          code,
-        })
+    const competition = await prisma.competition.findFirst({
+      where: { name: payload.competitionType as any },
+    })
 
-        const competition = await prisma.competition.findFirst({
-          where: { name: payload.competitionType as any },
-        })
-
-        if (competition) {
-          const firstStage = await this.repo.getFirstStageByCompetitionId(competition.id)
-          if (firstStage) {
-            await this.repo.updateStage(team.id, firstStage.id)
-          }
-        }
-
-        return {
-          data: this.sanitizeTeam(team),
-          message: "Team created successfully",
-        }
-      } catch (error: any) {
-        if (
-          error.code === "P2002" &&
-          error.meta?.target?.includes("code")
-        ) {
-          attempt++
-          continue
-        }
-
-        throw error
+    if (competition) {
+      const firstStage = await this.repo.getFirstStageByCompetitionId(competition.id)
+      if (firstStage) {
+        await this.repo.updateStage(team.id, firstStage.id)
       }
     }
 
-    throw new AppError(
-      "Gagal membuat kode tim. Silakan coba lagi.",
-      500
-    )
+    return {
+      data: this.sanitizeTeam(team),
+      message: "Team created successfully",
+    }
   }
   async findAll(
     query: QueryTeam
@@ -141,6 +111,14 @@ export default class TeamService {
 
     if (query.competitionType) {
       where.competitionType = query.competitionType
+    }
+
+    if (query.registrationStatus) {
+      if (query.registrationStatus === 'NONE') {
+        where.registration = { is: null }
+      } else {
+        where.registration = { status: query.registrationStatus as any }
+      }
     }
 
     const [teams, total] = await Promise.all([

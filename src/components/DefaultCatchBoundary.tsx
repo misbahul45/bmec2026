@@ -109,24 +109,6 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
               <RefreshCw className="w-4 h-4" />
               Try Again
             </button>
-
-            {isRoot ? (
-              <Link
-                to="/"
-                className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 transition active:scale-95"
-              >
-                <Home className="w-4 h-4" />
-                Back Home
-              </Link>
-            ) : (
-              <button
-                onClick={() => window.history.back()}
-                className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 transition active:scale-95"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Go Back
-              </button>
-            )}
           </div>
         </div>
       </div>

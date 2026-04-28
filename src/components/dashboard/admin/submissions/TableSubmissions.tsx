@@ -8,11 +8,19 @@ interface Submission {
   id: string
   title: string | null
   fileUrl: string | null
+  turnitinUrl?: string | null
+  orsinalitasUrl?: string | null
   score: number | null
   feedback: string | null
   status: string
   createdAt: string | Date
-  team: { id: string; name: string; schoolName: string; competitionType: any }
+  team: {
+    id: string
+    name: string
+    schoolName: string
+    competitionType: any
+    registration?: { paymentProof?: string | null; status?: string } | null
+  }
   stage: { id: string; name: string; competition: { name: string } }
   admin: { name: string } | null
 }
@@ -38,6 +46,9 @@ export function TableSubmissions({ submissions, meta, adminId, queryKey, onPageC
               <TableHead>Stage</TableHead>
               <TableHead>Judul</TableHead>
               <TableHead>File</TableHead>
+              <TableHead>Turnitin</TableHead>
+              <TableHead>Orisinalitas</TableHead>
+              <TableHead>Bukti Bayar</TableHead>
               <TableHead className="text-center">Skor</TableHead>
               <TableHead className="text-center">Status</TableHead>
               <TableHead>Reviewer</TableHead>
@@ -49,7 +60,7 @@ export function TableSubmissions({ submissions, meta, adminId, queryKey, onPageC
           <TableBody>
             {submissions.length === 0 && (
               <TableRow>
-                <TableCell colSpan={11} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={14} className="text-center py-10 text-muted-foreground">
                   Tidak ada data submission
                 </TableCell>
               </TableRow>
@@ -82,16 +93,41 @@ export function TableSubmissions({ submissions, meta, adminId, queryKey, onPageC
 
                 <TableCell>
                   {sub.fileUrl ? (
-                    <a
-                      href={sub.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary underline text-xs"
-                    >
+                    <a href={sub.fileUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline text-xs">
                       Lihat File
                     </a>
                   ) : (
                     <span className="text-xs text-muted-foreground">—</span>
+                  )}
+                </TableCell>
+
+                <TableCell>
+                  {sub.turnitinUrl ? (
+                    <a href={sub.turnitinUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline text-xs">
+                      Lihat
+                    </a>
+                  ) : (
+                    <span className="text-[10px] text-muted-foreground italic">Tanpa turnitin</span>
+                  )}
+                </TableCell>
+
+                <TableCell>
+                  {sub.orsinalitasUrl ? (
+                    <a href={sub.orsinalitasUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline text-xs">
+                      Lihat
+                    </a>
+                  ) : (
+                    <span className="text-[10px] text-muted-foreground italic">Tidak ada</span>
+                  )}
+                </TableCell>
+
+                <TableCell>
+                  {sub.team.registration?.paymentProof ? (
+                    <a href={sub.team.registration.paymentProof} target="_blank" rel="noopener noreferrer" className="text-primary underline text-xs">
+                      Lihat
+                    </a>
+                  ) : (
+                    <span className="text-[10px] text-muted-foreground italic">Belum upload</span>
                   )}
                 </TableCell>
 
@@ -108,9 +144,7 @@ export function TableSubmissions({ submissions, meta, adminId, queryKey, onPageC
                 </TableCell>
 
                 <TableCell>
-                  <span className="text-xs">
-                    {new Date(sub.createdAt).toLocaleDateString('id-ID')}
-                  </span>
+                  <span className="text-xs">{new Date(sub.createdAt).toLocaleDateString('id-ID')}</span>
                 </TableCell>
 
                 <TableCell className="text-center">

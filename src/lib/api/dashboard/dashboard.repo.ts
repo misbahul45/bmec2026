@@ -10,7 +10,6 @@ export default class DashboardRepo {
       prisma.registration.count(),
       prisma.submission.count(),
       prisma.examAttempt.count(),
-      prisma.abstractSubmission.count(),
     ])
   }
 
@@ -20,10 +19,6 @@ export default class DashboardRepo {
 
   getSubmissionByStatus() {
     return prisma.submission.groupBy({ by: ['status'], _count: { _all: true } })
-  }
-
-  getAbstractByStatus() {
-    return prisma.abstractSubmission.groupBy({ by: ['status'], _count: { _all: true } })
   }
 
   getTeamsByCompetitionType() {

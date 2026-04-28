@@ -25,8 +25,8 @@ function DashboardContent() {
   const statusGroups = [
     { label: 'Registrasi', data: d.registrationByStatus },
     { label: 'Submission', data: d.submissionByStatus },
-    { label: 'Abstract', data: d.abstractByStatus },
   ]
+
 
   return (
     <div className="space-y-6">

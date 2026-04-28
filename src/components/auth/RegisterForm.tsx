@@ -135,7 +135,7 @@ const RegisterForm = () => {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid} className="input-anim">
-                    <FieldLabel htmlFor="reg-email">Email Team</FieldLabel>
+                    <FieldLabel htmlFor="reg-email">Email Tim (Ketua Tim)</FieldLabel>
                     <Input {...field} id="reg-email" type="email" placeholder="email@team.com" autoComplete="email" aria-invalid={fieldState.invalid} className="rounded-md text-xs h-9 focus:ring-2 focus:ring-primary/40 transition-all" />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
@@ -147,7 +147,7 @@ const RegisterForm = () => {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid} className="input-anim">
-                    <FieldLabel htmlFor="phone">No. Telepon</FieldLabel>
+                    <FieldLabel htmlFor="phone">Nomor Telepon Sekolah</FieldLabel>
                     <Input {...field} id="phone" type="tel" placeholder="08xxxxxxxxxx" aria-invalid={fieldState.invalid} className="rounded-md text-xs h-9 focus:ring-2 focus:ring-primary/40 transition-all" />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>

@@ -22,6 +22,14 @@ const competitionTypes = [
   { label: "Infografis", value: "INFOGRAFIS" },
 ]
 
+const registrationStatuses = [
+  { label: "Semua Status", value: "ALL" },
+  { label: "Belum Mendaftar", value: "NONE" },
+  { label: "Menunggu Verifikasi", value: "PENDING" },
+  { label: "Terverifikasi", value: "APPROVED" },
+  { label: "Ditolak", value: "REJECTED" },
+]
+
 const limits = [10, 50, 100, 1000]
 
 export default function SearchTeam() {
@@ -61,28 +69,33 @@ export default function SearchTeam() {
 
         <div className="flex flex-col w-55 gap-1">
           <Label>Competition</Label>
-
           <Select
             value={draft.competitionType}
-            onValueChange={(val) =>
-              setDraft({
-                ...draft,
-                competitionType: val,
-              })
-            }
+            onValueChange={(val) => setDraft({ ...draft, competitionType: val })}
           >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
-
             <SelectContent>
               {competitionTypes.map((item) => (
-                <SelectItem
-                  key={item.value}
-                  value={item.value}
-                >
-                  {item.label}
-                </SelectItem>
+                <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex flex-col w-48 gap-1">
+          <Label>Status Registrasi</Label>
+          <Select
+            value={draft.registrationStatus}
+            onValueChange={(val) => setDraft({ ...draft, registrationStatus: val })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {registrationStatuses.map((item) => (
+                <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -126,6 +139,7 @@ export default function SearchTeam() {
               limit: 10,
               search: "",
               competitionType: "ALL",
+              registrationStatus: "ALL",
             })
           }
         >

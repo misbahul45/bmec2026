@@ -26,13 +26,44 @@ export const processes: TimelineProcess[] = [
     Icon: Medal,
     accent: 'primary',
     events: [
-      { date: '20 Feb 2026', label: 'Pendaftaran Batch 1', phase: 'open' },
-      { date: '01 Mar 2026', label: 'Pendaftaran Batch 2', phase: 'open' },
-      { date: '15 Mar 2026', label: 'Tryout 1', phase: 'select' },
-      { date: '25 Mar 2026', label: 'Tryout 2', phase: 'select' },
-      { date: '05 Apr 2026', label: 'Seleksi / Penyisihan', phase: 'final' },
+      {
+        date: '25 Mei - 4 Sep',
+        label: 'Registration',
+        phase: 'open',
+      },
+      {
+        date: '1 Ags - 6 Sep',
+        label: 'Tryout Period',
+        phase: 'submit',
+      },
+      {
+        date: '12 September',
+        label: 'Babak Penyisihan',
+        phase: 'select',
+      },
+      {
+        date: '17 Oktober',
+        label: 'Webinar & Pengumuman Semifinalis',
+        phase: 'select',
+      },
+      {
+        date: '24 Oktober',
+        label: 'Technical Meeting',
+        phase: 'select',
+      },
+      {
+        date: '7 November',
+        label: 'Semifinal',
+        phase: 'final',
+      },
+      {
+        date: '8 November',
+        label: 'Grand Final',
+        phase: 'final',
+      },
     ],
   },
+
   {
     id: 'lkti',
     processNum: 2,
@@ -41,13 +72,44 @@ export const processes: TimelineProcess[] = [
     Icon: FileText,
     accent: 'secondary',
     events: [
-      { date: '10 Apr 2026', label: 'Pendaftaran LKTI', phase: 'open' },
-      { date: '20 Mei 2026', label: 'Pengumpulan Karya', phase: 'submit' },
-      { date: '10 Jun 2026', label: 'Penilaian Juri', phase: 'select' },
-      { date: '18 Sep 2026', label: 'Semifinal (Offline)', phase: 'select' },
-      { date: '02 Okt 2026', label: 'Final (Offline)', phase: 'final' },
+      {
+        date: '25 Mei - 24 Juli',
+        label: 'Submit Abstract',
+        phase: 'open',
+      },
+      {
+        date: '15 Juli',
+        label: 'Pengumuman Lolos Abstract',
+        phase: 'select',
+      },
+      {
+        date: '16 Juli - 4 Sep',
+        label: 'Submit Full Paper',
+        phase: 'submit',
+      },
+      {
+        date: '17 Oktober',
+        label: 'Webinar & Pengumuman',
+        phase: 'select',
+      },
+      {
+        date: '24 Oktober',
+        label: 'Technical Meeting',
+        phase: 'select',
+      },
+      {
+        date: '7 November',
+        label: 'Semifinal',
+        phase: 'final',
+      },
+      {
+        date: '8 November',
+        label: 'Grand Final',
+        phase: 'final',
+      },
     ],
   },
+
   {
     id: 'infografis',
     processNum: 3,
@@ -56,11 +118,36 @@ export const processes: TimelineProcess[] = [
     Icon: Image,
     accent: 'accent',
     events: [
-      { date: '15 Apr 2026', label: 'Pendaftaran', phase: 'open' },
-      { date: '25 Mei 2026', label: 'Submit Karya', phase: 'submit' },
-      { date: '15 Jun 2026', label: 'Kurasi', phase: 'select' },
-      { date: '18 Sep 2026', label: 'Showcase', phase: 'select' },
-      { date: '02 Okt 2026', label: 'Final & Awarding', phase: 'final' },
+      {
+        date: '25 Mei - 4 Sep',
+        label: 'Registration',
+        phase: 'open',
+      },
+      {
+        date: '17 Oktober',
+        label: 'Webinar & Pengumuman Finalis',
+        phase: 'select',
+      },
+      {
+        date: '19 Okt - 2 Nov',
+        label: 'Upload Feed Finalis',
+        phase: 'submit',
+      },
+      {
+        date: '24 Oktober',
+        label: 'Technical Meeting',
+        phase: 'select',
+      },
+      {
+        date: '7 November',
+        label: 'Semifinal',
+        phase: 'final',
+      },
+      {
+        date: '8 November',
+        label: 'Grand Final',
+        phase: 'final',
+      },
     ],
   },
 ]

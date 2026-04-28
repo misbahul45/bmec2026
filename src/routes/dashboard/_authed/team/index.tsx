@@ -11,12 +11,17 @@ import { RegistrationStatusCard } from '~/components/dashboard/team/Registration
 import { Skeleton } from '~/components/ui/skeleton'
 import { MapPin, ChevronRight } from 'lucide-react'
 import { Badge } from '~/components/ui/badge'
+import { competitionQueryOptions } from '~/lib/api/competitions/competition.query-options'
 
 export const Route = createFileRoute('/dashboard/_authed/team/')({
   loader: async ({ context }) => {
     const userId = context.user?.userId
     if (userId) {
       await context.queryClient.ensureQueryData(teamDashboardQueryOptions(userId))
+
+      await context.queryClient.ensureQueryData(
+        competitionQueryOptions("LKTI")
+      )
     }
   },
   component: RouteComponent,
@@ -38,20 +43,33 @@ function RouteComponent() {
 function TeamDashboard({ teamId }: { teamId: string }) {
   const queryKey = teamDashboardQueryOptions(teamId).queryKey
   const { data: res } = useSuspenseQuery(teamDashboardQueryOptions(teamId))
+
+  const { data: competitionRes } =
+  useSuspenseQuery(
+    competitionQueryOptions("LKTI")
+  )
+
   const team = res.data
 
   const registration = team.registration
   const registrationStatus = registration?.status ?? null
-  const abstract = team.abstract
   const competitionType = team.competitionType
   const currentStage = team.currentStage
   const allStages = registration?.competition?.stages ?? []
+  const abstractStatus=team.submissions[0]?.status ?? null
+
+  const competition =
+    competitionRes.data
+
+  const activeBatch =
+    competition?.batches?.[0] ?? null
+
 
   return (
     <div className="space-y-8">
       <div className="space-y-4">
         <ProfileTeam data={team} />
-        <EditTeamForm team={team} queryKey={queryKey} />
+        <EditTeamForm team={team} queryKey={queryKey} registrationStatus={registrationStatus} />
       </div>
 
       {allStages.length > 0 && (
@@ -134,9 +152,11 @@ function TeamDashboard({ teamId }: { teamId: string }) {
 
         {competitionType === 'LKTI' && (
           <LKTISection
-            abstractStatus={abstract?.status ?? null}
+            abstractStatus={abstractStatus}
             teamId={teamId}
             stageId={team.currentStageId ?? null}
+            competitionId={competition?.id}
+            batchId={activeBatch?.id}
             batchName={registration?.batch?.name}
             batchPrice={registration?.batch?.price ? Number(registration.batch.price) : undefined}
             existingSubmission={team.submissions?.find((s: any) => s.stageId === team.currentStageId) ?? null}

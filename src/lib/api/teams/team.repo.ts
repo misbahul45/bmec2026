@@ -29,9 +29,16 @@ export default class TeamRepo {
       orderBy: { createdAt: "desc" },
       include: {
         members: true,
-        abstract: true,
         registration: { include: { competition: { include: { stages: { orderBy: { order: 'asc' } } } } } },
         currentStage: true,
+      },
+    })
+  }
+
+  findSubmissionsByTeamId(teamId:string){
+    return prisma.submission.findMany({
+      where:{
+        teamId
       },
     })
   }
@@ -52,7 +59,6 @@ export default class TeamRepo {
       where: { id },
       include: {
         members: true,
-        abstract: true,
         currentStage: true,
         submissions: true,
         registration: {
@@ -114,17 +120,13 @@ export default class TeamRepo {
 
   findLatestCodeByType(prefix: string) {
     return prisma.team.findFirst({
-      where: {
-        code: {
-          startsWith: prefix,
-        },
-      },
-      orderBy: {
-        code: "desc",
-      },
-      select: {
-        code: true,
-      },
+      where: { code: { startsWith: prefix } },
+      orderBy: { code: "desc" },
+      select: { code: true },
     })
+  }
+
+  updateCode(teamId: string, code: string) {
+    return prisma.team.update({ where: { id: teamId }, data: { code } })
   }
 }

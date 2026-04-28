@@ -5,26 +5,24 @@ export default class DashboardService {
 
   async getSummary() {
     const [
-      [teams, members, admins, competitions, registrations, submissions, attempts, abstracts],
-      regByStatus,
-      subByStatus,
-      absByStatus,
-      teamsByCompType,
-      subByStageType,
-      attemptDates,
-      [flagged, normal, cheatAgg],
-      avgScore,
-    ] = await Promise.all([
-      this.repo.getCounts(),
-      this.repo.getRegistrationByStatus(),
-      this.repo.getSubmissionByStatus(),
-      this.repo.getAbstractByStatus(),
-      this.repo.getTeamsByCompetitionType(),
-      this.repo.getSubmissionCountByStageType(),
-      this.repo.getExamAttemptsByDate(),
-      this.repo.getCheatStats(),
-      this.repo.getAvgScore(),
-    ])
+    [teams, members, admins, competitions, registrations, submissions, attempts],
+    regByStatus,
+    subByStatus,
+    teamsByCompType,
+    subByStageType,
+    attemptDates,
+    [flagged, normal, cheatAgg],
+    avgScore,
+  ] = await Promise.all([
+    this.repo.getCounts(),
+    this.repo.getRegistrationByStatus(),
+    this.repo.getSubmissionByStatus(),
+    this.repo.getTeamsByCompetitionType(),
+    this.repo.getSubmissionCountByStageType(),
+    this.repo.getExamAttemptsByDate(),
+    this.repo.getCheatStats(),
+    this.repo.getAvgScore(),
+  ])
 
     const toStatusMap = (arr: { status: string; _count: { _all: number } }[]) =>
       Object.fromEntries(arr.map((r) => [r.status, r._count._all]))
@@ -54,15 +52,14 @@ export default class DashboardService {
     ])
 
     return {
-      counts: { teams, members, admins, competitions, registrations, submissions, attempts, abstracts },
+      counts: { teams, members, admins, competitions, registrations, submissions, attempts, },
       registrationByStatus: toStatusMap(regByStatus as any),
       submissionByStatus: toStatusMap(subByStatus as any),
-      abstractByStatus: toStatusMap(absByStatus as any),
-      registrationByCompetition: teamsByCompType.map((t) => ({
+      registrationByCompetition: teamsByCompType.map((t:any) => ({
         name: t.competitionType,
         count: t._count._all,
       })),
-      submissionByStage: subByStageType.map((s) => ({
+      submissionByStage: subByStageType.map((s:any) => ({
         name: s.stage_name,
         count: Number(s.count),
       })),
@@ -72,7 +69,7 @@ export default class DashboardService {
         normal,
         totalCheatEvents: cheatAgg._sum.cheatCount ?? 0,
       },
-      avgExamScore: Math.round(avgScore._avg.totalScore ?? 0),
+      avgExamScore: Math.round(avgScore?._avg.totalScore ?? 0),
       insights: {
         mostActiveTeam: mostActiveTeam?.name ?? '—',
         mostPopularCompetition: mostPopularComp?.name ?? '—',

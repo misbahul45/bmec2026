@@ -5,6 +5,7 @@ export const NAV_ITEMS = [
   { title: 'Timeline', href: '#timeline' },
   { title: 'Competition', href: '#competition' },
   { title: 'Gallery', href: '#gallery' },
+  { title: 'FAQ', href: '#faq' },
 ]
 
 export const ABOUT_IMAGES =  [
@@ -85,7 +86,7 @@ export const allowedRegisterPaths = (id: string) => [
 ]
 
 export const WA_GROUP_LINKS: Record<'OLIMPIADE' | 'LKTI' | 'INFOGRAFIS', string> = {
-  OLIMPIADE: 'https://chat.whatsapp.com/OLIMPIADE_LINK_HERE',
-  LKTI: 'https://chat.whatsapp.com/LKTI_LINK_HERE',
-  INFOGRAFIS: 'https://chat.whatsapp.com/INFOGRAFIS_LINK_HERE',
+  OLIMPIADE: 'https://chat.whatsapp.com/H12itJmZMtqGmhX0cQI8Uu?mode=gi_t',
+  LKTI: 'https://chat.whatsapp.com/Ed3YvD4bAxmFnx0vc86Fae?mode=gi_t ',
+  INFOGRAFIS: 'https://chat.whatsapp.com/FdW6eAzUshtBp5tjNr0YO1?mode=gi_t',
 }

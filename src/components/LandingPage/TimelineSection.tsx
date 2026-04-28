@@ -4,7 +4,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { processes, accentMap } from './Timeline/data'
 import { TimelineCard } from './Timeline/TimelineCard'
 import { TimelinePath } from './Timeline/TimelinePath'
-import { TimelineParticles } from './Timeline/TimelineParticles'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -76,7 +75,6 @@ const TimelineSection = () => {
       id="timeline"
       className="relative overflow-hidden py-20 md:py-28 bg-background"
     >
-      <TimelineParticles />
 
       <div className="relative z-10 max-w-5xl mx-auto px-6">
         <div className="tl-header text-center mb-16">
@@ -88,7 +86,6 @@ const TimelineSection = () => {
           </p>
         </div>
 
-        {/* Desktop */}
         <div ref={gridRef} className="hidden md:block relative">
           <TimelinePath containerRef={gridRef} />
 

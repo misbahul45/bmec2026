@@ -5,13 +5,6 @@ import { useCTAAnimation } from './CTA/useCTAAnimation'
 import { CTAThree } from './CTA/CTAThree'
 import { Button } from '~/components/ui/button'
 
-const stats = [
-  { value: '3', label: 'Cabang Lomba' },
-  { value: 'Rp19,5jt', label: 'Total Hadiah' },
-  { value: '100+', label: 'Soal Eksklusif' },
-  { value: '∞', label: 'Potensimu' },
-]
-
 const CTASection = () => {
   const sectionRef = useRef<HTMLElement>(null)
   useCTAAnimation(sectionRef)
@@ -20,55 +13,37 @@ const CTASection = () => {
     <section
       ref={sectionRef}
       id="cta"
-      className="relative overflow-hidden py-28 md:py-40"
+      className="relative overflow-hidden py-16 md:py-20 w-full max-w-4xl mx-auto mb-10 rounded-2xl"
       style={{
-        background: 'linear-gradient(180deg, transparent 0%, var(--accent) 100%)',
-        backgroundColor: 'var(--background)',
+        background: 'linear-gradient(160deg, color-mix(in srgb, var(--primary) 15%, var(--background)) 0%, var(--accent) 100%)',
       }}
     >
       <CTAThree />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        <h2 className="cta-headline text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-accent-foreground leading-[1.05] tracking-tight mb-6">
-          Jadilah Bagian dari<br />
-          <span className="text-primary/80">Generasi Inovator</span><br />
-          <span className="text-accent-foreground">Biomedis Indonesia</span>
+      <div className="relative z-10 mx-auto text-center px-6">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-accent-foreground leading-snug tracking-tight mb-3">
+          Jadilah Bagian dari{' '}
+          <span className="text-primary">Generasi Inovator</span>{' '}
+          Biomedis Indonesia
         </h2>
-
-        <p className="cta-sub text-accent-foreground/65 text-base md:text-lg max-w-xl mx-auto leading-relaxed mb-10">
-          BMEC 2026 bukan sekadar kompetisi. Ini adalah panggung untuk membuktikan bahwa kamu siap membawa inovasi ke dunia kesehatan masa depan.
+        <p className="text-sm text-accent-foreground/60 max-w-md mx-auto mb-8">
+          Daftarkan timmu sekarang dan buktikan kemampuanmu di kompetisi Teknik Biomedis terbesar.
         </p>
 
-        <div className="cta-stats flex flex-wrap justify-center gap-3 mb-12">
-          {stats.map((s) => (
-            <div
-              key={s.label}
-              className="flex flex-col items-center bg-secondary/80 border border-accent-foreground/20 rounded-2xl px-5 py-3 min-w-22.5"
-            >
-              <span className="text-xl font-bold text-accent-foreground">{s.value}</span>
-              <span className="text-[10px] text-accent-foreground/55 uppercase tracking-wide mt-0.5">{s.label}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="cta-actions flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button size="lg" className="rounded-xl px-8 gap-2" asChild>
+        <div className="cta-actions flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button size="default" className="rounded-xl px-6 gap-2 text-sm" asChild>
             <Link to="/auth/register">
               Daftar Sekarang
-              <ArrowRight size={15} />
+              <ArrowRight size={14} />
             </Link>
           </Button>
-          <Button size="lg" variant="outline" className="rounded-xl px-8 gap-2" asChild>
+          <Button size="default" variant="outline" className="rounded-xl px-6 gap-2 text-sm" asChild>
             <a href="#competition">
-              <BookOpen size={15} />
+              <BookOpen size={14} />
               Lihat Detail Lomba
             </a>
           </Button>
         </div>
-
-        <p className="cta-footnote text-xs text-accent-foreground/45 mt-7">
-          Sertifikat untuk semua peserta · Gratis tryout · Soal dari dosen UNAIR
-        </p>
       </div>
     </section>
   )

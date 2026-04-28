@@ -117,22 +117,22 @@ const HeroSection = () => {
               </span>{' '}
               2026
             </h1>
-
             <p
               ref={descRef}
-              className="text-sm opacity-90 md:text-md sm:text-lg lg:text-2xl sm:max-w-md lg:max-w-xl"
+              className="text-sm opacity-90 md:text-md sm:text-lg lg:text-2xl sm:max-w-md lg:max-w-2xl leading-relaxed"
             >
-              Ajang kompetisi tahunan Teknik Biomedis oleh HMTB Universitas Airlangga
-              untuk mengembangkan potensi, kreativitas, dan inovasi di bidang kesehatan.
+              Kompetisi nasional Teknik Biomedis untuk pelajar dan mahasiswa
+              seluruh Indonesia. Hadir dengan cabang Olimpiade, Infografis,
+              dan LKTI untuk melahirkan inovasi baru di bidang kesehatan.
             </p>
 
             <div ref={ctaRef} className="flex gap-2 sm:gap-3 flex-wrap justify-center">
-              <Link
-                to="/auth/register"
+              <a
+                href='#competition'
                 className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs sm:text-sm shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200"
               >
-                Daftar Sekarang →
-              </Link>
+                Detail Kompetisi →
+              </a>
               <a
                 href="#timeline"
                 className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-background/10 backdrop-blur border font-semibold text-xs sm:text-sm hover:bg-white/20 transition-all duration-200"

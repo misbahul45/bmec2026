@@ -5,6 +5,7 @@ export interface SubmissionQuery {
   search?: string
   stageId?: string
   status?: SubmissionStatus | 'ALL'
+  competitionType?: string
   page?: number
   limit?: number
 }
@@ -17,7 +18,12 @@ export default class SubmissionRepo {
       take,
       orderBy: { createdAt: 'desc' },
       include: {
-        team: { select: { id: true, name: true, schoolName: true, competitionType: true } },
+        team: {
+          select: {
+            id: true, name: true, schoolName: true, competitionType: true,
+            registration: { select: { paymentProof: true, status: true } },
+          },
+        },
         stage: { select: { id: true, name: true, competition: { select: { name: true } } } },
         admin: { select: { id: true, name: true } },
       },
@@ -80,11 +86,21 @@ export default class SubmissionRepo {
     return prisma.submission.create({ data })
   }
 
-  upsert(data: { teamId: string; stageId: string; fileUrl: string; title?: string }) {
+  upsert(data: { teamId: string; stageId: string; title?: string; turnitinUrl?: string; orsinalitasUrl?: string, abstractUrl?:string, fileUrl?:string }) {
     return prisma.submission.upsert({
       where: { teamId_stageId: { teamId: data.teamId, stageId: data.stageId } },
-      update: { fileUrl: data.fileUrl, title: data.title, status: 'PENDING' },
-      create: data,
+      update: { title: data.title, status:'PENDING' , turnitinUrl: data.turnitinUrl, orsinalitasUrl: data.orsinalitasUrl, abstractUrl:data.abstractUrl },
+      create: {
+        ...data,
+        status:!data.turnitinUrl?'APPROVED':'PENDING'
+      },
+    })
+  }
+
+  updateFileUrl(teamId: string, stageId: string, data: { fileUrl?: string; turnitinUrl?: string; orsinalitasUrl?: string }) {
+    return prisma.submission.update({
+      where: { teamId_stageId: { teamId, stageId } },
+      data,
     })
   }
 

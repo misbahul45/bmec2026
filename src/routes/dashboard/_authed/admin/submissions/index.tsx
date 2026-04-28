@@ -5,7 +5,7 @@ import { submissionsQueryOptions } from '~/lib/api/submissions/submission.query-
 import { TableSubmissions } from '~/components/dashboard/admin/submissions/TableSubmissions'
 import { SubmissionFilters } from '~/components/dashboard/admin/submissions/SubmissionFilters'
 
-const DEFAULT_FILTERS = { search: '', status: 'ALL', limit: 10 }
+const DEFAULT_FILTERS = { search: '', status: 'ALL', competitionType: 'ALL', limit: 10 }
 
 export const Route = createFileRoute('/dashboard/_authed/admin/submissions/')({
   loader: async ({ context }) => {
@@ -19,6 +19,7 @@ function SubmissionsContent({ filters, page, adminId }: { filters: typeof DEFAUL
   const query = {
     search: filters.search || undefined,
     status: filters.status as any,
+    competitionType: filters.competitionType !== 'ALL' ? filters.competitionType : undefined,
     limit: filters.limit,
     page,
   }
@@ -56,7 +57,6 @@ function RouteComponent() {
     setApplied(DEFAULT_FILTERS)
     setPage(1)
   }
-
   return (
     <div className="space-y-6 w-full pt-20 min-h-screen pb-6 max-w-6xl mx-auto px-8">
       <div>

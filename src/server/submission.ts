@@ -10,6 +10,7 @@ const submissionQuerySchema = z.object({
   search: z.string().optional(),
   stageId: z.string().optional(),
   status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'ALL']).optional(),
+  competitionType: z.string().optional(),
   page: z.coerce.number().optional(),
   limit: z.coerce.number().optional(),
 })
@@ -80,12 +81,31 @@ export const upsertSubmission = createServerFn({ method: 'POST' })
   .inputValidator(z.object({
     teamId: z.string().uuid(),
     stageId: z.string().uuid(),
-    fileUrl: z.string().url(),
     title: z.string().optional(),
+    turnitinUrl: z.string().url().optional(),
+    orsinalitasUrl: z.string().url().optional(),
+    abstractUrl:z.string().url().optional(),
+    fileUrl:z.string().url().optional(),
   }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
       const result = await submissionService.upsertSubmission(data)
+      return successResponse(result.data, result.message)
+    })
+  )
+
+export const updateSubmissionFiles = createServerFn({ method: 'POST' })
+  .inputValidator(z.object({
+    teamId: z.string().uuid(),
+    stageId: z.string().uuid(),
+    fileUrl: z.string().url().optional(),
+    turnitinUrl: z.string().url().optional(),
+    orsinalitasUrl: z.string().url().optional(),
+  }))
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      const { teamId, stageId, ...files } = data
+      const result = await submissionService.updateSubmissionFiles(teamId, stageId, files)
       return successResponse(result.data, result.message)
     })
   )

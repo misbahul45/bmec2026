@@ -70,4 +70,13 @@ export const registerSchema = z
 
 export type RegisterFormData = z.infer<typeof registerSchema>
 
+export const createAbstractSubmissionSchema = z.object({
+  teamId: z.string().min(1),
+  status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
+  abstractFile: z.instanceof(File),
+  turnitinFile: z.instanceof(File).optional(),
+  orsinalitasFile: z.instanceof(File).optional(),
+})
 
+export type CreateAbstractSubmissionData =
+  z.output<typeof createAbstractSubmissionSchema>

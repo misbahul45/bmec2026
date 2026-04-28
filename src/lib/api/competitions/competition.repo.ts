@@ -1,32 +1,45 @@
-import { CompetitionType, PaymentStatus } from "@prisma/client";
+import { CompetitionType, PaymentStatus, Prisma } from "@prisma/client";
 import { prisma } from "~/lib/utils/prisma";
 import { RegistrationCompetitionData } from "~/schemas/competition.schema";
 
-export default class CompetitionRepo{
+export default class CompetitionRepo {
     findByName(name: CompetitionType) {
         const now = new Date()
-
         return prisma.competition.findUnique({
-            where: {
-                name,
-            },
+            where: { name },
             include: {
                 batches: {
-                    where: {
-                        startDate: {
-                            lte: now,
-                        },
-                        endDate: {
-                            gte: now,
-                        },
-                    },
-                    orderBy: {
-                        startDate: "asc",
-                    },
+                    where: { startDate: { lte: now }, endDate: { gte: now } },
+                    orderBy: { startDate: "asc" },
                     take: 1,
                 },
             },
         })
+    }
+
+    findAllWithBatches() {
+        return prisma.competition.findMany({
+            include: {
+                batches: { orderBy: { startDate: "asc" } },
+            },
+            orderBy: { name: "asc" },
+        })
+    }
+
+    updateBatch(id: string, data: Prisma.BatchUpdateInput) {
+        return prisma.batch.update({ where: { id }, data })
+    }
+
+    createBatch(data: Prisma.BatchCreateInput) {
+        return prisma.batch.create({ data })
+    }
+
+    deleteBatch(id: string) {
+        return prisma.batch.delete({ where: { id } })
+    }
+
+    findBatchById(id: string) {
+        return prisma.batch.findUnique({ where: { id } })
     }
 
     createRegistration(data : RegistrationCompetitionData){

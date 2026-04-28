@@ -4,7 +4,7 @@ import { NAV_ITEMS } from '~/contants'
 import { Link, useLocation, useRouteContext, useRouter } from '@tanstack/react-router'
 import gsap from 'gsap'
 import { cn, toggleHome } from '~/lib/utils'
-import { Menu, X, LayoutDashboard, LogOut, ChevronDown, Loader2, Users, ClipboardList, Trophy, FileText } from 'lucide-react'
+import { Menu, X, LayoutDashboard, LogOut, ChevronDown, Loader2, Users, ClipboardList, Trophy, FileText, Layers } from 'lucide-react'
 import MobileMenu from './MobileMenu'
 import RibbonSVG from '../ui/RibbonSVG'
 import NavIndicator from './NavIndicator'
@@ -279,6 +279,22 @@ const UserDropdown = ({
                 <Trophy size={14} className="text-primary/70 shrink-0" />
                 <span className="font-medium">Scoreboard</span>
               </Link>
+
+              <Link
+                to="/dashboard/admin/competitions"
+                onClick={closeDropdown}
+                data-menu-item
+                onMouseEnter={(e) => handleItemHover(e.currentTarget, true)}
+                onMouseLeave={(e) => handleItemHover(e.currentTarget, false)}
+                className={cn(
+                  'flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs',
+                  'text-foreground/70 hover:text-foreground',
+                  'hover:bg-foreground/5 transition-colors duration-150',
+                )}
+              >
+                <Layers size={14} className="text-primary/70 shrink-0" />
+                <span className="font-medium">Batch</span>
+              </Link>
             </>
           ) : (
             <Link
@@ -547,7 +563,7 @@ const Header = () => {
           </Link>
 
           {!isLoggedIn && (
-            <nav className="hidden lg:flex items-center gap-0.5 relative text-xs">
+            <nav className="hidden lg:flex items-center gap-0 relative text-xs">
               <NavIndicator isScroll={isScroll} activeIndex={activeNavIndex} navRefs={navRefs} />
               {NAV_ITEMS.map((item, i) => {
                 const isActive = activeSection === item.href
@@ -559,7 +575,7 @@ const Header = () => {
                     onMouseEnter={(e) => handleNavHover(e.currentTarget, true)}
                     onMouseLeave={(e) => handleNavHover(e.currentTarget, false)}
                     className={cn(
-                      'relative px-3 py-1.5 rounded-full z-10 transition-colors duration-200 select-none text-[10px]',
+                      'relative px-2.5 py-1.5 rounded-full z-10 transition-colors duration-200 select-none text-[10px]',
                       isActive ? 'text-black font-medium' : 'text-foreground/55 hover:text-foreground/85'
                     )}
                     style={{ willChange: 'transform' }}

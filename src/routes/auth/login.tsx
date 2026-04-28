@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import FormSignin from '~/components/auth/FormSignin'
 
 export const Route = createFileRoute('/auth/login')({
@@ -7,33 +7,55 @@ export const Route = createFileRoute('/auth/login')({
 
 function RouteComponent() {
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row">
-      <div className="flex-1 flex items-center justify-center px-6 py-12 order-2 lg:order-1">
-        <FormSignin />
+    <div className="min-h-screen w-full flex">
+      <div className="flex-1 flex items-center justify-center px-8 py-12 relative">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full bg-accent/8 blur-3xl" />
+        </div>
+        <div className="relative z-10 w-full max-w-xs">
+          <FormSignin />
+        </div>
       </div>
 
-      <div className="hidden lg:flex flex-1 bg-secondary/30 relative overflow-hidden  items-center justify-center px-8 py-16 order-1 lg:order-2 min-h-50 lg:min-h-screen">
+      <div 
+      className="hidden animated-border bg-muted/30 lg:flex flex-1 shrink-0 flex-col justify-between p-12 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-[60%_40%_55%_45%/55%_60%_40%_45%] bg-primary/40 blur-3xl animate-pulse" />
-          <div className="absolute top-1/4 right-1/4 w-40 h-40 rounded-full bg-accent/30 blur-2xl" />
+          <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/5 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white/5 blur-2xl" />
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage: 'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
+              backgroundSize: '32px 32px',
+            }}
+          />
         </div>
 
-        <div className="relative z-10 text-center max-w-sm">
-          <h1 className="text-xl lg:text-2xl font-bold text-foreground leading-tight mb-4">
-            Biomedical Engineering Competition 2026
-          </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+        <div className="relative z-10">
+          <p className="text-black text-xs font-semibold uppercase tracking-widest">BMEC 2026</p>
+        </div>
+
+        <div className="relative z-10 space-y-6">
+          <h2 className="text-2xl font-bold text-black leading-snug">
+            Biomedical Engineering Competition
+          </h2>
+          <p className="text-sm text-black leading-relaxed">
             Kompetisi nasional Teknik Biomedis untuk inovasi teknologi kesehatan masa depan.
           </p>
 
-          <div className="flex justify-center gap-6 mt-8">
-            {[['3', 'Cabang Lomba'], ['Rp19,5jt', 'Total Hadiah'], ['∞', 'Potensimu']].map(([val, lbl]) => (
-              <div key={lbl} className="flex flex-col items-center">
-                <span className="text-base font-bold text-foreground">{val}</span>
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{lbl}</span>
+          <div className="flex gap-8 pt-2">
+            {[['3', 'Cabang Lomba'], ['Rp19.5jt', 'Total Hadiah'], ['2026', 'Tahun Ini']].map(([val, lbl]) => (
+              <div key={lbl}>
+                <p className="text-lg font-bold text-black">{val}</p>
+                <p className="text-[10px] text-black/70 uppercase tracking-wide">{lbl}</p>
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="relative z-10">
+          <p className="text-[10px] text-black/60">Universitas Airlangga · Surabaya</p>
         </div>
       </div>
     </div>

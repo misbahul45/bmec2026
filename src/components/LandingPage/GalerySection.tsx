@@ -18,7 +18,7 @@ const GalerySection = () => {
     <section
       ref={sectionRef}
       id="gallery"
-      className="relative bg-background py-20 md:py-28 overflow-hidden"
+      className="relative bg-background py-8 overflow-hidden"
     >
       <GalleryThreeAmbient />
 
@@ -45,7 +45,7 @@ const GalerySection = () => {
             >
               <img
                 src={item.image}
-                alt={item.title}
+                alt={item.id}
                 className="gallery-bg-img w-full h-full object-cover"
                 loading={i === 0 ? 'eager' : 'lazy'}
               />
@@ -54,18 +54,6 @@ const GalerySection = () => {
           ))}
 
           <div className="gallery-meta absolute bottom-0 left-0 right-0 p-6 md:p-8">
-            <div className="gallery-active-cat mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/20 border border-primary/30 rounded-full px-3 py-1">
-                {active.category}
-              </span>
-            </div>
-            <h3 className="gallery-active-title text-xl md:text-2xl font-bold text-white mb-1.5 leading-tight">
-              {active.title}
-            </h3>
-            <p className="gallery-active-desc text-sm text-white/70 max-w-lg leading-relaxed">
-              {active.description}
-            </p>
-
             <div className="flex items-center gap-2 mt-4">
               {bmecGallery.map((_, i) => (
                 <button

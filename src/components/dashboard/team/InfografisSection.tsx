@@ -4,7 +4,7 @@ import { Lock, ImageIcon, CheckCircle2, Loader2, Upload } from 'lucide-react'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { PaymentStatus } from '@prisma/client'
-import { uploadToImageKit } from '~/lib/api/uploads/service'
+import { uploadToImageKit, uploadPdfToImageKit } from '~/lib/api/uploads/service'
 import { upsertSubmission } from '~/server/submission'
 import { toast } from 'sonner'
 import { FileUploadField } from '~/components/ui/FileUploadField'
@@ -57,27 +57,33 @@ export function InfografisSection({ registrationStatus, teamId, stageId, existin
 
 function InfografisUpload({ teamId, stageId, queryKey }: { teamId: string; stageId: string; queryKey: unknown[] }) {
   const [file, setFile] = useState<File | undefined>()
+  const [orsinalitasFile, setOrsinalitasFile] = useState<File | undefined>()
   const [uploading, setUploading] = useState(false)
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: (fileUrl: string) =>
-      upsertSubmission({ data: { teamId, stageId, fileUrl, title: 'Infografis' } }),
+    mutationFn: (data: { fileUrl: string; orsinalitasUrl?: string }) =>
+      upsertSubmission({ data: { teamId, stageId, fileUrl: data.fileUrl, title: 'Infografis', orsinalitasUrl: data.orsinalitasUrl } }),
     onSuccess: () => {
       toast.success('Infografis berhasil diunggah')
       setFile(undefined)
+      setOrsinalitasFile(undefined)
       queryClient.invalidateQueries({ queryKey: queryKey as any })
     },
     onError: (e: any) => toast.error(e?.message ?? 'Gagal mengunggah'),
   })
 
   const handleSubmit = async () => {
-    if (!file) return toast.error('Pilih file terlebih dahulu')
+    if (!file) return toast.error('Pilih file infografis terlebih dahulu')
     if (file.size > 10 * 1024 * 1024) return toast.error('Ukuran file maksimal 10MB')
+    if (orsinalitasFile && orsinalitasFile.size > 10 * 1024 * 1024) return toast.error('Ukuran surat orisinalitas maksimal 10MB')
     setUploading(true)
     try {
-      const url = await uploadToImageKit(file)
-      mutation.mutate(url)
+      const [fileUrl, orsinalitasUrl] = await Promise.all([
+        uploadToImageKit(file),
+        orsinalitasFile ? uploadPdfToImageKit(orsinalitasFile) : Promise.resolve(undefined),
+      ])
+      mutation.mutate({ fileUrl, orsinalitasUrl: orsinalitasUrl ?? undefined })
     } catch {
       toast.error('Gagal mengunggah file')
     } finally {
@@ -94,10 +100,15 @@ function InfografisUpload({ teamId, stageId, queryKey }: { teamId: string; stage
         Upload Infografis
       </h3>
       <div className="rounded-2xl bg-background shadow border p-5 space-y-4">
-        <p className="text-xs text-muted-foreground">
-          Upload file infografis dalam format PNG, JPG, atau PDF. Pastikan file sudah sesuai dengan ketentuan lomba.
-        </p>
-        <FileUploadField value={file} onChange={setFile} label="Pilih file infografis (PNG / JPG / PDF)" accept="image/*,.pdf" />
+        <div className="space-y-2">
+          <p className="text-xs font-semibold">File Infografis <span className="text-destructive">*</span></p>
+          <p className="text-[11px] text-muted-foreground">Format PNG, JPG, atau PDF. Maksimal 10MB.</p>
+          <FileUploadField value={file} onChange={setFile} label="Pilih file infografis (PNG / JPG / PDF)" accept="image/*,.pdf" />
+        </div>
+        <div className="space-y-2">
+          <p className="text-xs font-semibold">Surat Orisinalitas <span className="text-muted-foreground font-normal">(opsional)</span></p>
+          <FileUploadField value={orsinalitasFile} onChange={setOrsinalitasFile} label="Upload surat orisinalitas (.pdf)" accept=".pdf" />
+        </div>
         <Button className="w-full rounded-xl" disabled={isPending || !file} onClick={handleSubmit}>
           {isPending
             ? <span className="flex items-center gap-2"><Loader2 size={13} className="animate-spin" />Mengunggah...</span>

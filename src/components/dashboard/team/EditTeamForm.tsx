@@ -28,11 +28,14 @@ type Props = {
     documentUrl?: string | null
   }
   queryKey: unknown[]
+  registrationStatus?: string | null
 }
 
-export function EditTeamForm({ team, queryKey }: Props) {
+export function EditTeamForm({ team, queryKey, registrationStatus }: Props) {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
+
+  if (registrationStatus === 'APPROVED') return null
   const [docFile, setDocFile] = useState<File | null>(null)
   const [uploadingDoc, setUploadingDoc] = useState(false)
   const [deletingDoc, setDeletingDoc] = useState(false)

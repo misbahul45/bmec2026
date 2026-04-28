@@ -64,9 +64,9 @@ export const teamsSearchParams = {
   limit: parseAsInteger.withDefault(10),
   search: parseAsString.withDefault(""),
   competitionType: parseAsString.withDefault("ALL"),
+  registrationStatus: parseAsString.withDefault("ALL"),
 }
-export const loadTeamsSearchParams =
-  createLoader(teamsSearchParams)
+export const loadTeamsSearchParams = createLoader(teamsSearchParams)
 
 export function normalizeTeamQuery(
   q: {
@@ -74,6 +74,7 @@ export function normalizeTeamQuery(
     limit: number
     search: string
     competitionType: string | null
+    registrationStatus: string | null
   }
 ): QueryTeam {
   return {
@@ -81,9 +82,9 @@ export function normalizeTeamQuery(
     limit: q.limit,
     search: q.search,
     competitionType:
-      q.competitionType === null
-        ? undefined
-        : (q.competitionType as QueryTeam["competitionType"]),
+      q.competitionType === null ? undefined : (q.competitionType as QueryTeam["competitionType"]),
+    registrationStatus:
+      q.registrationStatus === null ? undefined : (q.registrationStatus as QueryTeam["registrationStatus"]),
   }
 }
 
@@ -91,12 +92,17 @@ export const queryTeam = createPaginationQuerySchema(
   z.object({
     competitionType: z.preprocess(
       (val) => {
-        if (val === "ALL" || val === "" || val == null) {
-          return undefined
-        }
+        if (val === "ALL" || val === "" || val == null) return undefined
         return val
       },
       z.enum(["OLIMPIADE", "LKTI", "INFOGRAFIS"]).optional()
+    ),
+    registrationStatus: z.preprocess(
+      (val) => {
+        if (val === "ALL" || val === "" || val == null) return undefined
+        return val
+      },
+      z.enum(["PENDING", "APPROVED", "REJECTED", "NONE"]).optional()
     ),
   })
 )

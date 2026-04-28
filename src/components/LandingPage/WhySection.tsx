@@ -93,7 +93,6 @@ const WhySection = () => {
           </p>
         </div>
 
-        {/* Desktop */}
         <div ref={gridRef} className="hidden md:block relative">
           <FlowPath containerRef={gridRef} />
 
@@ -103,7 +102,7 @@ const WhySection = () => {
                 <div className="w-[320px]">
                   <WhyCard node={n1} nodeId="why-node-1" />
                 </div>
-              </div>
+              </div>       
               <div className="flex justify-end">
                 <div className="w-[320px]">
                   <WhyCard node={n2} nodeId="why-node-2" />
@@ -132,7 +131,6 @@ const WhySection = () => {
           </div>
         </div>
 
-        {/* Mobile */}
         <div className="md:hidden relative">
           <div className="absolute left-4 top-0 bottom-0 w-px bg-accent/30" />
           <div className="flex flex-col gap-6 pl-10">

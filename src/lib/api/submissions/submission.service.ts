@@ -24,6 +24,9 @@ export default class SubmissionService {
 
     if (query.stageId) where.stageId = query.stageId
     if (query.status && query.status !== 'ALL') where.status = query.status
+    if (query.competitionType && query.competitionType !== 'ALL') {
+      where.team = { ...where.team, competitionType: query.competitionType as any }
+    }
 
     const [submissions, total] = await Promise.all([
       this.repo.findAll(where, skip, limit),
@@ -68,9 +71,16 @@ export default class SubmissionService {
     return { data, message: 'Leaderboard fetched' }
   }
 
-  async upsertSubmission(data: { teamId: string; stageId: string; fileUrl: string; title?: string }) {
+  async upsertSubmission(data: { teamId: string; stageId: string; title?: string; turnitinUrl?: string; orsinalitasUrl?: string, abstractUrl?:string, fileUrl?:string }) {
     const result = await this.repo.upsert(data)
     return { data: result, message: 'Submission saved' }
+  }
+
+  async updateSubmissionFiles(teamId: string, stageId: string, data: { fileUrl?: string; turnitinUrl?: string; orsinalitasUrl?: string }) {
+    const existing = await this.repo.findByTeamAndStage(teamId, stageId)
+    if (!existing) throw new AppError('Submission not found', 404)
+    const result = await this.repo.updateFileUrl(teamId, stageId, data)
+    return { data: result, message: 'Submission updated' }
   }
 
   async submitWithPayment(data: { teamId: string; stageId: string; fileUrl: string; paymentProof: string; title?: string }) {
