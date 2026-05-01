@@ -4,8 +4,12 @@ import gsap from "gsap";
 type Member = {
   id: string;
   name: string;
-  studentId: string;
+  studentId: string | null;
   role: "KETUA" | "ANGGOTA";
+  email: string;
+  phone: string;
+  major: string | null;
+  faculty: string | null;
 };
 
 type Team = {
@@ -17,7 +21,7 @@ const NodeCard: React.FC<{
   className?: string;
   topLabel: React.ReactNode;
   name: string;
-  sub?: string;
+  sub?: string | null;
   glow?: boolean;
 }> = ({ className = "", topLabel, name, sub, glow }) => (
   <div
@@ -79,15 +83,10 @@ const TeamTree: React.FC<{ team: Team }> = ({ team }) => {
         x: r.left + r.width / 2 - rect.left,
         top: r.top - rect.top,
         bottom: r.bottom - rect.top,
-        cx: r.left + r.width / 2 - rect.left,
       };
     };
 
-    const drawCurve = (
-      x1: number, y1: number,
-      x2: number, y2: number,
-      color: string
-    ) => {
+    const drawCurve = (x1: number, y1: number, x2: number, y2: number, color: string) => {
       const grad = ctx.createLinearGradient(x1, y1, x2, y2);
       grad.addColorStop(0, color + "cc");
       grad.addColorStop(1, color + "44");
@@ -121,34 +120,12 @@ const TeamTree: React.FC<{ team: Team }> = ({ team }) => {
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-
-      tl.from(".team-node", {
-        opacity: 0,
-        y: -30,
-        scale: 0.85,
-        duration: 0.55,
-      })
-        .from(
-          ".ketua-node",
-          { opacity: 0, y: -20, scale: 0.85, duration: 0.5 },
-          "-=0.2"
-        )
-        .from(
-          ".anggota-node",
-          {
-            opacity: 0,
-            y: 30,
-            scale: 0.85,
-            stagger: 0.1,
-            duration: 0.5,
-            ease: "back.out(1.5)",
-          },
-          "-=0.15"
-        );
+      tl.from(".team-node", { opacity: 0, y: -30, scale: 0.85, duration: 0.55 })
+        .from(".ketua-node", { opacity: 0, y: -20, scale: 0.85, duration: 0.5 }, "-=0.2")
+        .from(".anggota-node", { opacity: 0, y: 30, scale: 0.85, stagger: 0.1, duration: 0.5, ease: "back.out(1.5)" }, "-=0.15");
     }, containerRef);
 
     const redraw = () => requestAnimationFrame(() => requestAnimationFrame(drawLines));
-
     const ro = new ResizeObserver(redraw);
     ro.observe(containerRef.current!);
     window.addEventListener("resize", redraw);
@@ -176,27 +153,15 @@ const TeamTree: React.FC<{ team: Team }> = ({ team }) => {
         }}
       />
 
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full pointer-events-none z-0"
-      />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none z-0" />
 
       <div className="relative z-10 team-node">
-        <NodeCard
-          topLabel="Team"
-          name={team.name}
-          glow
-        />
+        <NodeCard topLabel="Team" name={team.name} glow />
       </div>
 
       {ketua && (
         <div className="relative z-10 ketua-node">
-          <NodeCard
-            topLabel={<>👑 Ketua</>}
-            name={ketua.name}
-            sub={ketua.studentId}
-            glow
-          />
+          <NodeCard topLabel={<>👑 Ketua</>} name={ketua.name} sub={ketua.studentId} glow />
         </div>
       )}
 
@@ -204,11 +169,7 @@ const TeamTree: React.FC<{ team: Team }> = ({ team }) => {
         <div className="relative z-10 flex flex-wrap justify-center gap-3 sm:gap-4 px-4 sm:px-8 w-full">
           {anggota.map((m) => (
             <div key={m.id} className="anggota-node w-[calc(50%-6px)] sm:w-64 md:w-72">
-              <NodeCard
-                topLabel="Anggota"
-                name={m.name}
-                sub={m.studentId}
-              />
+              <NodeCard topLabel="Anggota" name={m.name} sub={m.studentId} />
             </div>
           ))}
         </div>

@@ -3,14 +3,12 @@ import { seedCompetition } from "./seeds/competition";
 import { seedAdmin } from "./seeds/admin";
 import { seedStage } from "./seeds/stage";
 import { seedExam } from "./seeds/exam";
-import { seedExamQuestions } from "./seeds/seedExamQuestion";
 
 const seeds = [
   seedCompetition,
   seedStage,
   seedAdmin,
   seedExam,
-  seedExamQuestions,
 ]
 
 async function main() {

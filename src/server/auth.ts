@@ -97,27 +97,28 @@ export const fetchUser = createServerFn({ method: "GET" })
 
     if (!team) return null
 
-    const registration =
-      await competitionRepo.findRegistrationByTeamid(team.id)
-
-    const abstractTeam =
-      (await teamRepo.findSubmissionsByTeamId(team.id))[0]?.abstractUrl
+    const mentor = await teamRepo.findMentorByTeamId(team.id)
+    const registration = await competitionRepo.findRegistrationByTeamid(team.id)
+    const abstractTeam = (await teamRepo.findSubmissionsByTeamId(team.id))[0]?.abstractUrl
 
     let redirect: string
 
-    if (!team.members || team.members.length === 0) {
+    if (!mentor) {
       redirect = `/auth/register/${team.id}/`
+    } else if (!team.members || team.members.length === 0) {
+      redirect = `/auth/register/${team.id}/?tab=members`
     } else if (team.competitionType === 'LKTI') {
       if (!abstractTeam) {
-        redirect = `/auth/register/${team.id}/completed`
+        redirect = `/auth/register/${team.id}/?tab=dokumen`
       } else {
         redirect = "/dashboard/team"
       }
     } else if (!registration) {
-      redirect = `/auth/register/${team.id}/completed`
+      redirect = `/auth/register/${team.id}/?tab=dokumen`
     } else {
       redirect = "/dashboard/team"
     }
+
     return {
       ...session.data,
       redirect,

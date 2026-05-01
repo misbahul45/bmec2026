@@ -545,7 +545,7 @@ const Header = () => {
               'shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_0%,transparent)] group-hover:shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_25%,transparent)]'
             )}>
               <Image
-                src="https://imgs.search.brave.com/f4DZCC5tTEnEpjTBtq61BTqSYeUFK8kpfTQNgsxA0hY/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMjI2MGZjODVi/ODFhZmU0ZmU5MjRh/MjM3YmZlNjM5NmNm/MTRkZGIyNzE3OTk4/MzZmMzc1NGM2ZTc5/MTBhMjcxNy9taW1v/LnhpYW9taS5jb20v"
+                src="/logo.png"
                 alt="logo"
                 width={28}
                 height={28}

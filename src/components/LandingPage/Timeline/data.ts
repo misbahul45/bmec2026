@@ -4,7 +4,6 @@ import { Medal, FileText, Image } from 'lucide-react'
 export interface TimelineEvent {
   date: string
   label: string
-  phase: 'open' | 'submit' | 'select' | 'final'
 }
 
 export interface TimelineProcess {
@@ -27,39 +26,44 @@ export const processes: TimelineProcess[] = [
     accent: 'primary',
     events: [
       {
-        date: '25 Mei - 4 Sep',
-        label: 'Registration',
-        phase: 'open',
+        date: '25 Mei - 24 Juni',
+        label: 'Batch 1 Registration',
       },
       {
-        date: '1 Ags - 6 Sep',
-        label: 'Tryout Period',
-        phase: 'submit',
+        date: '1 Juli - 31 Juli',
+        label: 'Batch 2 Registration',
+      },
+      {
+        date: '3 Agustus - 4 September',
+        label: 'Batch 3 Registration',
+      },
+      {
+        date: '1 Agustus',
+        label: 'Tryout 1',
+      },
+      {
+        date: '6 September',
+        label: 'Tryout 2',
       },
       {
         date: '12 September',
         label: 'Babak Penyisihan',
-        phase: 'select',
       },
       {
         date: '17 Oktober',
         label: 'Webinar & Pengumuman Semifinalis',
-        phase: 'select',
       },
       {
         date: '24 Oktober',
-        label: 'Technical Meeting',
-        phase: 'select',
+        label: 'Technical Meeting Semifinal',
       },
       {
         date: '7 November',
         label: 'Semifinal',
-        phase: 'final',
       },
       {
         date: '8 November',
         label: 'Grand Final',
-        phase: 'final',
       },
     ],
   },
@@ -74,38 +78,35 @@ export const processes: TimelineProcess[] = [
     events: [
       {
         date: '25 Mei - 24 Juli',
-        label: 'Submit Abstract',
-        phase: 'open',
+        label: 'Open Submit Abstract',
       },
       {
         date: '15 Juli',
         label: 'Pengumuman Lolos Abstract',
-        phase: 'select',
       },
       {
-        date: '16 Juli - 4 Sep',
-        label: 'Submit Full Paper',
-        phase: 'submit',
+        date: '16 Juli - 31 Juli',
+        label: 'Submit Full Paper Batch 1',
+      },
+      {
+        date: '3 Agustus - 4 September',
+        label: 'Submit Full Paper Batch 2',
       },
       {
         date: '17 Oktober',
-        label: 'Webinar & Pengumuman',
-        phase: 'select',
+        label: 'Webinar & Pengumuman Finalis',
       },
       {
         date: '24 Oktober',
-        label: 'Technical Meeting',
-        phase: 'select',
+        label: 'Technical Meeting Semifinal',
       },
       {
         date: '7 November',
         label: 'Semifinal',
-        phase: 'final',
       },
       {
         date: '8 November',
         label: 'Grand Final',
-        phase: 'final',
       },
     ],
   },
@@ -119,40 +120,41 @@ export const processes: TimelineProcess[] = [
     accent: 'accent',
     events: [
       {
-        date: '25 Mei - 4 Sep',
-        label: 'Registration',
-        phase: 'open',
+        date: '25 Mei - 24 Juni',
+        label: 'Batch 1 Registration',
+      },
+      {
+        date: '1 Juli - 31 Juli',
+        label: 'Batch 2 Registration',
+      },
+      {
+        date: '3 Agustus - 4 September',
+        label: 'Batch 3 Registration',
       },
       {
         date: '17 Oktober',
         label: 'Webinar & Pengumuman Finalis',
-        phase: 'select',
       },
       {
-        date: '19 Okt - 2 Nov',
+        date: '19 Oktober - 2 November',
         label: 'Upload Feed Finalis',
-        phase: 'submit',
       },
       {
         date: '24 Oktober',
-        label: 'Technical Meeting',
-        phase: 'select',
+        label: 'Technical Meeting Semifinal',
       },
       {
         date: '7 November',
         label: 'Semifinal',
-        phase: 'final',
       },
       {
         date: '8 November',
         label: 'Grand Final',
-        phase: 'final',
       },
     ],
   },
 ]
-
-export const phaseColors: Record<TimelineEvent['phase'], string> = {
+export const phaseColors = {
   open: 'bg-primary/10 text-primary border-primary/20',
   submit: 'bg-secondary/50 text-secondary-foreground border-secondary',
   select: 'bg-accent/40 text-accent-foreground border-accent/40',

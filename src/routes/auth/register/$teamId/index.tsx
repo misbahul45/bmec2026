@@ -7,10 +7,10 @@ import { z } from 'zod'
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import FormMember from '~/components/auth/FormMember'
+import FormMentor from '~/components/auth/FormMentor'
 import { DocumentUploadTab } from '~/components/auth/DocumentUploadTab'
 import { TeamNotFound } from '~/components/errors/TeamNotFound'
 import { Button } from '~/components/ui/button'
-import { Badge } from '~/components/ui/badge'
 import {
   Card,
   CardContent,
@@ -27,16 +27,22 @@ import {
 import { teamQueryOptions } from '~/lib/api/teams/team.query-options'
 import { mapCompetitionToEducation } from '~/lib/utils'
 import { CreateMemberData, createMembersSchema } from '~/schemas/team.member.schema'
-import { createTeamMember } from '~/server/team'
+import { CreateMentorInput, createMentorSchema } from '~/schemas/team.mentor.schema'
+import { createTeamMember, createMentor } from '~/server/team'
 import { toast } from 'sonner'
 import { CheckCircle2 } from 'lucide-react'
 
+const searchSchema = z.object({
+  tab: z.enum(['members', 'dokumen']).optional(),
+})
+
 export const Route = createFileRoute('/auth/register/$teamId/')({
+  validateSearch: searchSchema,
   beforeLoad: async ({ context, location }) => {
     if (!context.user) {
       throw redirect({ to: '/auth/login' })
     }
-    const normalize = (p: string) => p.replace(/\/$/, '')
+    const normalize = (p: string) => p.split('?')[0].replace(/\/$/, '')
     if (normalize(context.user.redirect) !== normalize(location.pathname)) {
       throw redirect({ to: context.user.redirect })
     }
@@ -49,20 +55,35 @@ export const Route = createFileRoute('/auth/register/$teamId/')({
   errorComponent: TeamNotFound,
 })
 
-type FormValues = z.infer<typeof createMembersSchema>
+type MemberFormValues = z.infer<typeof createMembersSchema>
+type MentorFormValues = z.infer<typeof createMentorSchema>
 
 function RouteComponent() {
   const { teamId } = Route.useParams()
+  const { tab } = Route.useSearch()
   const { data: res } = useSuspenseQuery(teamQueryOptions(teamId))
   const navigate = useNavigate()
   const containerRef = useRef<HTMLDivElement>(null)
-  const [activeTab, setActiveTab] = useState('member-0')
-  const [membersSubmitted, setMembersSubmitted] = useState(false)
+
+  const initialTab =
+    tab === 'dokumen' ? 'dokumen' :
+    tab === 'members' ? 'member-0' :
+    'mentor'
+
+  const [activeTab, setActiveTab] = useState(initialTab)
+  const [mentorSubmitted, setMentorSubmitted] = useState(tab === 'members' || tab === 'dokumen')
+  const [membersSubmitted, setMembersSubmitted] = useState(tab === 'dokumen')
 
   const team = res.data!
   const educationLevel: 'SMA' | 'MAHASISWA' = mapCompetitionToEducation(team.competitionType)
 
-  const form = useForm<FormValues>({
+  const mentorForm = useForm<MentorFormValues>({
+    resolver: zodResolver(createMentorSchema),
+    defaultValues: { name: '', email: '', phone: '', teamId },
+    mode: 'onChange',
+  })
+
+  const memberForm = useForm<MemberFormValues>({
     resolver: zodResolver(createMembersSchema),
     defaultValues: {
       members: [MemberRole.KETUA, MemberRole.ANGGOTA, MemberRole.ANGGOTA].map((role) => ({
@@ -84,23 +105,44 @@ function RouteComponent() {
     return () => ctx.revert()
   }, [])
 
-  const mutation = useMutation({
-    mutationFn: (formData: CreateMemberData) => createTeamMember({ data: formData }),
+  const mentorMutation = useMutation({
+    mutationFn: (data: CreateMentorInput) => createMentor({ data }),
+    onError: (error: any) => toast.error(error.message),
+    onSuccess: (res: any) => {
+      toast.success(res.message)
+      mentorForm.reset()
+      setMentorSubmitted(true)
+      setActiveTab('member-0')
+    },
+  })
+
+  const memberMutation = useMutation({
+    mutationFn: (data: CreateMemberData) => createTeamMember({ data }),
     onError: (error: any) => toast.error(error.message),
     onSuccess: (res) => {
       toast.success(res.message)
-      form.reset()
+      memberForm.reset()
       setMembersSubmitted(true)
       setActiveTab('dokumen')
     },
   })
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => mutation.mutate(data)
+  const onMentorSubmit: SubmitHandler<MentorFormValues> = (data) =>
+    mentorMutation.mutate(data)
+
+  const onMembersSubmit: SubmitHandler<MemberFormValues> = (data) =>
+    memberMutation.mutate(data)
 
   const memberTabs = [
     { value: 'member-0', label: 'Ketua' },
     { value: 'member-1', label: 'Anggota 1' },
     { value: 'member-2', label: 'Anggota 2' },
+  ]
+
+  const steps = [
+    { label: 'Mentor',   done: mentorSubmitted,  active: !mentorSubmitted },
+    { label: 'Data Tim', done: membersSubmitted,  active: mentorSubmitted && !membersSubmitted },
+    { label: 'Dokumen',  done: false,             active: membersSubmitted },
   ]
 
   return (
@@ -111,33 +153,57 @@ function RouteComponent() {
             Lengkapi Data Tim <span className="text-primary">{team.name}</span>
           </CardTitle>
           <CardDescription className="text-sm text-center">
-            Isi data anggota terlebih dahulu, lalu upload dokumen kelengkapan tim.
+            Isi data mentor & anggota terlebih dahulu, lalu upload dokumen kelengkapan tim.
           </CardDescription>
 
-          <div className="flex items-center justify-center gap-3 pt-2">
-            <div className="flex items-center gap-1.5">
-              {membersSubmitted
-                ? <CheckCircle2 size={14} className="text-green-600" />
-                : <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">1</span>
-              }
-              <span className={`text-xs font-medium ${membersSubmitted ? 'text-green-600' : 'text-foreground'}`}>Data Anggota</span>
-            </div>
-            <div className="w-8 h-px bg-border" />
-            <div className="flex items-center gap-1.5">
-              <span className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold ${membersSubmitted ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>2</span>
-              <span className={`text-xs font-medium ${membersSubmitted ? 'text-foreground' : 'text-muted-foreground'}`}>Upload Dokumen</span>
-            </div>
+          <div className="flex items-center justify-center gap-2 pt-2">
+            {steps.map((step, i) => (
+              <div key={step.label} className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
+                  {step.done
+                    ? <CheckCircle2 size={14} className="text-green-600" />
+                    : (
+                      <span className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold
+                        ${step.active
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground'}`}
+                      >
+                        {i + 1}
+                      </span>
+                    )
+                  }
+                  <span className={`text-xs font-medium
+                    ${step.done ? 'text-green-600' : step.active ? 'text-foreground' : 'text-muted-foreground'}`}
+                  >
+                    {step.label}
+                  </span>
+                </div>
+                {i < steps.length - 1 && <div className="w-8 h-px bg-border" />}
+              </div>
+            ))}
           </div>
         </CardHeader>
 
         <CardContent className="space-y-6 fade-up">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-4 w-full">
+            <TabsList className="grid grid-cols-5 w-full">
+              <TabsTrigger value="mentor" disabled={mentorSubmitted}>
+                <span className="flex items-center gap-1">
+                  Mentor
+                  {mentorSubmitted && <CheckCircle2 size={11} className="text-green-600" />}
+                </span>
+              </TabsTrigger>
+
               {memberTabs.map(({ value, label }) => (
-                <TabsTrigger key={value} value={value} disabled={membersSubmitted}>
+                <TabsTrigger
+                  key={value}
+                  value={value}
+                  disabled={!mentorSubmitted || membersSubmitted}
+                >
                   {label}
                 </TabsTrigger>
               ))}
+
               <TabsTrigger value="dokumen" disabled={!membersSubmitted}>
                 <span className="flex items-center gap-1">
                   Dokumen
@@ -146,14 +212,32 @@ function RouteComponent() {
               </TabsTrigger>
             </TabsList>
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <TabsContent value="mentor" className="mt-6 tab-anim">
+              <form onSubmit={mentorForm.handleSubmit(onMentorSubmit)} className="space-y-6">
+                <FormMentor form={mentorForm} teamId={teamId} />
+                <div className="flex items-center justify-between pt-2">
+                  <p className="text-xs text-muted-foreground">
+                    Isi data mentor pembimbing tim
+                  </p>
+                  <Button
+                    type="submit"
+                    className="active:scale-95 rounded-xl"
+                    disabled={mentorMutation.isPending}
+                  >
+                    {mentorMutation.isPending ? 'Menyimpan...' : 'Simpan Mentor →'}
+                  </Button>
+                </div>
+              </form>
+            </TabsContent>
+
+            <form onSubmit={memberForm.handleSubmit(onMembersSubmit)} className="space-y-6">
               {[0, 1, 2].map((index) => (
                 <TabsContent key={index} value={`member-${index}`} className="mt-6 tab-anim">
-                  <FormMember form={form} index={index} educationLevel={educationLevel} />
+                  <FormMember form={memberForm} index={index} educationLevel={educationLevel} />
                 </TabsContent>
               ))}
 
-              {!membersSubmitted && (
+              {mentorSubmitted && !membersSubmitted && (
                 <div className="flex items-center justify-between pt-2">
                   <p className="text-xs text-muted-foreground">
                     Isi semua tab anggota sebelum menyimpan
@@ -161,9 +245,9 @@ function RouteComponent() {
                   <Button
                     type="submit"
                     className="active:scale-95 rounded-xl"
-                    disabled={mutation.isPending}
+                    disabled={memberMutation.isPending}
                   >
-                    {mutation.isPending ? 'Menyimpan...' : 'Simpan Anggota →'}
+                    {memberMutation.isPending ? 'Menyimpan...' : 'Simpan Anggota →'}
                   </Button>
                 </div>
               )}

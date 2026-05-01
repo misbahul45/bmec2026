@@ -16,6 +16,7 @@ model Team {
   schoolName      String
   schoolAddress   String
   documentUrl     String?
+  sourceInfo      String?  //update
   competitionType CompetitionType
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
@@ -26,18 +27,41 @@ model Team {
   registration    Registration?
   submissions     Submission[]
   currentStage    Stage?          @relation("TeamCurrentStage", fields: [currentStageId], references: [id])
+  
+  mentor          Mentor? 
 
   @@map("team")
 }
 
-model Member {
+model Mentor {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String
+
+  teamId    String   @unique
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Member {createMentor
   id        String     @id @default(uuid())
   name      String
   role      MemberRole
+  email     String     @unique
+  phone     String     // whatsapp
+  studentId String?    @unique
+
+  // khusus LKTI
+  major     String?    // prodi
+  faculty   String?    // fakultas
+
   teamId    String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  studentId String     @unique
+
   team      Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 
@@ -155,6 +179,8 @@ model Exam {
   stage     Stage          @relation(fields: [stageId], references: [id])
   attempts  ExamAttempt[]
   questions ExamQuestion[]
+
+  @@unique([title, stageId], name: "title_stageId")
 }
 
 model ExamQuestion {

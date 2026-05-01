@@ -7,13 +7,25 @@ export default class TeamRepo {
   findByEmail(email: string) {
     return prisma.team.findUnique({
       where: { email },
-      include: { members: true },
+      include: { members: true, registration: { include: { competition: { include: { stages: { orderBy: { order: 'asc' } } } } } }, currentStage: true, mentor: true },
     })
   }
 
   findByName(name: string) {
     return prisma.team.findUnique({
       where: { name },
+      include: { members: true, registration: { include: { competition: { include: { stages: { orderBy: { order: 'asc' } } } } } }, currentStage: true, mentor: true },
+    })
+  }
+
+  createMentor(data: { teamId: string; name: string; email: string; phone: string }) {
+    return prisma.mentor.create({
+      data: {
+        teamId: data.teamId,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+      },
     })
   }
 
@@ -50,7 +62,7 @@ export default class TeamRepo {
   findById(id: string) {
     return prisma.team.findUnique({
       where: { id },
-      include: { members: true },
+      include: { members: true, registration: { include: { competition: { include: { stages: { orderBy: { order: 'asc' } } } } } }, currentStage: true, mentor: true },
     })
   }
 
@@ -87,13 +99,17 @@ export default class TeamRepo {
   createMember(data: MemberData[]) {
     return prisma.member.createMany({
       data: data.map((t) => ({
-        role: t.role,
-        studentId: t.studentId,
-        teamId: t.teamId!,
         name: t.name,
+        email: t.email,
+        phone: t.phone,
+        role: t.role,
+        teamId: t.teamId!,
+        studentId: t.studentId,
+        major: t.major ?? null,
+        faculty: t.faculty ?? null,
       })),
     })
-  }
+  };
 
   updateStage(teamId: string, stageId: string) {
     return prisma.team.update({
@@ -128,5 +144,11 @@ export default class TeamRepo {
 
   updateCode(teamId: string, code: string) {
     return prisma.team.update({ where: { id: teamId }, data: { code } })
+  }
+
+  findMentorByTeamId(teamId: string) {
+    return prisma.mentor.findUnique({
+      where: { teamId },
+    })
   }
 }

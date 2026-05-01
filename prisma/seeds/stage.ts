@@ -19,11 +19,11 @@ export async function seedStage() {
           },
         },
         update: {
-          order: stage.order, // 🔥 update juga biar konsisten
+          order: stage.order,
         },
         create: {
           name: stage.name,
-          order: stage.order, // 🔥 wajib isi
+          order: stage.order,
           competitionId: competition.id,
         },
       })

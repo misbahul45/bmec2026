@@ -22,9 +22,12 @@ const CTASection = () => {
 
       <div className="relative z-10 mx-auto text-center px-6">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-accent-foreground leading-snug tracking-tight mb-3">
-          Jadilah Bagian dari{' '}
-          <span className="text-primary">Generasi Inovator</span>{' '}
-          Biomedis Indonesia
+          Calling young innovators to collaborate, create, and
+          <br />
+          <span className="text-primary">
+            Splash New Horizons
+          </span>{' '}
+          through BMEC 2026!
         </h2>
         <p className="text-sm text-accent-foreground/60 max-w-md mx-auto mb-8">
           Daftarkan timmu sekarang dan buktikan kemampuanmu di kompetisi Teknik Biomedis terbesar.

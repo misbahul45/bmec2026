@@ -1,26 +1,26 @@
 import { Link, useLocation } from '@tanstack/react-router'
 import { NAV_ITEMS } from '~/contants'
-import { InstagramLogoIcon, WhatsappLogoIcon, GoogleDriveLogoIcon } from '@phosphor-icons/react'
+import { InstagramLogoIcon, WhatsappLogoIcon, GoogleDriveLogoIcon, TiktokLogoIcon } from '@phosphor-icons/react'
 import { toggleHome } from '~/lib/utils'
 
 const socials = [
   {
     Icon: InstagramLogoIcon,
-    href: 'https://instagram.com/bmec_unair',
+    href: 'https://www.instagram.com/bmecunair?igsh=ZDA0NGN2cjNscHVi',
     label: 'Instagram BMEC',
     tooltip: 'Instagram BMEC',
   },
   {
     Icon: WhatsappLogoIcon,
-    href: 'https://wa.me/6281234567890',
+    href: 'https://wa.me/6281227206052',
     label: 'WhatsApp BMEC',
     tooltip: 'WA BMEC',
   },
   {
-    Icon: GoogleDriveLogoIcon,
-    href: 'https://drive.google.com',
-    label: 'Guidebook BMEC',
-    tooltip: 'Guidebook',
+    Icon: TiktokLogoIcon,
+    href: 'https://www.tiktok.com/@bmecunair?_r=1&_t=ZS-95zQw5cyxeP',
+    label: 'Tiktok BMEC',
+    tooltip: 'Tiktok BMEC',
   },
 ]
 

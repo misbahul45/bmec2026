@@ -9,6 +9,7 @@ import TeamRepo from "./team.repo"
 import MemberRepo from "../members/member.repo"
 import { QueryTeam } from "~/schemas/team.schema"
 import { prisma } from "~/lib/utils/prisma"
+import { CreateMentorInput } from "~/schemas/team.mentor.schema"
 
 export default class TeamService {
   private repo = new TeamRepo()
@@ -21,6 +22,24 @@ export default class TeamService {
       ? "ifs"
       : "lk"
   }
+
+  async createMentor(payload: CreateMentorInput) {
+    const team = await this.repo.findById(payload.teamId)
+    if (!team) throw new AppError('Team not found', 404)
+      
+    const mentor = await this.repo.createMentor({
+      teamId: payload.teamId,
+      name: payload.name,
+      email: payload.email,
+      phone: payload.phone
+    })
+    
+    return{
+      data: mentor,
+      message: "Mentor berhasil ditambahkan"
+    }
+  }
+
   private async generateNextCode(type: CompetitionType) {
     const prefix = this.generateCodeTeam(type)
 
@@ -65,6 +84,7 @@ export default class TeamService {
       name: payload.teamName,
       phone: payload.phone,
       code: tempCode,
+      sourceInfo: payload.sourceInfo,
     })
 
     const competition = await prisma.competition.findFirst({
@@ -80,7 +100,7 @@ export default class TeamService {
 
     return {
       data: this.sanitizeTeam(team),
-      message: "Team created successfully",
+      message: "data Team berhasil dibuat, silakan lanjutkan dengan mengisi data lainnya",
     }
   }
   async findAll(

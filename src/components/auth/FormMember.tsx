@@ -1,14 +1,7 @@
 import { Controller, UseFormReturn } from "react-hook-form"
 import { z } from "zod"
-
 import { createMembersSchema } from "~/schemas/team.member.schema"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel
-} from "../ui/field"
-
+import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field"
 import { Input } from "../ui/input"
 
 type FormValues = z.infer<typeof createMembersSchema>
@@ -20,8 +13,9 @@ type Props = {
 }
 
 const FormMember = ({ form, index, educationLevel }: Props) => {
-  const studentLabel =
-  educationLevel === "MAHASISWA" ? "NIM" : "NIS"
+  const isMahasiswa = educationLevel === "MAHASISWA"
+  const studentLabel = isMahasiswa ? "NIM" : "NIS"
+  const nameLabel = index === 0 ? "Nama Ketua" : `Nama Anggota ${index}`
 
   return (
     <div className="mt-6">
@@ -31,21 +25,47 @@ const FormMember = ({ form, index, educationLevel }: Props) => {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>
-                {index === 0
-                  ? 'Nama Ketua'
-                  : `Nama Anggota ${index}`}
-              </FieldLabel>
-
+              <FieldLabel>{nameLabel}</FieldLabel>
               <Input
                 {...field}
-                placeholder="Masukkan Nama"
+                placeholder="Masukkan nama lengkap"
                 aria-invalid={fieldState.invalid}
               />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-              {fieldState.invalid && (
-                <FieldError errors={[fieldState.error]} />
-              )}
+        <Controller
+          name={`members.${index}.email`}
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Email</FieldLabel>
+              <Input
+                {...field}
+                type="email"
+                placeholder="nama@email.com"
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name={`members.${index}.phone`}
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Nomor WhatsApp</FieldLabel>
+              <Input
+                {...field}
+                type="tel"
+                placeholder="08xxxxxxxxxx"
+                aria-invalid={fieldState.invalid}
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
@@ -55,24 +75,53 @@ const FormMember = ({ form, index, educationLevel }: Props) => {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>
-                {studentLabel}
-              </FieldLabel>
-
+              <FieldLabel>{studentLabel}</FieldLabel>
               <Input
                 {...field}
                 placeholder={`Masukkan ${studentLabel}`}
                 aria-invalid={fieldState.invalid}
               />
-
-              {fieldState.invalid && (
-                <FieldError errors={[fieldState.error]} />
-              )}
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
-      </FieldGroup>
 
+        {isMahasiswa && (
+          <>
+            <Controller
+              name={`members.${index}.faculty`}
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Fakultas</FieldLabel>
+                  <Input
+                    {...field}
+                    placeholder="Masukkan fakultas"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name={`members.${index}.major`}
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Program Studi</FieldLabel>
+                  <Input
+                    {...field}
+                    placeholder="Masukkan program studi"
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+          </>
+        )}
+      </FieldGroup>
     </div>
   )
 }

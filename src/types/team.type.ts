@@ -13,6 +13,7 @@ export type TeamWithRelations =
         }
       }
       currentStage: true
+      mentor: true
     }
   }>
 

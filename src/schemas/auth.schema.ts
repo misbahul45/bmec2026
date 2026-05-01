@@ -24,6 +24,7 @@ export const registerSchema = z
     institution: z.string().min(3, 'Nama institusi minimal 3 karakter'),
     email: z.string().email('Email tidak valid'),
     phone: z.string().min(9, 'Nomor telepon tidak valid'),
+    sourceInfo: z.string().min(3, 'Sumber informasi wajib diisi'),
     competitionType: z.enum(competitionTypes, {
       required_error: 'Pilih jenis lomba',
     }),

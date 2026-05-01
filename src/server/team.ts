@@ -9,6 +9,7 @@ import { Uuid } from "~/schemas/general.schema"
 import { SafeTeam, TeamsResponse } from "~/types/team.type"
 import { queryTeam, updateTeamSchema } from "~/schemas/team.schema"
 import { loginFn } from "./auth"
+import { createMentorSchema } from "~/schemas/team.mentor.schema"
 
 const teamService = new TeamService()
 
@@ -42,6 +43,15 @@ export const createTeam = createServerFn({ method: "POST" })
         }
       })
       return successResponse<SafeTeam>(result.data, result.message)
+    })
+  )
+
+export const  createMentor = createServerFn({ method: "POST" })
+  .inputValidator(createMentorSchema)
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      const result = await teamService.createMentor(data)
+      return successResponse<any>(result.data, result.message)
     })
   )
 

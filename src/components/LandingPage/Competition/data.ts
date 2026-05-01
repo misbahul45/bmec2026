@@ -23,9 +23,22 @@ export const competitions = [
       'Batch 3 · Rp150.000',
     ],
     prizes: [
-      { rank: 1, amount: 'Rp3.000.000' },
-      { rank: 2, amount: 'Rp2.000.000' },
-      { rank: 3, amount: 'Rp1.500.000' },
+      {
+        title: 'Juara 1',
+        reward: 'Rp3.000.000 + Piala + Medali + Sertifikat',
+      },
+      {
+        title: 'Juara 2',
+        reward: 'Rp2.000.000 + Piala + Medali + Sertifikat',
+      },
+      {
+        title: 'Juara 3',
+        reward: 'Rp1.500.000 + Piala + Medali + Sertifikat',
+      },
+      {
+        title: 'Juara Harapan 1',
+        reward: 'Rp1.000.000 + Medali + Sertifikat',
+      },
     ],
     guideUrl: '#',
   },
@@ -42,9 +55,26 @@ export const competitions = [
       'Batch 2 · Rp150.000',
     ],
     prizes: [
-      { rank: 1, amount: 'Rp4.000.000' },
-      { rank: 2, amount: 'Rp3.000.000' },
-      { rank: 3, amount: 'Rp2.000.000' },
+      {
+        title: 'Juara 1',
+        reward: 'Rp4.000.000 + Piala + Medali + Sertifikat',
+      },
+      {
+        title: 'Juara 2',
+        reward: 'Rp3.000.000 + Piala + Medali + Sertifikat',
+      },
+      {
+        title: 'Juara 3',
+        reward: 'Rp2.000.000 + Piala + Medali + Sertifikat',
+      },
+      {
+        title: 'Best Infografis LKTI',
+        reward: 'Rp750.000 + Medali + Sertifikat',
+      },
+      {
+        title: 'Best Presentation LKTI',
+        reward: 'Rp750.000 + Medali + Sertifikat',
+      },
     ],
     guideUrl: '#',
   },
@@ -62,9 +92,26 @@ export const competitions = [
       'Batch 3 · Rp90.000',
     ],
     prizes: [
-      { rank: 1, amount: 'Rp900.000' },
-      { rank: 2, amount: 'Rp700.000' },
-      { rank: 3, amount: 'Rp500.000' },
+      {
+        title: 'Juara 1',
+        reward: 'Rp1.000.000 + Piala + Medali + Sertifikat',
+      },
+      {
+        title: 'Juara 2',
+        reward: 'Rp800.000 + Piala + Medali + Sertifikat',
+      },
+      {
+        title: 'Juara 3',
+        reward: 'Rp600.000 + Piala + Medali + Sertifikat',
+      },
+      {
+        title: 'Most Favorite',
+        reward: 'Rp400.000 + Medali + Sertifikat',
+      },
+      {
+        title: 'Best Presentation',
+        reward: 'Rp400.000 + Medali + Sertifikat',
+      },
     ],
     guideUrl: '#',
   },
