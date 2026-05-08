@@ -12,7 +12,7 @@ export const competitions = [
   {
     id: 'olimpiade',
     title: 'Olimpiade',
-    desc: 'Kompetisi nasional untuk siswa/siswi SMA sederajat yang menguji kemampuan IPA dan dasar Teknik Biomedis melalui tahapan tryout, penyisihan, semifinal, dan final.',
+    desc: 'Lomba Olimpiade BMEC 2026 ini merupakan kompetisi yang ditujukan bagi siswa/siswi SMA sederajat di seluruh Indonesia. Kompetisi ini dirancang untuk menguji dan mengasah pemahaman peserta dalam Ilmu Pengetahuan Alam serta dasar-dasar Teknik Biomedis.',
     image:
       'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=900&q=80',
     accent: 'primary',
@@ -45,7 +45,7 @@ export const competitions = [
   {
     id: 'lkti',
     title: 'LKTI',
-    desc: 'Ajang karya tulis ilmiah bagi mahasiswa untuk menghadirkan gagasan solutif dan inovatif di bidang Teknik Biomedis melalui seleksi abstrak, full paper, semifinal, hingga final.',
+    desc: 'Lomba LKTI BMEC 2026 merupakan ajang bagi mahasiswa untuk mengembangkan gagasan ilmiah yang solutif dan inovatif di bidang Teknik Biomedis. Tahapannya meliputi seleksi abstrak, full paper, hingga final dengan penilaian pada kualitas penyajian argumen, validitas data, dan prototipe yg ditawarkan.',
     image:
       'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=900&q=80',
     accent: 'secondary',
@@ -81,7 +81,7 @@ export const competitions = [
   {
     id: 'infografis',
     title: 'Infografis',
-    desc: 'Kompetisi kreatif bagi siswa/siswi SMA sederajat untuk menyampaikan ide inovasi Teknik Biomedis melalui visual yang menarik dan komunikatif.',
+    desc: 'Lomba Infografis BMEC 2026 adalah kompetisi bagi siswa/siswi SMA sederajat di seluruh Indonesia untuk menyajikan ide inovasi di bidang Teknik Biomedis melalui visual yang menarik dan komunikatif, dengan fokus pada teknologi kesehatan terkini. Terdiri dari seleksi online dan final offline berupa presentasi filosofi & gagasan ide.',
     image:
       'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&q=80',
     accent: 'accent',
