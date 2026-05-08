@@ -21,7 +21,6 @@ export const uploadToImageKit = async (file: File) => {
 
   const data = await res.json()
 
-  console.log(data)
 
   await saveUpload({
     data: {

@@ -94,23 +94,23 @@ export const competitions = [
     prizes: [
       {
         title: 'Juara 1',
-        reward: 'Rp1.000.000 + Piala + Medali + Sertifikat',
+        reward: 'Rp900.000 + Piala + Medali + Sertifikat',
       },
       {
         title: 'Juara 2',
-        reward: 'Rp800.000 + Piala + Medali + Sertifikat',
+        reward: 'Rp700.000 + Piala + Medali + Sertifikat',
       },
       {
         title: 'Juara 3',
-        reward: 'Rp600.000 + Piala + Medali + Sertifikat',
+        reward: 'Rp500.000 + Piala + Medali + Sertifikat',
       },
       {
         title: 'Most Favorite',
-        reward: 'Rp400.000 + Medali + Sertifikat',
+        reward: 'Rp300.000 + Medali + Sertifikat',
       },
       {
         title: 'Best Presentation',
-        reward: 'Rp400.000 + Medali + Sertifikat',
+        reward: 'Rp300.000 + Medali + Sertifikat',
       },
     ],
     guideUrl: '#',
