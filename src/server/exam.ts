@@ -65,10 +65,10 @@ export const deleteExamQuestion = createServerFn({ method: 'POST' })
   )
 
 export const getExamsByCompetitionType = createServerFn({ method: 'GET' })
-  .inputValidator(z.string())
+  .inputValidator(z.object({ type: z.string(), teamId: z.string() }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
-      const result = await examService.findByCompetitionType(data)
+      const result = await examService.findByCompetitionType(data.type, data.teamId)
       return successResponse<any>(result.data, result.message)
     })
   )

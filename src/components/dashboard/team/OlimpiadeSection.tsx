@@ -17,7 +17,7 @@ type Props = {
   } | null
 }
 
-export function OlimpiadeSection({ registrationStatus }: Props) {
+export function OlimpiadeSection({ registrationStatus, teamId }: Props) {
   if (!registrationStatus) {
     return (
       <div className="rounded-2xl bg-background shadow border p-6 flex flex-col items-center gap-3 text-center">
@@ -43,11 +43,11 @@ export function OlimpiadeSection({ registrationStatus }: Props) {
     )
   }
 
-  return <ExamList />
+  return <ExamList teamId={teamId} />
 }
 
-function ExamList() {
-  const { data: res } = useSuspenseQuery(examsByCompetitionTypeQueryOptions('OLIMPIADE'))
+function ExamList({ teamId }: { teamId: string }) {
+  const { data: res } = useSuspenseQuery(examsByCompetitionTypeQueryOptions('OLIMPIADE', teamId))
   const exams: any[] = res.data ?? []
   const now = new Date()
 
@@ -72,6 +72,8 @@ function ExamList() {
           const isActive = now >= start && now <= end
           const isEnded = now > end
           const isUpcoming = now < start
+          
+          const isFinished = exam.attempts?.[0]?.finished
 
           return (
             <div key={exam.id} className="rounded-2xl bg-background shadow border p-5 space-y-3">
@@ -80,9 +82,15 @@ function ExamList() {
                   <p className="font-semibold text-sm">{exam.title}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{exam.stage?.name}</p>
                 </div>
-                {isActive && <Badge className="shrink-0">Aktif</Badge>}
-                {isUpcoming && <Badge variant="outline" className="shrink-0">Segera</Badge>}
-                {isEnded && <Badge variant="secondary" className="shrink-0">Selesai</Badge>}
+                {isFinished ? (
+                  <Badge variant="secondary" className="shrink-0 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">Selesai</Badge>
+                ) : isActive ? (
+                  <Badge className="shrink-0">Aktif</Badge>
+                ) : isUpcoming ? (
+                  <Badge variant="outline" className="shrink-0">Segera</Badge>
+                ) : (
+                  <Badge variant="secondary" className="shrink-0">Ditutup</Badge>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -96,9 +104,23 @@ function ExamList() {
                 </div>
               </div>
 
-              {isActive ? (
+              {isFinished ? (
+                exam.type === 'TRYOUT' ? (
+                  <Button size="sm" variant="outline" className="w-full rounded-xl" asChild>
+                    <a href={`/dashboard/team/exam/${exam.id}/review`}>
+                      <BookOpen size={13} className="mr-1.5" />
+                      Lihat Pembahasan
+                    </a>
+                  </Button>
+                ) : (
+                  <Button size="sm" variant="ghost" className="w-full rounded-xl" disabled>
+                    <CheckCircle2 size={13} className="mr-1.5" />
+                    Selesai Dikerjakan
+                  </Button>
+                )
+              ) : isActive ? (
                 <Button size="sm" className="w-full rounded-xl" asChild>
-                  <a href={`/dashboard/admin/exams/${exam.id}`}>
+                  <a href={`/dashboard/team/exam/${exam.id}`}>
                     <BookOpen size={13} className="mr-1.5" />
                     Mulai Kerjakan
                   </a>
@@ -110,8 +132,8 @@ function ExamList() {
                 </Button>
               ) : (
                 <Button size="sm" variant="ghost" className="w-full rounded-xl" disabled>
-                  <CheckCircle2 size={13} className="mr-1.5" />
-                  Ujian Selesai
+                  <Clock size={13} className="mr-1.5" />
+                  Waktu Habis
                 </Button>
               )}
             </div>

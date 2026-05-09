@@ -1,7 +1,14 @@
-import { Prisma } from "@prisma/client";
+export interface ExamQuestion {
+  id: string
+  question: string
+  optionA: string
+  optionB: string
+  optionC: string
+  optionD: string
+  optionE: string
+  score: number
+}
 
-export type ExamWithStage = Prisma.ExamGetPayload<{
-    include:{
-        stage:true
-    }
-}>
+import { Exam, Stage } from '@prisma/client'
+
+export type ExamWithStage = Exam & { stage: Stage }

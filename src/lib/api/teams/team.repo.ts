@@ -73,6 +73,7 @@ export default class TeamRepo {
         members: true,
         currentStage: true,
         submissions: true,
+        mentor: true,
         registration: {
           include: {
             batch: true,
@@ -149,6 +150,13 @@ export default class TeamRepo {
   findMentorByTeamId(teamId: string) {
     return prisma.mentor.findUnique({
       where: { teamId },
+    })
+  }
+
+  updateMentor(teamId: string, data: { name?: string; email?: string; phone?: string }) {
+    return prisma.mentor.update({
+      where: { teamId },
+      data,
     })
   }
 }

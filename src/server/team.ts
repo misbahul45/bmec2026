@@ -46,11 +46,26 @@ export const createTeam = createServerFn({ method: "POST" })
     })
   )
 
-export const  createMentor = createServerFn({ method: "POST" })
+export const createMentor = createServerFn({ method: "POST" })
   .inputValidator(createMentorSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
       const result = await teamService.createMentor(data)
+      return successResponse<any>(result.data, result.message)
+    })
+  )
+
+export const updateMentor = createServerFn({ method: "POST" })
+  .inputValidator(z.object({
+    teamId: z.string().uuid(),
+    name: z.string().min(1).optional(),
+    email: z.string().email().optional(),
+    phone: z.string().min(8).max(15).optional(),
+  }))
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      const { teamId, ...body } = data
+      const result = await teamService.updateMentor(teamId, body)
       return successResponse<any>(result.data, result.message)
     })
   )

@@ -35,9 +35,15 @@ const CompetitionPriceCard = ({ name, batch }: Props) => {
           Transfer pembayaran ke:
         </p>
 
-        <p className="font-semibold">
-          BCA • 091891981 (Nayla)
-        </p>
+        <ul>
+            <li className="font-semibold">
+              BRI • 058001042204505 (Alexa Putri Marinda)
+            </li>
+
+            <li className="font-semibold">
+              Bank Mandiri • 1420024862970 (Amelia Husna Arrania)
+            </li>
+        </ul>
       </div>
     </div>
   )

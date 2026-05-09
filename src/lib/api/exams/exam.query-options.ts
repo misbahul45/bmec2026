@@ -19,8 +19,8 @@ export const examQuestionsQueryOptions = (examId: string) =>
     queryFn: () => getExamQuestion({ data: examId }),
   })
 
-export const examsByCompetitionTypeQueryOptions = (competitionType: string) =>
+export const examsByCompetitionTypeQueryOptions = (competitionType: string, teamId: string) =>
   queryOptions({
-    queryKey: ["exams", "competition", competitionType],
-    queryFn: () => getExamsByCompetitionType({ data: competitionType }),
+    queryKey: ["exams", "competition", competitionType, teamId],
+    queryFn: () => getExamsByCompetitionType({ data: { type: competitionType, teamId } }),
   })

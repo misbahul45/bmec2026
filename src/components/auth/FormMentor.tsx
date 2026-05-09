@@ -20,10 +20,10 @@ const FormMentor = ({ form }: Props) => {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Nama Mentor</FieldLabel>
+              <FieldLabel>Nama Pembimbing</FieldLabel>
               <Input
                 {...field}
-                placeholder="Masukkan nama mentor"
+                placeholder="Masukkan nama pembimbing"
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -40,7 +40,7 @@ const FormMentor = ({ form }: Props) => {
               <Input
                 {...field}
                 type="email"
-                placeholder="mentor@email.com"
+                placeholder="pembimbing@email.com"
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

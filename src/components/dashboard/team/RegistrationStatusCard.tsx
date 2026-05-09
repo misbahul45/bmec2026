@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, BookOpen, ReceiptText, Download } from 'lucide-react'
+import { CheckCircle2, Clock, BookOpen, ReceiptText, Download, FileText } from 'lucide-react'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { PaymentStatus } from '@prisma/client'
@@ -18,6 +18,7 @@ type Props = {
   competitionType: 'OLIMPIADE' | 'LKTI' | 'INFOGRAFIS'
   moduleUrl?: string | null
   invoiceUrl?: string | null
+  onOpenInvoice?: () => void
 }
 
 const invoiceTitle = {
@@ -38,9 +39,9 @@ export function RegistrationStatusCard({
   competitionType,
   moduleUrl,
   invoiceUrl,
+  onOpenInvoice,
 }: Props) {
   const isApproved = status === 'APPROVED'
-  const isPending = status === 'PENDING'
 
   return (
     <div
@@ -138,6 +139,18 @@ export function RegistrationStatusCard({
               <Download size={13} />
               Download Invoice
             </a>
+          </Button>
+        )}
+
+        {isApproved && onOpenInvoice && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="rounded-xl gap-1.5 text-xs"
+            onClick={onOpenInvoice}
+          >
+            <FileText size={13} />
+            Lihat Invoice
           </Button>
         )}
 

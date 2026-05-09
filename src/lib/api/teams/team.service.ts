@@ -25,18 +25,21 @@ export default class TeamService {
 
   async createMentor(payload: CreateMentorInput) {
     const team = await this.repo.findById(payload.teamId)
-    if (!team) throw new AppError('Team not found', 404)
-      
+    if (!team) throw new AppError('Tim tidak ditemukan', 404)
+
+    const existing = await this.repo.findMentorByTeamId(payload.teamId)
+    if (existing) throw new AppError('Pembimbing sudah terdaftar untuk tim ini', 400)
+
     const mentor = await this.repo.createMentor({
       teamId: payload.teamId,
       name: payload.name,
       email: payload.email,
       phone: payload.phone
     })
-    
-    return{
+
+    return {
       data: mentor,
-      message: "Mentor berhasil ditambahkan"
+      message: 'Pembimbing berhasil ditambahkan',
     }
   }
 
@@ -165,7 +168,7 @@ export default class TeamService {
     const team = await this.repo.findById(id)
 
     if (!team) {
-      throw new AppError("Team not found", 404)
+      throw new AppError('Tim tidak ditemukan', 404)
     }
 
     return {
@@ -179,14 +182,14 @@ export default class TeamService {
     const team = await this.repo.findById(id)
 
     if (!team) {
-      throw new AppError("Team not found", 404)
+      throw new AppError('Tim tidak ditemukan', 404)
     }
 
     await this.repo.delete(id)
 
     return {
       data: null,
-      message: "Team deleted successfully",
+      message: 'Tim berhasil dihapus',
     }
   }
 
@@ -197,7 +200,7 @@ export default class TeamService {
     const team = await this.repo.findById(id)
 
     if (!team) {
-      throw new AppError("Team not found", 404)
+      throw new AppError('Tim tidak ditemukan', 404)
     }
 
     const updated = await this.repo.update(id, {
@@ -211,7 +214,7 @@ export default class TeamService {
 
     return {
       data: this.sanitizeTeam(updated),
-      message: "Team updated successfully",
+      message: 'Data tim berhasil diperbarui',
     }
   }
 
@@ -225,7 +228,7 @@ export default class TeamService {
     const existingTeam = await this.repo.findById(teamId);
 
     if (!existingTeam) {
-      throw new AppError('Team not found', 404);
+      throw new AppError('Tim tidak ditemukan', 404);
     }
 
     const studentIds = payload.members.map((m) => m.studentId);
@@ -242,24 +245,24 @@ export default class TeamService {
 
     return {
       data: result,
-      message: "Team members have been successfully added"
+      message: 'Anggota tim berhasil ditambahkan',
     };
   }
 
   async updateStage(teamId: string, stageId: string): Promise<ServiceResponse<any>> {
     const team = await this.repo.findById(teamId)
-    if (!team) throw new AppError('Team not found', 404)
+    if (!team) throw new AppError('Tim tidak ditemukan', 404)
 
     const stage = await prisma.stage.findUnique({ where: { id: stageId } })
-    if (!stage) throw new AppError('Stage not found', 404)
+    if (!stage) throw new AppError('Stage tidak ditemukan', 404)
 
     const updated = await this.repo.updateStage(teamId, stageId)
-    return { data: this.sanitizeTeam(updated), message: 'Stage updated' }
+    return { data: this.sanitizeTeam(updated), message: 'Stage berhasil diperbarui' }
   }
 
   async getStagesForTeam(teamId: string): Promise<ServiceResponse<any>> {
     const team = await this.repo.findById(teamId)
-    if (!team) throw new AppError('Team not found', 404)
+    if (!team) throw new AppError('Tim tidak ditemukan', 404)
 
     const competition = await prisma.competition.findFirst({
       where: { name: team.competitionType as any },
@@ -271,9 +274,20 @@ export default class TeamService {
     return { data: stages }
   }
 
+  async updateMentor(teamId: string, payload: { name?: string; email?: string; phone?: string }) {
+    const existing = await this.repo.findMentorByTeamId(teamId)
+    if (!existing) throw new AppError('Pembimbing tidak ditemukan', 404)
+
+    const updated = await this.repo.updateMentor(teamId, payload)
+    return {
+      data: updated,
+      message: 'Data pembimbing berhasil diperbarui',
+    }
+  }
+
   async getDashboard(teamId: string): Promise<ServiceResponse<any>> {
     const team = await this.repo.findDashboard(teamId)
-    if (!team) throw new AppError('Team not found', 404)
+    if (!team) throw new AppError('Tim tidak ditemukan', 404)
     const { password, ...rest } = team as any
     if (rest.registration?.batch?.price) {
       rest.registration.batch.price = Number(rest.registration.batch.price)

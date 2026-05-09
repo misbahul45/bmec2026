@@ -40,14 +40,19 @@ export default class ExamRepo {
     });
   }
 
-  getExamsByStageCompetitionType(competitionType: string) {
+  getExamsByStageCompetitionType(competitionType: string, teamId: string) {
     return prisma.exam.findMany({
       where: {
         stage: {
           competition: { name: competitionType as any },
         },
       },
-      include: { stage: true },
+      include: {
+        stage: true,
+        attempts: {
+          where: { teamId },
+        },
+      },
       orderBy: { startDate: 'asc' },
     })
   }

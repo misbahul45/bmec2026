@@ -1,25 +1,31 @@
-import { prisma } from "~/lib/utils/prisma";
+import { prisma } from "~/lib/utils/prisma"
 
 export async function seedCompetition() {
-  const competitions = ["OLIMPIADE", "LKTI", "INFOGRAFIS"] as const;
+  const competitionConfig = {
+    OLIMPIADE: [90000, 120000, 150000],
+    INFOGRAFIS: [60000, 75000, 90000],
+    LKTI: [125000, 150000],
+  } as const
 
-  const baseStartDate = new Date();
+  const baseStartDate = new Date()
 
-  for (const compName of competitions) {
+  for (const [compName, prices] of Object.entries(competitionConfig)) {
     const competition = await prisma.competition.upsert({
-      where: { name: compName },
+      where: {
+        name: compName,
+      },
       update: {},
       create: {
         name: compName,
       },
-    });
+    })
 
-    for (let i = 0; i < 3; i++) {
-      const startDate = new Date(baseStartDate);
-      startDate.setDate(baseStartDate.getDate() + i * 10);
+    for (let i = 0; i < prices.length; i++) {
+      const startDate = new Date(baseStartDate)
+      startDate.setDate(baseStartDate.getDate() + i * 10)
 
-      const endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 5);
+      const endDate = new Date(startDate)
+      endDate.setDate(startDate.getDate() + 5)
 
       await prisma.batch.upsert({
         where: {
@@ -28,18 +34,23 @@ export async function seedCompetition() {
             competitionId: competition.id,
           },
         },
-        update: {},
+        update: {
+          startDate,
+          endDate,
+          price: prices[i],
+          module_bacth: `module-${compName.toLowerCase()}-${i + 1}`,
+        },
         create: {
           name: `Batch ${i + 1}`,
           startDate,
           endDate,
-          price: 100000 + i * 25000,
+          price: prices[i],
           module_bacth: `module-${compName.toLowerCase()}-${i + 1}`,
           competitionId: competition.id,
         },
-      });
+      })
     }
   }
 
-  console.log("✅ Competition + Batch seeded");
+  console.log("✅ Competition + Batch seeded")
 }

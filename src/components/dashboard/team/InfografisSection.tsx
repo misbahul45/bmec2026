@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Lock, ImageIcon, CheckCircle2, Loader2, Upload } from 'lucide-react'
+import { ImageIcon, CheckCircle2, Loader2, Upload } from 'lucide-react'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { PaymentStatus } from '@prisma/client'
@@ -18,18 +18,7 @@ type Props = {
 }
 
 export function InfografisSection({ registrationStatus, teamId, stageId, existingSubmission, queryKey }: Props) {
-  if (registrationStatus !== 'APPROVED') {
-    return (
-      <div className="animated-border rounded-2xl p-6 flex flex-col items-center gap-3 text-center">
-        <Lock size={32} className="text-muted-foreground/50" />
-        <p className="font-semibold text-base">Registrasi Belum Diverifikasi</p>
-        <p className="text-sm text-muted-foreground max-w-sm">
-          Bukti pembayaran kamu sedang dalam proses verifikasi. Upload infografis akan tersedia setelah registrasi disetujui.
-        </p>
-        <Badge variant="outline" className="mt-1">Menunggu Verifikasi</Badge>
-      </div>
-    )
-  }
+  const notApproved = registrationStatus !== 'APPROVED'
 
   if (!stageId) {
     return (
@@ -52,10 +41,20 @@ export function InfografisSection({ registrationStatus, teamId, stageId, existin
     )
   }
 
-  return <InfografisUpload teamId={teamId} stageId={stageId} queryKey={queryKey} />
+  return <InfografisUpload teamId={teamId} stageId={stageId} queryKey={queryKey} showPendingWarning={notApproved} />
 }
 
-function InfografisUpload({ teamId, stageId, queryKey }: { teamId: string; stageId: string; queryKey: unknown[] }) {
+function InfografisUpload({
+  teamId,
+  stageId,
+  queryKey,
+  showPendingWarning,
+}: {
+  teamId: string
+  stageId: string
+  queryKey: unknown[]
+  showPendingWarning: boolean
+}) {
   const [file, setFile] = useState<File | undefined>()
   const [orsinalitasFile, setOrsinalitasFile] = useState<File | undefined>()
   const [uploading, setUploading] = useState(false)
@@ -91,7 +90,7 @@ function InfografisUpload({ teamId, stageId, queryKey }: { teamId: string; stage
     }
   }
 
-  const isPending = uploading || mutation.isPending
+  const isSubmitting = uploading || mutation.isPending
 
   return (
     <div className="space-y-4">
@@ -99,6 +98,14 @@ function InfografisUpload({ teamId, stageId, queryKey }: { teamId: string; stage
         <ImageIcon size={16} className="text-primary" />
         Upload Infografis
       </h3>
+
+      {showPendingWarning && (
+        <div className="flex items-center gap-2 rounded-xl border border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20 dark:border-yellow-800/40 px-4 py-2.5">
+          <Badge variant="outline" className="text-yellow-700 border-yellow-300 text-[10px] shrink-0">Pending</Badge>
+          <p className="text-xs text-yellow-700 dark:text-yellow-400">Submission akan diproses setelah pembayaran diverifikasi.</p>
+        </div>
+      )}
+
       <div className="rounded-2xl bg-background shadow border p-5 space-y-4">
         <div className="space-y-2">
           <p className="text-xs font-semibold">File Infografis <span className="text-destructive">*</span></p>
@@ -109,8 +116,8 @@ function InfografisUpload({ teamId, stageId, queryKey }: { teamId: string; stage
           <p className="text-xs font-semibold">Surat Orisinalitas <span className="text-muted-foreground font-normal">(opsional)</span></p>
           <FileUploadField value={orsinalitasFile} onChange={setOrsinalitasFile} label="Upload surat orisinalitas (.pdf)" accept=".pdf" />
         </div>
-        <Button className="w-full rounded-xl" disabled={isPending || !file} onClick={handleSubmit}>
-          {isPending
+        <Button className="w-full rounded-xl" disabled={isSubmitting || !file} onClick={handleSubmit}>
+          {isSubmitting
             ? <span className="flex items-center gap-2"><Loader2 size={13} className="animate-spin" />Mengunggah...</span>
             : <span className="flex items-center gap-2"><Upload size={13} />Upload Infografis</span>
           }

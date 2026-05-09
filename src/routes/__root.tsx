@@ -120,6 +120,7 @@ function RootComponent() {
 function RootDocument({ children }: { children: React.ReactNode }) {
   const location = useLocation()
   const isAuthPage = location.pathname.startsWith('/auth')
+  const isExamPage = location.pathname.includes('/exam/')
 
   return (
     <html lang="id">
@@ -127,11 +128,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="bg-background">
-        {!isAuthPage && <Header />}
+        {!isAuthPage && !isExamPage && <Header />}
 
         {children}
 
-        {!isAuthPage && <Footer />}
+        {!isAuthPage && !isExamPage && <Footer />}
         {import.meta.env.DEV && (
           <>
             <TanStackRouterDevtools position="bottom-right" />

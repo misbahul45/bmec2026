@@ -88,8 +88,8 @@ export default class ExamService {
     }
   }
 
-  async findByCompetitionType(competitionType: string) {
-    const exams = await this.repo.getExamsByStageCompetitionType(competitionType)
+  async findByCompetitionType(competitionType: string, teamId: string) {
+    const exams = await this.repo.getExamsByStageCompetitionType(competitionType, teamId)
     return { data: exams, message: 'Successfully fetched exams' }
   }
 }
