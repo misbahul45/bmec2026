@@ -13,6 +13,11 @@ export default class CompetitionRepo {
                     orderBy: { startDate: "asc" },
                     take: 1,
                 },
+                stages: {
+                    orderBy: {
+                        order: 'asc',
+                    },
+                },
             },
         })
     }
