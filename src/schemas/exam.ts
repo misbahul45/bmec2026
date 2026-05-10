@@ -19,6 +19,8 @@ export const examQuestionSchema = z.object({
   examId: z.string().uuid(),
 
   createdAt: z.date().optional(),
+
+  order:z.number({ message:'order question is required' })
 })
 
 export type ExamQuestionData = z.infer<typeof examQuestionSchema>

@@ -22,6 +22,7 @@ interface Question {
   optionE: string
   correctAnswer: string
   score: number
+  order:number
 }
 
 interface Props {
@@ -65,14 +66,24 @@ const QuestionCard = ({ data, number }: Props) => {
     optionE: data.optionE,
     correctAnswer: data.correctAnswer as ExamQuestionData['correctAnswer'],
     score: data.score,
+    order:data.order
   }
 
   return (
     <>
       <Card className="rounded-lg border">
         <CardHeader className="flex flex-row items-start justify-between gap-2">
-          <CardTitle className="prose max-w-none flex-1">
-            <div dangerouslySetInnerHTML={{ __html: `<strong>${number}.</strong> ${data.question}` }} />
+          <CardTitle className="flex items-start gap-2 flex-1">
+            <span className="font-bold shrink-0">
+              {data.order}.
+            </span>
+
+            <div
+              className="prose max-w-none flex-1 [&>p:first-child]:mt-0 [&>p:first-child]:inline"
+              dangerouslySetInnerHTML={{
+                __html: data.question,
+              }}
+            />
           </CardTitle>
 
           <div className="flex gap-1 shrink-0">
@@ -121,11 +132,23 @@ const QuestionCard = ({ data, number }: Props) => {
             <div
               key={opt.key}
               className={cn(
-                'p-2 rounded-md border prose max-w-none',
-                opt.key === data.correctAnswer && 'bg-green-100 border-green-400 text-green-700'
+                'p-2 rounded-md border',
+                opt.key === data.correctAnswer &&
+                  'bg-green-100 border-green-400 text-green-700'
               )}
             >
-              <div dangerouslySetInnerHTML={{ __html: `<strong>${opt.key}.</strong> ${opt.value}` }} />
+              <div className="flex items-start gap-2">
+                <span className="font-semibold shrink-0">
+                  {opt.key}.
+                </span>
+
+                <div
+                  className="prose max-w-none flex-1 [&>p:first-child]:mt-0 [&>p:first-child]:mb-0"
+                  dangerouslySetInnerHTML={{
+                    __html: opt.value,
+                  }}
+                />
+              </div>
             </div>
           ))}
         </CardContent>

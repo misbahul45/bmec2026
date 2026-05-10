@@ -191,6 +191,7 @@ model ExamQuestion {
   optionC       String
   optionD       String
   optionE       String
+  order         Int                 @default(0)
   correctAnswer String
   score         Int          @default(5)
   examId        String
