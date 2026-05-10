@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Trophy, Medal, Award, BookOpen, UserPlus } from 'lucide-react'
 import { accentTokens } from './data'
+import { Image } from '@unpic/react'
 
 type AccentKey = keyof typeof accentTokens
 
@@ -30,13 +31,15 @@ const CompetitionCard = ({ comp, index }: CompetitionCardProps) => {
           !isEven ? 'md:order-2' : ''
         }`}
       >
-        <img
+        <Image
           src={comp.image}
           alt={comp.title}
+          height={200}
+          width={400}
           className="absolute inset-0 w-full h-full object-cover"
         />
 
-        <div className="absolute inset-0 bg-black/45" />
+        <div className="absolute inset-0 bg-black/1-" />
 
         <div className="absolute top-3 left-3">
           <div

@@ -1,0 +1,8 @@
+allowBuilds:
+  '@prisma/engines': true
+  bcrypt: true
+  core-js: true
+  esbuild: true
+  msw: true
+  prisma: true
+  sharp: true
