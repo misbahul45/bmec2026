@@ -1,11 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
 import FormSignin from '~/components/auth/FormSignin'
+import CountdownWaiting from '~/components/ui/CoundownTime'
 
 export const Route = createFileRoute('/auth/login')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const TARGET_DATE = new Date('2026-05-25T00:00:00')
+  const isPast = TARGET_DATE.getTime() <= Date.now()
+
+  if (!isPast) {
+    return <CountdownWaiting />
+  }
   return (
     <div className="min-h-screen w-full flex">
       <div className="flex-1 flex items-center justify-center px-8 py-12 relative">
