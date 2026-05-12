@@ -19,44 +19,29 @@ export async function seedExam() {
     return
   }
 
-  const addDays = (date: Date, days: number) => {
-    const newDate = new Date(date)
-    newDate.setDate(newDate.getDate() + days)
-    return newDate
-  }
-
-  const baseDate = new Date()
+  const today = new Date()
 
   for (const stage of stages) {
-    const tryout1Start = baseDate
-    const tryout1End = addDays(tryout1Start, 7)
-
-    const tryout2Start = addDays(tryout1End, 1)
-    const tryout2End = addDays(tryout2Start, 7)
-
-    const penyisihanStart = addDays(tryout2End, 1)
-    const penyisihanEnd = addDays(penyisihanStart, 7)
-
     const exams = [
       {
         title: `Tryout 1 ${stage.competition.name}`,
         type: ExamType.TRYOUT,
-        startDate: tryout1Start,
-        endDate: tryout1End,
+        startDate: today,
+        endDate: today,
         duration: 60,
       },
       {
         title: `Tryout 2 ${stage.competition.name}`,
         type: ExamType.TRYOUT,
-        startDate: tryout2Start,
-        endDate: tryout2End,
+        startDate: today,
+        endDate: today,
         duration: 60,
       },
       {
         title: `Penyisihan ${stage.competition.name}`,
         type: ExamType.OLYMPIAD,
-        startDate: penyisihanStart,
-        endDate: penyisihanEnd,
+        startDate: today,
+        endDate: today,
         duration: 90,
       },
     ]

@@ -41,7 +41,7 @@ const FormMentor = ({ form, educationLevel }: Props) => {
               <Input
                 {...field}
                 type="email"
-                placeholder={`Masukkan nama ${educationLevel === 'MAHASISWA'?'Pembina@gmail.com':'Pendamping@gmail.com'}`}
+                placeholder={`${educationLevel === 'MAHASISWA'?'Pembina@gmail.com':'Pendamping@gmail.com'}`}
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

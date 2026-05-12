@@ -58,6 +58,8 @@ export const Route = createFileRoute('/auth/register/$teamId/')({
 type MemberFormValues = z.infer<typeof createMembersSchema>
 type MentorFormValues = z.infer<typeof createMentorSchema>
 
+const MEMBER_TABS = ['member-0', 'member-1', 'member-2']
+
 function RouteComponent() {
   const { teamId } = Route.useParams()
   const { tab } = Route.useSearch()
@@ -130,8 +132,23 @@ function RouteComponent() {
   const onMentorSubmit: SubmitHandler<MentorFormValues> = (data) =>
     mentorMutation.mutate(data)
 
-  const onMembersSubmit: SubmitHandler<MemberFormValues> = (data) =>
-    memberMutation.mutate(data)
+  const currentMemberIndex = MEMBER_TABS.indexOf(activeTab)
+  const isLastMemberTab = currentMemberIndex === MEMBER_TABS.length - 1
+
+  const handleMemberNext = async () => {
+    const isValid = await memberForm.trigger(`members.${currentMemberIndex}` as any)
+    if (!isValid) return
+
+    if (!isLastMemberTab) {
+      setActiveTab(MEMBER_TABS[currentMemberIndex + 1])
+      return
+    }
+
+    const allValid = await memberForm.trigger('members')
+    if (!allValid) return
+
+    memberMutation.mutate(memberForm.getValues())
+  }
 
   const memberTabs = [
     { value: 'member-0', label: 'Ketua' },
@@ -153,7 +170,7 @@ function RouteComponent() {
             Lengkapi Data Tim <span className="text-primary">{team.name}</span>
           </CardTitle>
           <CardDescription className="text-sm text-center">
-            Isi data {educationLevel === 'MAHASISWA'?'Pembina':'Pendamping'} & anggota terlebih dahulu, lalu upload dokumen kelengkapan tim.
+            Isi data {educationLevel === 'MAHASISWA' ? 'Pembina' : 'Pendamping'} & anggota terlebih dahulu, lalu upload dokumen kelengkapan tim.
           </CardDescription>
 
           <div className="flex items-center justify-center gap-2 pt-2">
@@ -189,7 +206,7 @@ function RouteComponent() {
             <TabsList className="grid grid-cols-5 w-full">
               <TabsTrigger value="mentor" disabled={mentorSubmitted}>
                 <span className="flex items-center gap-1">
-                  {educationLevel === 'MAHASISWA'?'Pembina':'Pendamping'}
+                  {educationLevel === 'MAHASISWA' ? 'Pembina' : 'Pendamping'}
                   {mentorSubmitted && <CheckCircle2 size={11} className="text-green-600" />}
                 </span>
               </TabsTrigger>
@@ -217,7 +234,7 @@ function RouteComponent() {
                 <FormMentor educationLevel={educationLevel} form={mentorForm} teamId={teamId} />
                 <div className="flex items-center justify-between pt-2">
                   <p className="text-xs text-muted-foreground">
-                    Isi data {educationLevel === 'MAHASISWA'?'Pembina':'Pendamping'} tim
+                    Isi data {educationLevel === 'MAHASISWA' ? 'Pembina' : 'Pendamping'} tim
                   </p>
                   <Button
                     type="submit"
@@ -230,28 +247,35 @@ function RouteComponent() {
               </form>
             </TabsContent>
 
-            <form onSubmit={memberForm.handleSubmit(onMembersSubmit)} className="space-y-6">
-              {[0, 1, 2].map((index) => (
-                <TabsContent key={index} value={`member-${index}`} className="mt-6 tab-anim">
+            {[0, 1, 2].map((index) => (
+              <TabsContent key={index} value={`member-${index}`} className="mt-6 tab-anim">
+                <div className="space-y-6">
                   <FormMember form={memberForm} index={index} educationLevel={educationLevel} />
-                </TabsContent>
-              ))}
 
-              {mentorSubmitted && !membersSubmitted && (
-                <div className="flex items-center justify-between pt-2">
-                  <p className="text-xs text-muted-foreground">
-                    Isi semua tab anggota sebelum menyimpan
-                  </p>
-                  <Button
-                    type="submit"
-                    className="active:scale-95 rounded-xl"
-                    disabled={memberMutation.isPending}
-                  >
-                    {memberMutation.isPending ? 'Menyimpan...' : 'Simpan Anggota →'}
-                  </Button>
+                  {mentorSubmitted && !membersSubmitted && (
+                    <div className="flex items-center justify-between pt-2">
+                      <p className="text-xs text-muted-foreground">
+                        {isLastMemberTab
+                          ? 'Pastikan semua data anggota sudah terisi'
+                          : 'Lanjut isi data anggota berikutnya'}
+                      </p>
+                      <Button
+                        type="button"
+                        className="active:scale-95 rounded-xl"
+                        disabled={memberMutation.isPending}
+                        onClick={handleMemberNext}
+                      >
+                        {memberMutation.isPending
+                          ? 'Menyimpan...'
+                          : isLastMemberTab
+                            ? 'Simpan Anggota →'
+                            : 'Lanjut →'}
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </form>
+              </TabsContent>
+            ))}
 
             <TabsContent value="dokumen" className="mt-6 tab-anim">
               <DocumentUploadTab
