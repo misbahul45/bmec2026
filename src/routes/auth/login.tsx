@@ -52,7 +52,7 @@ function RouteComponent() {
           </p>
 
           <div className="flex gap-8 pt-2">
-            {[['3', 'Cabang Lomba'], ['Rp19.5jt', 'Total Hadiah'], ['2026', 'Tahun Ini']].map(([val, lbl]) => (
+            {[['3', 'Cabang Lomba'], ['Rp20jt', 'Total Hadiah'], ['2026', 'Tahun Ini']].map(([val, lbl]) => (
               <div key={lbl}>
                 <p className="text-lg font-bold text-black">{val}</p>
                 <p className="text-[10px] text-black/70 uppercase tracking-wide">{lbl}</p>
