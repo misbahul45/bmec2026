@@ -63,7 +63,7 @@ export const processes: TimelineProcess[] = [
       },
       {
         date: '8 November',
-        label: 'Grand Final',
+        label: 'Final',
       },
     ],
   },
@@ -78,19 +78,19 @@ export const processes: TimelineProcess[] = [
     events: [
       {
         date: '25 Mei - 24 Juli',
-        label: 'Open Submit Abstract',
+        label: 'Open Submission Abstract',
       },
       {
-        date: '15 Juli',
+        date: '1 Juli',
         label: 'Pengumuman Lolos Abstract',
       },
       {
-        date: '16 Juli - 31 Juli',
-        label: 'Submit Full Paper Batch 1',
+        date: '1 Juli - 31 Juli',
+        label: 'Full Paper Batch 1',
       },
       {
         date: '3 Agustus - 4 September',
-        label: 'Submit Full Paper Batch 2',
+        label: 'Full Paper Batch 2',
       },
       {
         date: '17 Oktober',
@@ -98,15 +98,11 @@ export const processes: TimelineProcess[] = [
       },
       {
         date: '24 Oktober',
-        label: 'Technical Meeting Semifinal',
-      },
-      {
-        date: '7 November',
-        label: 'Semifinal',
+        label: 'Technical Meeting Final',
       },
       {
         date: '8 November',
-        label: 'Grand Final',
+        label: 'Final',
       },
     ],
   },
@@ -137,19 +133,15 @@ export const processes: TimelineProcess[] = [
       },
       {
         date: '19 Oktober - 2 November',
-        label: 'Upload Feed Finalis',
+        label: 'Voting Karya Finalis Infografis',
       },
       {
         date: '24 Oktober',
-        label: 'Technical Meeting Semifinal',
-      },
-      {
-        date: '7 November',
-        label: 'Semifinal',
+        label: 'Technical Meeting Final',
       },
       {
         date: '8 November',
-        label: 'Grand Final',
+        label: 'Final',
       },
     ],
   },

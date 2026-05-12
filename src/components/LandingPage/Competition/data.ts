@@ -49,6 +49,7 @@ export const competitions = [
     accent: 'secondary',
     Icon: FileText,
     registerFees: [
+      'Submission Abstract · Free',
       'Batch 1 · Rp125.000',
       'Batch 2 · Rp150.000',
     ],

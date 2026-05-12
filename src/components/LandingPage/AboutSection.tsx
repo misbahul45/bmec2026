@@ -133,7 +133,7 @@ const AboutSection: React.FC = () => {
                 { number: "500+", label: "Peserta", icon: Users },
                 { number: "40+", label: "Sekolah", icon: School },
                 { number: "3", label: "Kompetisi", icon: Trophy },
-                { number: "19.5Jt+", label: "Total Hadiah", icon: Gift },
+                { number: "20Jt+", label: "Total Hadiah", icon: Gift },
               ].map((stat, i) => (
                 <div
                   key={i}
