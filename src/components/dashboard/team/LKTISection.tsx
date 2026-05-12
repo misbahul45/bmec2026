@@ -49,6 +49,21 @@ export function LKTISection({
   existingSubmission,
   queryKey,
 }: Props) {
+  if (!batchId) {
+    return (
+      <div className="animated-border flex flex-col items-center gap-3 rounded-2xl p-6 text-center">
+        <CreditCard size={32} className="text-muted-foreground/50" />
+        <p className="text-base font-semibold">Pendaftaran Belum Tersedia</p>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          Maaf, pendaftaran untuk tahap ini belum dibuka. Pantau terus informasi dari panitia.
+        </p>
+        <Badge variant="outline" className="mt-1">
+          Segera Hadir
+        </Badge>
+      </div>
+    )
+  }
+
   if (!abstractStatus) {
     return (
       <div className="animated-border flex flex-col items-center gap-3 rounded-2xl p-6 text-center">

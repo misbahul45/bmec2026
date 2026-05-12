@@ -46,13 +46,12 @@ model Mentor {
   updatedAt DateTime @updatedAt
 }
 
-model Member {createMentor
+model Member {
   id        String     @id @default(uuid())
   name      String
   role      MemberRole
   email     String     @unique
-  phone     String     // whatsapp
-  studentId String?    @unique
+  phone     String     
 
   // khusus LKTI
   major     String?    // prodi

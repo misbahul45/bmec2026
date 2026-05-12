@@ -105,7 +105,6 @@ export default class TeamRepo {
         phone: t.phone,
         role: t.role,
         teamId: t.teamId!,
-        studentId: t.studentId,
         major: t.major ?? null,
         faculty: t.faculty ?? null,
       })),

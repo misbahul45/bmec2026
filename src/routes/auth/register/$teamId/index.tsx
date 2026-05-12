@@ -153,7 +153,7 @@ function RouteComponent() {
             Lengkapi Data Tim <span className="text-primary">{team.name}</span>
           </CardTitle>
           <CardDescription className="text-sm text-center">
-            Isi data mentor & anggota terlebih dahulu, lalu upload dokumen kelengkapan tim.
+            Isi data {educationLevel === 'MAHASISWA'?'Pembina':'Pendamping'} & anggota terlebih dahulu, lalu upload dokumen kelengkapan tim.
           </CardDescription>
 
           <div className="flex items-center justify-center gap-2 pt-2">
@@ -189,7 +189,7 @@ function RouteComponent() {
             <TabsList className="grid grid-cols-5 w-full">
               <TabsTrigger value="mentor" disabled={mentorSubmitted}>
                 <span className="flex items-center gap-1">
-                  Pembimbing
+                  {educationLevel === 'MAHASISWA'?'Pembina':'Pendamping'}
                   {mentorSubmitted && <CheckCircle2 size={11} className="text-green-600" />}
                 </span>
               </TabsTrigger>
@@ -214,10 +214,10 @@ function RouteComponent() {
 
             <TabsContent value="mentor" className="mt-6 tab-anim">
               <form onSubmit={mentorForm.handleSubmit(onMentorSubmit)} className="space-y-6">
-                <FormMentor form={mentorForm} teamId={teamId} />
+                <FormMentor educationLevel={educationLevel} form={mentorForm} teamId={teamId} />
                 <div className="flex items-center justify-between pt-2">
                   <p className="text-xs text-muted-foreground">
-                    Isi data pembimbing tim
+                    Isi data {educationLevel === 'MAHASISWA'?'Pembina':'Pendamping'} tim
                   </p>
                   <Button
                     type="submit"

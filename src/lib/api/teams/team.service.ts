@@ -6,14 +6,12 @@ import { CreateMemberData } from "~/schemas/team.member.schema"
 import { CompetitionType, Prisma } from "@prisma/client"
 import * as bcrypt from "bcrypt"
 import TeamRepo from "./team.repo"
-import MemberRepo from "../members/member.repo"
 import { QueryTeam } from "~/schemas/team.schema"
 import { prisma } from "~/lib/utils/prisma"
 import { CreateMentorInput } from "~/schemas/team.mentor.schema"
 
 export default class TeamService {
   private repo = new TeamRepo()
-  private memberRepo=new MemberRepo()
 
   private generateCodeTeam(type: CompetitionType) {
     return type === "OLIMPIADE"
@@ -230,17 +228,6 @@ export default class TeamService {
     if (!existingTeam) {
       throw new AppError('Tim tidak ditemukan', 404);
     }
-
-    const studentIds = payload.members.map((m) => m.studentId);
-
-    const existingMembers =
-      await this.memberRepo.findMembersByStudentIdList(studentIds);
-
-    if (existingMembers.length > 0) {
-      const duplicatedIds = existingMembers.map((m) => m.studentId).join(', ');
-      throw new AppError(`${duplicatedIds} sudah terdaftar`, 400);
-    }
-
     const result = await this.repo.createMember(payload.members);
 
     return {

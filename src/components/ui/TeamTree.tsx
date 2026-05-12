@@ -4,7 +4,6 @@ import gsap from "gsap";
 type Member = {
   id: string;
   name: string;
-  studentId: string | null;
   role: "KETUA" | "ANGGOTA";
   email: string;
   phone: string;
@@ -22,8 +21,9 @@ const NodeCard: React.FC<{
   topLabel: React.ReactNode;
   name: string;
   sub?: string | null;
+  phone?:string;
   glow?: boolean;
-}> = ({ className = "", topLabel, name, sub, glow }) => (
+}> = ({ className = "", topLabel, name, sub, phone,glow }) => (
   <div
     className={`relative flex flex-col items-center gap-1 px-4 py-3 sm:px-5 sm:py-4 rounded-2xl border backdrop-blur-sm
       bg-background/60 border-border/60 shadow-lg transition-all duration-300
@@ -43,6 +43,11 @@ const NodeCard: React.FC<{
     {sub && (
       <span className="text-[10px] sm:text-xs text-muted-foreground font-mono">
         {sub}
+      </span>
+    )}
+    {phone && (
+      <span className="text-[10px] sm:text-xs text-muted-foreground font-mono">
+        {phone}
       </span>
     )}
   </div>
@@ -161,7 +166,7 @@ const TeamTree: React.FC<{ team: Team }> = ({ team }) => {
 
       {ketua && (
         <div className="relative z-10 ketua-node">
-          <NodeCard topLabel={<>👑 Ketua</>} name={ketua.name} sub={ketua.studentId} glow />
+          <NodeCard topLabel={<>👑 Ketua</>} name={ketua.name} sub={ketua.email} phone={ketua.phone} glow />
         </div>
       )}
 
@@ -169,7 +174,7 @@ const TeamTree: React.FC<{ team: Team }> = ({ team }) => {
         <div className="relative z-10 flex flex-wrap justify-center gap-3 sm:gap-4 px-4 sm:px-8 w-full">
           {anggota.map((m) => (
             <div key={m.id} className="anggota-node w-[calc(50%-6px)] sm:w-64 md:w-72">
-              <NodeCard topLabel="Anggota" name={m.name} sub={m.studentId} />
+              <NodeCard topLabel="Anggota" name={m.name} sub={m.email} phone={m.phone} />
             </div>
           ))}
         </div>

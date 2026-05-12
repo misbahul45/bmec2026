@@ -70,22 +70,6 @@ const FormMember = ({ form, index, educationLevel }: Props) => {
           )}
         />
 
-        <Controller
-          name={`members.${index}.studentId`}
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>{studentLabel}</FieldLabel>
-              <Input
-                {...field}
-                placeholder={`Masukkan ${studentLabel}`}
-                aria-invalid={fieldState.invalid}
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
         {isMahasiswa && (
           <>
             <Controller

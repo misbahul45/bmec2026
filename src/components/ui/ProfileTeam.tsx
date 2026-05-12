@@ -105,13 +105,13 @@ const ProfileTeam: React.FC<Props> = ({ data }) => {
             <div className="flex items-center gap-2 mb-3">
               <GraduationCap size={15} className="text-primary" />
               <span className="text-xs font-semibold uppercase tracking-widest text-primary/80">
-                Pembimbing
+                {data.competitionType === 'LKTI'?'Pembina':'Pendamping'}
               </span>
             </div>
             <div className="grid grid-cols-1 xs:grid-cols-3 gap-2.5 text-sm">
-              <InfoItem icon={BookOpen} label={mentor.name} caption="Nama Pembimbing" />
-              <InfoItem icon={Mail} label={mentor.email} caption="Email Pembimbing" />
-              <InfoItem icon={Phone} label={mentor.phone} caption="WhatsApp Pembimbing" />
+              <InfoItem icon={BookOpen} label={mentor.name} caption={`Nama ${data.competitionType === 'LKTI'?'Pembina':'Pendamping'}`} />
+              <InfoItem icon={Mail} label={mentor.email} caption={`Email ${data.competitionType === 'LKTI'?'Pembina':'Pendamping'}`} />
+              <InfoItem icon={Phone} label={mentor.phone} caption={`Whatsapp ${data.competitionType === 'LKTI'?'Pembina':'Pendamping'}`}/>
             </div>
           </div>
         )}
