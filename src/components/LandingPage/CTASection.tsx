@@ -43,7 +43,7 @@ const CTASection = () => {
           <Button size="default" variant="outline" className="rounded-xl px-6 gap-2 text-sm" asChild>
             <a href="#competition">
               <BookOpen size={14} />
-              Lihat Detail Lomba
+              Lihat Detail Kompetisi
             </a>
           </Button>
         </div>
