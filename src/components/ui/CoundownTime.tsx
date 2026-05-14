@@ -93,7 +93,7 @@ export default function CountdownWaiting() {
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 leading-tight">
             BMEC 2026
           </h1>
-          <p className="text-sm text-gray-900 leading-relaxed max-w-[260px]">
+          <p className="text-sm text-gray-900 leading-relaxed max-w-65">
             {isPast
               ? 'Platform pendaftaran sudah dibuka. Silakan masuk.'
               : 'Platform pendaftaran akan dibuka pada 25 Mei 2026.'}
@@ -119,7 +119,7 @@ export default function CountdownWaiting() {
                 <CountdownUnit value={timeLeft.seconds} label="Detik" />
               </div>
             </div>
-            <p className="text-[10px] tracking-[0.1em] uppercase text-gray-900 gsap-countdown-sub">
+            <p className="text-[10px] tracking-widest uppercase text-gray-900 gsap-countdown-sub">
               Menuju 25 Mei 2026
             </p>
           </div>
