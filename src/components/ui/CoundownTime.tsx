@@ -128,7 +128,7 @@ export default function CountdownWaiting() {
         <div className="w-full rounded-xl p-5 flex flex-col gap-3 border border-primary/15 bg-secondary/90 gsap-info-card">
           {[
             ['3', 'Cabang Lomba'],
-            ['Rp19.5jt', 'Total Hadiah'],
+            ['Rp20jt', 'Total Hadiah'],
             ['25 Mei', 'Pendaftaran'],
           ].map(([val, lbl]) => (
             <div
