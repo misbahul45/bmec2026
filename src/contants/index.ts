@@ -55,7 +55,7 @@ export const ABOUT_IMAGES =  [
     title: "Olimpiade Teknik Biomedis",
     description:
       "Uji kemampuan Matematika, Fisika, Kimia, Biologi, dan Teknik Biomedis dasar dengan soal bertingkat dan tryout eksklusif.",
-    img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1200&auto=format&fit=crop",
+    img: "/images/detail/3.jpeg",
     accent: "primary" as const,
     className: "rounded-xl overflow-hidden bg-card border border-border shadow-sm"
   },
@@ -64,7 +64,7 @@ export const ABOUT_IMAGES =  [
     title: "Lomba Karya Tulis Ilmiah",
     description:
       "Tuangkan ide inovatif Teknik Biomedis berbasis keberlanjutan dan presentasikan karya terbaikmu di babak final.",
-    img: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+    img: "/images/detail/1.jpeg",
     accent: "secondary" as const,
     className: "rounded-xl overflow-hidden bg-card border border-border shadow-sm"
   },
@@ -73,7 +73,7 @@ export const ABOUT_IMAGES =  [
     title: "Lomba Infografis Biomedis",
     description:
       "Kembangkan kreativitasmu dalam menyampaikan informasi Teknik Biomedis melalui desain infografis yang inovatif.",
-    img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
+    img: "/images/detail/2.jpeg",
     accent: "accent" as const,
     className: "rounded-xl overflow-hidden bg-card border border-border shadow-sm"
   }
