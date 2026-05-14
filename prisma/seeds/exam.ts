@@ -21,27 +21,34 @@ export async function seedExam() {
 
   const today = new Date()
 
+  // Helper tambah hari
+  const addDays = (date: Date, days: number) => {
+    const newDate = new Date(date)
+    newDate.setDate(newDate.getDate() + days)
+    return newDate
+  }
+
   for (const stage of stages) {
     const exams = [
       {
         title: `Tryout 1 ${stage.competition.name}`,
         type: ExamType.TRYOUT,
-        startDate: today,
-        endDate: today,
+        startDate: addDays(today, 0),
+        endDate: addDays(today, 1),
         duration: 60,
       },
       {
         title: `Tryout 2 ${stage.competition.name}`,
         type: ExamType.TRYOUT,
-        startDate: today,
-        endDate: today,
+        startDate: addDays(today, 0),
+        endDate: addDays(today, 1),
         duration: 60,
       },
       {
         title: `Penyisihan ${stage.competition.name}`,
         type: ExamType.OLYMPIAD,
-        startDate: today,
-        endDate: today,
+        startDate: addDays(today, 0),
+        endDate: addDays(today, 1),
         duration: 90,
       },
     ]
@@ -64,8 +71,10 @@ export async function seedExam() {
           stageId: stage.id,
         },
       })
+
+      console.log(`✅ ${exam.title} seeded`)
     }
   }
 
-  console.log("✅ Exam OLIMPIADE seeded")
+  console.log("✅ Exam OLIMPIADE seeded selesai")
 }

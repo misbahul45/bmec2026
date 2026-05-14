@@ -14,6 +14,7 @@ import { ExamDeviceLockScreen } from './ExamDeviceLockScreen'
 import { ExamBlockedScreen } from './ExamBlockedScreen'
 import { saveAnswer } from '~/server/exam-attempt'
 import { ExamQuestion } from '~/types/exam.type'
+import { ExamType } from '@prisma/client'
 
 interface ExamAttemptData {
   id: string
@@ -28,6 +29,7 @@ interface ExamData {
   endDate: string | Date
   duration: number
   stage?: { name: string }
+  type : ExamType
 }
 
 interface ExamShellProps {
@@ -69,7 +71,7 @@ export function ExamShell({ attempt, exam, questions, teamId }: ExamShellProps) 
     useExamNavigation(questions)
 
   const { isSubmitting, submitManual, submitAuto, showConfirmDialog, setShowConfirmDialog } =
-    useExamSubmit({ attemptId: attempt.id, teamId })
+    useExamSubmit({ attemptId: attempt.id, teamId, examType:exam.type })
 
   useExamAntiCheat({ attemptId: attempt.id, isFinished: false })
 

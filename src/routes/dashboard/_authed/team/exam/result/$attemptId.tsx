@@ -27,6 +27,7 @@ function RouteComponent() {
 
 function ResultPage({ attemptId }: { attemptId: string }) {
   const { data: res } = useSuspenseQuery(examResultQueryOptions(attemptId))
+
   const result = res.data as {
     id: string
     totalScore: number
@@ -38,6 +39,7 @@ function ResultPage({ attemptId }: { attemptId: string }) {
     flagged: boolean
     answers: { questionId: string; answer: string; isCorrect: boolean; question: { score: number } }[]
   }
+
 
   const correct = result.answers.filter((a) => a.isCorrect).length
   const wrong = result.answers.filter((a) => !a.isCorrect).length

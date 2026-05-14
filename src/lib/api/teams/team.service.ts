@@ -201,6 +201,9 @@ export default class TeamService {
       throw new AppError('Tim tidak ditemukan', 404)
     }
 
+    if(payload.password){
+      payload.password=bcrypt.hashSync(payload.password,10)
+    }
     const updated = await this.repo.update(id, {
       ...(payload.teamName && { name: payload.teamName }),
       ...(payload.institution && { schoolName: payload.institution }),
@@ -208,6 +211,7 @@ export default class TeamService {
       ...(payload.competitionType && { competitionType: payload.competitionType }),
       ...('documentUrl' in payload && { documentUrl: payload.documentUrl as string | null }),
       ...('twibbonUrl' in payload && { twibbonUrl: payload.twibbonUrl as string | null }),
+      ...('password' in payload && {password:payload.password})
     })
 
     return {

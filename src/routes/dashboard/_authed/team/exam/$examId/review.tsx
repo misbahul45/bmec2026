@@ -61,7 +61,7 @@ function RouteComponent() {
 
       <Suspense
         fallback={
-          <Skeleton className="h-[500px] w-full rounded-2xl" />
+          <Skeleton className="h-125 w-full rounded-2xl" />
         }
       >
         <ReviewPage examId={examId} />

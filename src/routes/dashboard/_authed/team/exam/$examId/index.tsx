@@ -5,6 +5,7 @@ import { Skeleton } from '~/components/ui/skeleton'
 import { ExamShell } from '~/components/exam/ExamShell'
 import { examSessionQueryOptions } from '~/lib/api/exam-attempts/exam-attempt.query-options'
 import { startExam } from '~/server/exam-attempt'
+import { ExamType } from '@prisma/client'
 
 export const Route = createFileRoute('/dashboard/_authed/team/exam/$examId/')({
   loader: async ({ context, params }) => {
@@ -63,6 +64,7 @@ function ExamPage({ teamId, examId }: { teamId: string; examId: string }) {
         optionE: string
         score: number
       }[]
+      type:ExamType
     }
   }
 
