@@ -35,7 +35,14 @@ function RouteComponent() {
 
         <div className="space-y-2">
           {questions?.map((q, index) => (
-            <QuestionCard key={q.id} data={q} number={index + 1} />
+            <QuestionCard
+              key={q.id}
+              data={{
+                ...q,
+                correctAnswer: q.correctAnswer as 'A' | 'B' | 'C' | 'D' | 'E',
+              }}
+              number={index + 1}
+            />
           ))}
         </div>
       </div>

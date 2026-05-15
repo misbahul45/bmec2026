@@ -1,26 +1,58 @@
 import { z } from "zod"
 
-export const examQuestionSchema = z.object({
-  id: z.string().uuid().optional(),
-  question: z.string().min(1, "Question is required"),
+export const examQuestionSchema = z
+  .object({
+    id: z.string().uuid().optional(),
 
-  optionA: z.string().min(1),
-  optionB: z.string().min(1),
-  optionC: z.string().min(1),
-  optionD: z.string().min(1),
-  optionE: z.string().min(1),
+    question: z.string().min(1, 'Question is required'),
 
-  correctAnswer: z.enum(["A", "B", "C", "D", "E"], {
-    message: "Correct answer must be one of A, B, C, D, or E",
-  }),
+    optionA: z.string().min(1),
+    optionB: z.string().min(1),
+    optionC: z.string().min(1),
+    optionD: z.string().min(1),
+    optionE: z.string().min(1),
 
-  score: z.number().int().nonnegative(),
+    correctAnswer: z.enum(['A', 'B', 'C', 'D', 'E']),
 
-  examId: z.string().uuid(),
+    difficulty: z
+      .enum(['EASY', 'MEDIUM', 'HARD'])
+      .default('EASY'),
 
-  createdAt: z.date().optional(),
+    examId: z.string().uuid(),
 
-  order:z.number({ message:'order question is required' })
-})
+    createdAt: z.date().optional(),
 
-export type ExamQuestionData = z.infer<typeof examQuestionSchema>
+    order: z.number().int(),
+  })
+  .transform((data) => {
+    const scoringMap = {
+      EASY: {
+        correctScore: 2,
+        wrongScore: -1,
+        emptyScore: 0,
+      },
+      MEDIUM: {
+        correctScore: 4,
+        wrongScore: -2,
+        emptyScore: -1,
+      },
+      HARD: {
+        correctScore: 6,
+        wrongScore: -3,
+        emptyScore: -2,
+      },
+    }
+
+    return {
+      ...data,
+      ...scoringMap[data.difficulty],
+    }
+  })
+
+// INPUT FORM TYPE
+export type ExamQuestionFormData =
+  z.input<typeof examQuestionSchema>
+
+// OUTPUT TYPE (hasil transform)
+export type ExamQuestionData =
+  z.output<typeof examQuestionSchema>

@@ -14,8 +14,27 @@ interface ExamQuestionViewProps {
 }
 
 const OPTIONS = ['A', 'B', 'C', 'D', 'E'] as const
-type OptionKey = 'optionA' | 'optionB' | 'optionC' | 'optionD' | 'optionE'
-const OPTION_KEYS: OptionKey[] = ['optionA', 'optionB', 'optionC', 'optionD', 'optionE']
+
+type OptionKey =
+  | 'optionA'
+  | 'optionB'
+  | 'optionC'
+  | 'optionD'
+  | 'optionE'
+
+const OPTION_KEYS: OptionKey[] = [
+  'optionA',
+  'optionB',
+  'optionC',
+  'optionD',
+  'optionE',
+]
+
+const difficultyLabel = {
+  EASY: 'Mudah',
+  MEDIUM: 'Sedang',
+  HARD: 'Sulit',
+}
 
 export function ExamQuestionView({
   question,
@@ -31,19 +50,50 @@ export function ExamQuestionView({
   }))
 
   return (
-    <div key={question.id} className="flex-1 overflow-y-auto p-6 space-y-5">
+    <div
+      key={question.id}
+      className="flex-1 overflow-y-auto p-6 space-y-5"
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm text-muted-foreground">
             Soal {currentIndex + 1} dari {total}
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">Skor: {question.score} poin</p>
+
+          <div className="flex flex-wrap items-center gap-2 mt-1">
+            <Badge variant="outline">
+              {
+                difficultyLabel[
+                  question.difficulty as keyof typeof difficultyLabel
+                ]
+              }
+            </Badge>
+
+            <p className="text-xs text-muted-foreground">
+              Benar:{' '}
+              <span className="font-medium text-emerald-600">
+                +{question.correctScore}
+              </span>
+
+              {' • '}Salah:{' '}
+              <span className="font-medium text-red-500">
+                {question.wrongScore}
+              </span>
+
+              {' • '}Kosong:{' '}
+              <span className="font-medium text-amber-500">
+                {question.emptyScore}
+              </span>
+            </p>
+          </div>
         </div>
+
         {status === 'doubt' && (
           <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/50 text-[10px]">
             Ragu-ragu
           </Badge>
         )}
+
         {status === 'saved' && (
           <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/50 text-[10px]">
             Sudah Dijawab

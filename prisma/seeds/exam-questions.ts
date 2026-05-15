@@ -1,5 +1,27 @@
 import { prisma } from '~/lib/utils/prisma'
-import { StageType, ExamType } from '@prisma/client'
+import {
+  StageType,
+  ExamType,
+  QuestionDifficulty,
+} from '@prisma/client'
+
+const difficultyScoring = {
+  [QuestionDifficulty.EASY]: {
+    correctScore: 2,
+    wrongScore: -1,
+    emptyScore: 0,
+  },
+  [QuestionDifficulty.MEDIUM]: {
+    correctScore: 4,
+    wrongScore: -2,
+    emptyScore: -1,
+  },
+  [QuestionDifficulty.HARD]: {
+    correctScore: 6,
+    wrongScore: -3,
+    emptyScore: -2,
+  },
+}
 
 const questions = [
   {
@@ -22,8 +44,9 @@ const questions = [
     optionD: '<p>Sensor piezoelektrik</p>',
     optionE: '<p>Sensor resistif</p>',
     correctAnswer: 'B',
-    score: 5,
+    difficulty: QuestionDifficulty.EASY,
   },
+
   {
     question:
       '<p>Nilai normal tekanan darah sistolik pada orang dewasa sehat adalah...</p>',
@@ -34,8 +57,9 @@ const questions = [
     optionD: '<p>120–140 mmHg</p>',
     optionE: '<p>140–160 mmHg</p>',
     correctAnswer: 'C',
-    score: 5,
+    difficulty: QuestionDifficulty.EASY,
   },
+
   {
     question:
       '<p>Prinsip kerja <strong>MRI</strong> (Magnetic Resonance Imaging) didasarkan pada...</p>',
@@ -50,8 +74,9 @@ const questions = [
     optionE:
       '<p>Konduksi listrik pada jaringan biologis</p>',
     correctAnswer: 'B',
-    score: 5,
+    difficulty: QuestionDifficulty.MEDIUM,
   },
+
   {
     question:
       '<p>Frekuensi gelombang ultrasonik yang digunakan dalam <em>USG medis</em> umumnya berada pada rentang...</p>',
@@ -64,8 +89,9 @@ const questions = [
     optionE:
       '<p>200 MHz – 2 GHz</p>',
     correctAnswer: 'C',
-    score: 5,
+    difficulty: QuestionDifficulty.MEDIUM,
   },
+
   {
     question:
       '<p>Elektroda pada pemeriksaan <strong>EKG</strong> berfungsi untuk...</p>',
@@ -80,7 +106,7 @@ const questions = [
     optionE:
       '<p>Mengukur kadar glukosa dalam darah</p>',
     correctAnswer: 'B',
-    score: 5,
+    difficulty: QuestionDifficulty.HARD,
   },
 ]
 
@@ -147,13 +173,48 @@ export async function seedExamQuestions() {
       (
         q,
         index
-      ) => ({
-        ...q,
-        order:
-          index + 1,
-        examId:
-          exam.id,
-      })
+      ) => {
+        const scoring =
+          difficultyScoring[
+            q.difficulty
+          ]
+
+        return {
+          question:
+            q.question,
+          optionA:
+            q.optionA,
+          optionB:
+            q.optionB,
+          optionC:
+            q.optionC,
+          optionD:
+            q.optionD,
+          optionE:
+            q.optionE,
+
+          correctAnswer:
+            q.correctAnswer,
+
+          difficulty:
+            q.difficulty,
+
+          correctScore:
+            scoring.correctScore,
+
+          wrongScore:
+            scoring.wrongScore,
+
+          emptyScore:
+            scoring.emptyScore,
+
+          order:
+            index + 1,
+
+          examId:
+            exam.id,
+        }
+      }
     ),
   })
 

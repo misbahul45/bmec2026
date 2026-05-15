@@ -1,15 +1,44 @@
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/components/ui/dialog'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '~/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '~/components/ui/alert-dialog'
 import { cn } from '~/lib/utils'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { deleteExamQuestion } from '~/server/exam'
 import FormEditQuestion from './FormEditQuestion'
-import { ExamQuestionData } from '~/schemas/exam'
-import { Pencil, Trash2 } from 'lucide-react'
+import {
+  ExamQuestionFormData,
+} from '~/schemas/exam'
+import {
+  Pencil,
+  Trash2,
+} from 'lucide-react'
+import { Badge } from '~/components/ui/badge'
 
 interface Question {
   id: string
@@ -20,9 +49,20 @@ interface Question {
   optionC: string
   optionD: string
   optionE: string
-  correctAnswer: string
-  score: number
-  order:number
+  correctAnswer:
+    | 'A'
+    | 'B'
+    | 'C'
+    | 'D'
+    | 'E'
+  difficulty:
+    | 'EASY'
+    | 'MEDIUM'
+    | 'HARD'
+  correctScore: number
+  wrongScore: number
+  emptyScore: number
+  order: number
 }
 
 interface Props {
@@ -30,74 +70,188 @@ interface Props {
   number: number
 }
 
-const QuestionCard = ({ data, number }: Props) => {
-  const [editOpen, setEditOpen] = useState(false)
-  const queryClient = useQueryClient()
+const difficultyLabel = {
+  EASY: {
+    label: 'Mudah',
+    score: '+2 / -1 / 0',
+  },
+  MEDIUM: {
+    label: 'Sedang',
+    score: '+4 / -2 / -1',
+  },
+  HARD: {
+    label: 'Sulit',
+    score: '+6 / -3 / -2',
+  },
+}
+
+const QuestionCard = ({
+  data,
+  number,
+}: Props) => {
+  const [
+    editOpen,
+    setEditOpen,
+  ] = useState(false)
+
+  const queryClient =
+    useQueryClient()
 
   const options = [
-    { key: 'A', value: data.optionA },
-    { key: 'B', value: data.optionB },
-    { key: 'C', value: data.optionC },
-    { key: 'D', value: data.optionD },
-    { key: 'E', value: data.optionE },
-  ]
+    {
+      key: 'A',
+      value:
+        data.optionA,
+    },
+    {
+      key: 'B',
+      value:
+        data.optionB,
+    },
+    {
+      key: 'C',
+      value:
+        data.optionC,
+    },
+    {
+      key: 'D',
+      value:
+        data.optionD,
+    },
+    {
+      key: 'E',
+      value:
+        data.optionE,
+    },
+  ] as const
 
-  const deleteMutation = useMutation({
-    mutationFn: async () => {
-      return deleteExamQuestion({ data: data.id })
-    },
-    onError: (error: any) => {
-      toast.error(error?.message ?? 'Something went wrong')
-    },
-    onSuccess: () => {
-      toast.success('Soal berhasil dihapus')
-      queryClient.invalidateQueries({ queryKey: ['exam-questions', data.examId] })
-    },
-  })
+  const deleteMutation =
+    useMutation({
+      mutationFn:
+        async () => {
+          return deleteExamQuestion(
+            {
+              data:
+                data.id,
+            }
+          )
+        },
 
-  const defaultValues: ExamQuestionData = {
-    id: data.id,
-    examId: data.examId,
-    question: data.question,
-    optionA: data.optionA,
-    optionB: data.optionB,
-    optionC: data.optionC,
-    optionD: data.optionD,
-    optionE: data.optionE,
-    correctAnswer: data.correctAnswer as ExamQuestionData['correctAnswer'],
-    score: data.score,
-    order:data.order
-  }
+      onError: (
+        error: any
+      ) => {
+        toast.error(
+          error?.message ??
+            'Something went wrong'
+        )
+      },
+
+      onSuccess:
+        async () => {
+          toast.success(
+            'Soal berhasil dihapus'
+          )
+
+          await queryClient.invalidateQueries(
+            {
+              queryKey:
+                [
+                  'exam-questions',
+                  data.examId,
+                ],
+            }
+          )
+        },
+    })
+
+  const defaultValues: ExamQuestionFormData =
+    {
+      id: data.id,
+      examId:
+        data.examId,
+      question:
+        data.question,
+
+      optionA:
+        data.optionA,
+      optionB:
+        data.optionB,
+      optionC:
+        data.optionC,
+      optionD:
+        data.optionD,
+      optionE:
+        data.optionE,
+
+      correctAnswer:
+        data.correctAnswer,
+
+      difficulty:
+        data.difficulty,
+
+      order:
+        data.order,
+    }
+
+  const difficultyInfo =
+    difficultyLabel[
+      data.difficulty
+    ]
 
   return (
     <>
       <Card className="rounded-lg border">
         <CardHeader className="flex flex-row items-start justify-between gap-2">
-          <CardTitle className="flex items-start gap-2 flex-1">
-            <span className="font-bold shrink-0">
-              {data.order}.
-            </span>
+          <div className="flex-1">
+            <CardTitle className="flex items-start gap-2">
+              <span className="font-bold shrink-0">
+                {
+                  data.order
+                }
+                .
+              </span>
 
-            <div
-              className="prose max-w-none flex-1 [&>p:first-child]:mt-0 [&>p:first-child]:inline"
-              dangerouslySetInnerHTML={{
-                __html: data.question,
-              }}
-            />
-          </CardTitle>
+              <div
+                className="prose max-w-none flex-1 [&>p:first-child]:mt-0 [&>p:first-child]:inline"
+                dangerouslySetInnerHTML={{
+                  __html:
+                    data.question,
+                }}
+              />
+            </CardTitle>
+
+            <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                <Badge variant={data.difficulty==='HARD'?'destructive':data.difficulty=='MEDIUM'?'secondary':'default'}>
+                  {
+                    difficultyInfo.label
+                  }
+                </Badge>
+                <Badge variant={'outline'}>
+                  {
+                    difficultyInfo.score
+                  }
+                </Badge>
+            </div>
+          </div>
 
           <div className="flex gap-1 shrink-0">
             <Button
               variant="ghost"
               size="icon"
               className="h-7 w-7"
-              onClick={() => setEditOpen(true)}
+              onClick={() =>
+                setEditOpen(
+                  true
+                )
+              }
             >
               <Pencil className="h-3.5 w-3.5" />
             </Button>
 
             <AlertDialog>
-              <AlertDialogTrigger asChild>
+              <AlertDialogTrigger
+                asChild
+              >
                 <Button
                   variant="ghost"
                   size="icon"
@@ -106,20 +260,36 @@ const QuestionCard = ({ data, number }: Props) => {
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </AlertDialogTrigger>
+
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Hapus soal ini?</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    Hapus soal
+                    ini?
+                  </AlertDialogTitle>
+
                   <AlertDialogDescription>
-                    Tindakan ini tidak dapat dibatalkan.
+                    Tindakan
+                    ini tidak
+                    dapat
+                    dibatalkan.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
+
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                  <AlertDialogCancel>
+                    Batal
+                  </AlertDialogCancel>
+
                   <AlertDialogAction
-                    onClick={() => deleteMutation.mutate()}
+                    onClick={() =>
+                      deleteMutation.mutate()
+                    }
                     className="bg-destructive hover:bg-destructive/90"
                   >
-                    {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+                    {deleteMutation.isPending
+                      ? 'Menghapus...'
+                      : 'Hapus'}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -128,41 +298,67 @@ const QuestionCard = ({ data, number }: Props) => {
         </CardHeader>
 
         <CardContent className="space-y-2">
-          {options.map((opt) => (
-            <div
-              key={opt.key}
-              className={cn(
-                'p-2 rounded-md border',
-                opt.key === data.correctAnswer &&
-                  'bg-green-100 border-green-400 text-green-700'
-              )}
-            >
-              <div className="flex items-start gap-2">
-                <span className="font-semibold shrink-0">
-                  {opt.key}.
-                </span>
+          {options.map(
+            (opt) => (
+              <div
+                key={
+                  opt.key
+                }
+                className={cn(
+                  'p-2 rounded-md border',
+                  opt.key ===
+                    data.correctAnswer &&
+                    'bg-green-100 border-green-400 text-green-700'
+                )}
+              >
+                <div className="flex items-start gap-2">
+                  <span className="font-semibold shrink-0">
+                    {
+                      opt.key
+                    }
+                    .
+                  </span>
 
-                <div
-                  className="prose max-w-none flex-1 [&>p:first-child]:mt-0 [&>p:first-child]:mb-0"
-                  dangerouslySetInnerHTML={{
-                    __html: opt.value,
-                  }}
-                />
+                  <div
+                    className="prose max-w-none flex-1 [&>p:first-child]:mt-0 [&>p:first-child]:mb-0"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        opt.value,
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </CardContent>
       </Card>
 
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+      <Dialog
+        open={editOpen}
+        onOpenChange={
+          setEditOpen
+        }
+      >
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Soal {number}</DialogTitle>
+            <DialogTitle>
+              Edit Soal{' '}
+              {number}
+            </DialogTitle>
           </DialogHeader>
+
           <FormEditQuestion
-            examId={data.examId}
-            defaultValues={defaultValues}
-            onSuccess={() => setEditOpen(false)}
+            examId={
+              data.examId
+            }
+            defaultValues={
+              defaultValues
+            }
+            onSuccess={() =>
+              setEditOpen(
+                false
+              )
+            }
           />
         </DialogContent>
       </Dialog>

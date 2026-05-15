@@ -147,7 +147,7 @@ function RouteComponent() {
       </div>
 
       <div className="flex flex-wrap items-end gap-4">
-        <div className="flex flex-col flex-1 gap-1 min-w-[180px]">
+        <div className="flex flex-col flex-1 gap-1 min-w-45">
           <Label>Cari Tim</Label>
           <Input
             value={filters.search}

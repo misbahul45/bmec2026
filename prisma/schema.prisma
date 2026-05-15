@@ -192,11 +192,21 @@ model ExamQuestion {
   optionE       String
   order         Int                 @default(0)
   correctAnswer String
-  score         Int          @default(5)
+  correctScore    Int
+  wrongScore      Int
+  emptyScore      Int
   examId        String
   createdAt     DateTime     @default(now())
   answers       ExamAnswer[]
   exam          Exam         @relation(fields: [examId], references: [id])
+
+  difficulty      QuestionDifficulty  @default(EASY)
+}
+
+enum QuestionDifficulty {
+  EASY
+  MEDIUM
+  HARD
 }
 
 model ExamAttempt {

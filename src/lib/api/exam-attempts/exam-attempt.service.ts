@@ -219,26 +219,88 @@ export default class ExamAttemptService {
     return { skipped: false }
   }
 
-  async finishExam(attemptId: string) {
-    return prisma.$transaction(async (tx) => {
-      const attempt = await this.repo.findAttemptForFinish(tx, attemptId)
-      if (!attempt) throw new AppError('Sesi ujian tidak ditemukan', 404)
 
-      if (attempt.finished) return { alreadyFinished: true, totalScore: null }
 
-      const totalScore = attempt.answers.reduce(
-        (sum, a) => (a.isCorrect ? sum + a.question.score : sum),
-        0,
-      )
+  async finishExam(
+    attemptId: string
+  ) {
+    return prisma.$transaction(
+      async (tx) => {
+        const attempt =
+          await this.repo.findAttemptForFinish(
+            tx,
+            attemptId
+          )
 
-      await this.repo.finishAttempt(tx, attemptId, totalScore)
+        if (!attempt) {
+          throw new AppError(
+            'Sesi ujian tidak ditemukan',
+            404
+          )
+        }
 
-      return { alreadyFinished: false, totalScore }
-    }, {
-      maxWait: 5000,
-      timeout: 15000
-    })
+        if (attempt.finished) {
+          return {
+            alreadyFinished: true,
+            totalScore: null,
+          }
+        }
+
+        const totalScore =
+          attempt.answers.reduce(
+            (
+              sum,
+              answer
+            ) => {
+              const question =
+                answer.question
+
+              const isEmpty =
+                !answer.answer ||
+                answer.answer.trim() === ''
+
+              if (isEmpty) {
+                return (
+                  sum +
+                  question.emptyScore
+                )
+              }
+
+              if (
+                answer.isCorrect
+              ) {
+                return (
+                  sum +
+                  question.correctScore
+                )
+              }
+
+              return (
+                sum +
+                question.wrongScore
+              )
+            },
+            0
+          )
+
+        await this.repo.finishAttempt(
+          tx,
+          attemptId,
+          totalScore
+        )
+
+        return {
+          alreadyFinished: false,
+          totalScore,
+        }
+      },
+      {
+        maxWait: 5000,
+        timeout: 15000,
+      }
+    )
   }
+
 
   async getResult(attemptId: string) {
     const attempt = await this.repo.findAttemptResult(attemptId)

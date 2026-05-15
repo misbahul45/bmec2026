@@ -6,7 +6,7 @@ export function CheatStatusBadge({ flagged, cheatCount }: { flagged: boolean; ch
     return (
       <Badge variant="destructive" className="gap-1">
         <ShieldAlert className="size-3" />
-        Flagged ({cheatCount})
+        Kecurangan ({cheatCount})
       </Badge>
     )
   }

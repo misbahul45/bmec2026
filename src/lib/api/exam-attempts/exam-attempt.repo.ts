@@ -58,16 +58,28 @@ export default class ExamAttemptRepo {
     })
   }
 
-  findAttemptForFinish(tx: Prisma.TransactionClient, attemptId: string) {
+  findAttemptForFinish(
+    tx: Prisma.TransactionClient,
+    attemptId: string
+  ) {
     return tx.examAttempt.findUnique({
-      where: { id: attemptId },
+      where: {
+        id: attemptId,
+      },
       select: {
         finished: true,
         examId: true,
         answers: {
           select: {
+            answer: true,
             isCorrect: true,
-            question: { select: { score: true } },
+            question: {
+              select: {
+                correctScore: true,
+                wrongScore: true,
+                emptyScore: true,
+              },
+            },
           },
         },
       },
@@ -138,7 +150,9 @@ export default class ExamAttemptRepo {
             optionC: true,
             optionD: true,
             optionE: true,
-            score: true,
+            correctScore:true,
+            wrongScore:true,
+            emptyScore:true,    
           },
           orderBy: { createdAt: 'asc' },
         },
@@ -162,9 +176,13 @@ export default class ExamAttemptRepo {
     })
   }
 
-  findAttemptResult(attemptId: string) {
+  findAttemptResult(
+    attemptId: string
+  ) {
     return prisma.examAttempt.findUnique({
-      where: { id: attemptId },
+      where: {
+        id: attemptId,
+      },
       select: {
         id: true,
         totalScore: true,
@@ -174,18 +192,26 @@ export default class ExamAttemptRepo {
         cheatCount: true,
         suspiciousScore: true,
         flagged: true,
+
         answers: {
           select: {
             questionId: true,
             answer: true,
             isCorrect: true,
-            question: { select: { score: true } },
+
+            question: {
+              select: {
+                difficulty: true,
+                correctScore: true,
+                wrongScore: true,
+                emptyScore: true,
+              },
+            },
           },
         },
       },
     })
   }
-
   logEventAndUpdateAttempt(
     tx: Prisma.TransactionClient,
     attemptId: string,
