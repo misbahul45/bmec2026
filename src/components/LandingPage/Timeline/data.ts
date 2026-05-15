@@ -132,12 +132,12 @@ export const processes: TimelineProcess[] = [
         label: 'Webinar & Pengumuman Finalis',
       },
       {
-        date: '26 Oktober - 2 November',
-        label: 'Voting Karya Finalis Infografis',
-      },
-      {
         date: '24 Oktober',
         label: 'Technical Meeting Final',
+      },
+      {
+        date: '26 Oktober - 2 November',
+        label: 'Voting Karya Finalis Infografis',
       },
       {
         date: '8 November',
