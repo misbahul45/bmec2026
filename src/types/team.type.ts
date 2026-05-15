@@ -4,9 +4,9 @@ export type TeamWithRelations =
   Prisma.TeamGetPayload<{
     include: {
       members: true
-      abstract: true
       registration: {
         include: {
+          batch: true
           competition: {
             include: { stages: true }
           }
@@ -17,12 +17,9 @@ export type TeamWithRelations =
     }
   }>
 
-export type SafeTeam = Omit<
-  TeamWithRelations,
-  "password"
->
+export type SafeTeam = Omit<TeamWithRelations, 'password'>
 
 export type TeamsResponse = {
-  teams: TeamWithRelations[]
+  teams: any[]
   meta: MetaData
 }

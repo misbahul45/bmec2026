@@ -1,6 +1,5 @@
 import React from "react"
 import { Button } from "~/components/ui/button"
-import { TeamWithRelations } from "~/types/team.type"
 import { Link, useRouteContext } from "@tanstack/react-router"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
@@ -11,7 +10,10 @@ import {
 import { PaymentStatus } from "@prisma/client"
 
 type Props = {
-  team: TeamWithRelations
+  team: {
+    id: string
+    registration?: { status: string } | null
+  }
 }
 
 const TeamActions: React.FC<Props> = ({

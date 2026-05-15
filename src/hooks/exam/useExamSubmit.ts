@@ -18,7 +18,7 @@ export function useExamSubmit({ attemptId, teamId, examType }: UseExamSubmitOpti
   const flushDoubtsAndFinish = useCallback(async () => {
     const doubts = getAllDoubts(attemptId)
     for (const { questionId, answer } of doubts) {
-      await saveAnswer({ data: { attemptId, questionId, answer: answer as 'A' | 'B' | 'C' | 'D' | 'E', teamId } })
+      await saveAnswer({ data: { attemptId, questionId, answer: answer ?? '', teamId } })
     }
     await finishExam({ data: { attemptId } })
     clearAllDoubts(attemptId)

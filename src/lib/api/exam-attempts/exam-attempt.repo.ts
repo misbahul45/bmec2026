@@ -168,11 +168,26 @@ export default class ExamAttemptRepo {
         exam: {
           include: {
             questions: {
-              orderBy: { createdAt: 'asc' }
-            }
-          }
-        }
-      }
+              select: {
+                id: true,
+                question: true,
+                optionA: true,
+                optionB: true,
+                optionC: true,
+                optionD: true,
+                optionE: true,
+                correctAnswer: true,
+                difficulty: true,
+                correctScore: true,
+                wrongScore: true,
+                emptyScore: true,
+                order: true,
+              },
+              orderBy: { order: 'asc' },
+            },
+          },
+        },
+      },
     })
   }
 
@@ -192,6 +207,19 @@ export default class ExamAttemptRepo {
         cheatCount: true,
         suspiciousScore: true,
         flagged: true,
+
+        exam: {
+          select: {
+            _count: {
+              select: { questions: true },
+            },
+            questions: {
+              select: {
+                correctScore: true,
+              },
+            },
+          },
+        },
 
         answers: {
           select: {

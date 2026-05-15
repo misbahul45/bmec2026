@@ -15,17 +15,28 @@ function ExamLeaderboardTable({ examId, examTitle }: { examId: string; examTitle
 
   const handleExport = () => {
     exportToExcel(
-      attempts.map((a, i) => ({
-        Rank: i + 1,
-        'Nama Tim': a.team.name,
-        Sekolah: a.team.schoolName,
-        'Total Skor': a.totalScore,
-        Benar: a.answers.filter((x: any) => x.isCorrect).length,
-        Salah: a.answers.filter((x: any) => !x.isCorrect).length,
-        Status: a.finished ? 'Selesai' : 'Berlangsung',
-      })),
+      attempts.map((a, i) => {
+        const totalQ = (a as any).exam?._count?.questions ?? 0
+        const correct = a.answers.filter(
+          (x: any) => x.answer && x.answer.trim() !== '' && x.isCorrect,
+        ).length
+        const wrong = a.answers.filter(
+          (x: any) => x.answer && x.answer.trim() !== '' && !x.isCorrect,
+        ).length
+        const empty = totalQ - correct - wrong
+        return {
+          Rank: i + 1,
+          'Nama Tim': a.team.name,
+          Sekolah: a.team.schoolName,
+          'Total Skor': a.totalScore,
+          Benar: correct,
+          Salah: wrong,
+          Kosong: empty,
+          Status: a.finished ? 'Selesai' : 'Berlangsung',
+        }
+      }),
       `leaderboard-olimpiade-${examTitle}`,
-      'Leaderboard'
+      'Leaderboard',
     )
   }
 
@@ -48,6 +59,7 @@ function ExamLeaderboardTable({ examId, examTitle }: { examId: string; examTitle
               <TableHead>Sekolah</TableHead>
               <TableHead className="text-center">Benar</TableHead>
               <TableHead className="text-center">Salah</TableHead>
+              <TableHead className="text-center">Kosong</TableHead>
               <TableHead className="text-center">Skor</TableHead>
               <TableHead className="text-center">Status</TableHead>
             </TableRow>
@@ -55,28 +67,49 @@ function ExamLeaderboardTable({ examId, examTitle }: { examId: string; examTitle
           <TableBody>
             {attempts.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   Belum ada peserta
                 </TableCell>
               </TableRow>
             )}
             {attempts.map((a, i) => {
-              const correct = a.answers.filter((x: any) => x.isCorrect).length
-              const wrong = a.answers.filter((x: any) => !x.isCorrect).length
+              const totalQ = (a as any).exam?._count?.questions ?? 0
+              const correct = a.answers.filter(
+                (x: any) => x.answer && x.answer.trim() !== '' && x.isCorrect,
+              ).length
+              const wrong = a.answers.filter(
+                (x: any) => x.answer && x.answer.trim() !== '' && !x.isCorrect,
+              ).length
+              const empty = totalQ - correct - wrong
               return (
                 <TableRow key={a.id}>
                   <TableCell className="text-center font-bold">
-                    <span className={i === 0 ? 'text-yellow-500' : i === 1 ? 'text-slate-400' : i === 2 ? 'text-amber-600' : 'text-muted-foreground'}>
+                    <span
+                      className={
+                        i === 0
+                          ? 'text-yellow-500'
+                          : i === 1
+                            ? 'text-slate-400'
+                            : i === 2
+                              ? 'text-amber-600'
+                              : 'text-muted-foreground'
+                      }
+                    >
                       #{i + 1}
                     </span>
                   </TableCell>
                   <TableCell className="font-medium">{a.team.name}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{a.team.schoolName}</TableCell>
-                  <TableCell className="text-center text-green-600 font-medium">{correct}</TableCell>
+                  <TableCell className="text-center text-emerald-600 font-medium">{correct}</TableCell>
                   <TableCell className="text-center text-destructive font-medium">{wrong}</TableCell>
+                  <TableCell className="text-center text-muted-foreground font-medium">{empty}</TableCell>
                   <TableCell className="text-center font-bold text-primary">{a.totalScore}</TableCell>
                   <TableCell className="text-center">
-                    {a.finished ? <Badge variant="default">Selesai</Badge> : <Badge variant="outline">Berlangsung</Badge>}
+                    {a.finished ? (
+                      <Badge variant="default">Selesai</Badge>
+                    ) : (
+                      <Badge variant="outline">Berlangsung</Badge>
+                    )}
                   </TableCell>
                 </TableRow>
               )
@@ -90,11 +123,13 @@ function ExamLeaderboardTable({ examId, examTitle }: { examId: string; examTitle
 
 export function OlimpiadeLeaderboard() {
   const { data: res } = useSuspenseQuery(examsQueryOptions())
-  const exams: any[] = Array.isArray(res) ? res : res?.data ?? []
+  const exams: any[] = Array.isArray(res) ? res : (res?.data ?? [])
   const [selectedExamId, setSelectedExamId] = useState<string>(exams[0]?.id ?? '')
 
   if (exams.length === 0) {
-    return <p className="text-sm text-muted-foreground py-8 text-center">Belum ada ujian</p>
+    return (
+      <p className="text-sm text-muted-foreground py-8 text-center">Belum ada ujian</p>
+    )
   }
 
   return (
@@ -107,7 +142,9 @@ export function OlimpiadeLeaderboard() {
           </SelectTrigger>
           <SelectContent>
             {exams.map((e) => (
-              <SelectItem key={e.id} value={e.id}>{e.title} — {e.type}</SelectItem>
+              <SelectItem key={e.id} value={e.id}>
+                {e.title} — {e.type}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>

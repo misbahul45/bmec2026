@@ -58,6 +58,9 @@ export default class TeamService {
   }
   private sanitizeTeam(team: any) {
     const { password, ...rest } = team
+    if (rest.registration?.batch?.price) {
+      rest.registration.batch.price = Number(rest.registration.batch.price)
+    }
     return rest
   }
 

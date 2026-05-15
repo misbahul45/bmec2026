@@ -207,12 +207,13 @@ export default class ExamAttemptService {
     if (!question) throw new AppError('Soal tidak ditemukan', 404)
     if (question.examId !== attempt.examId) throw new AppError('Soal tidak termasuk dalam ujian ini', 400)
 
-    const isCorrect = question.correctAnswer === input.answer
+    const isEmpty = !input.answer || input.answer.trim() === ''
+    const isCorrect = isEmpty ? false : question.correctAnswer === input.answer
 
     await this.repo.upsertAnswer({
       attemptId: input.attemptId,
       questionId: input.questionId,
-      answer: input.answer,
+      answer: input.answer ?? '',
       isCorrect,
     })
 

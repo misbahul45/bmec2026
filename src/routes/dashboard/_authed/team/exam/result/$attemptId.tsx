@@ -104,6 +104,11 @@ function ResultPage({
       suspiciousScore: number
       flagged: boolean
 
+      exam: {
+        _count: { questions: number }
+        questions: { correctScore: number }[]
+      }
+
       answers: {
         questionId: string
         answer: string
@@ -120,6 +125,8 @@ function ResultPage({
       }[]
     }
 
+  const totalQuestions = result.exam._count.questions
+
   const correct =
     result.answers.filter(
       (a) =>
@@ -134,23 +141,11 @@ function ResultPage({
         !a.isCorrect
     ).length
 
-  const empty =
-    result.answers.filter(
-      (a) =>
-        !a.answer ||
-        a.answer.trim() ===
-          ''
-    ).length
+  const empty = totalQuestions - correct - wrong
 
   const maxScore =
-    result.answers.reduce(
-      (
-        sum,
-        a
-      ) =>
-        sum +
-        a.question
-          .correctScore,
+    result.exam.questions.reduce(
+      (sum, q) => sum + q.correctScore,
       0
     )
 

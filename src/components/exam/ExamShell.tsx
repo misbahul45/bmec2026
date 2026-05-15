@@ -82,21 +82,23 @@ export function ExamShell({ attempt, exam, questions, teamId }: ExamShellProps) 
   }, [currentIndex, currentQuestion?.id, answers, setSelectedAnswer])
 
   const handleDoubt = useCallback(() => {
-    if (!currentQuestion || !selectedAnswer) return
-    markAsDoubt(currentQuestion.id, selectedAnswer)
+    if (!currentQuestion) return
+    const answerToSave = selectedAnswer ?? ''
+    markAsDoubt(currentQuestion.id, answerToSave)
     goToNext()
   }, [currentQuestion, selectedAnswer, markAsDoubt, goToNext])
 
   const handleSave = useCallback(async () => {
-    if (!currentQuestion || !selectedAnswer) return
+    if (!currentQuestion) return
+    const answerToSave = selectedAnswer ?? ''
     const previous = answers[currentQuestion.id]
-    markAsSaved(currentQuestion.id, selectedAnswer)
+    markAsSaved(currentQuestion.id, answerToSave)
     try {
       await saveAnswer({
         data: {
           attemptId: attempt.id,
           questionId: currentQuestion.id,
-          answer: selectedAnswer as 'A' | 'B' | 'C' | 'D' | 'E',
+          answer: answerToSave,
           teamId,
         },
       })

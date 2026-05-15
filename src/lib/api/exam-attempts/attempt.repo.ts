@@ -46,6 +46,9 @@ export default class AttemptRepo {
             id: true,
             title: true,
             type: true,
+            _count: {
+              select: { questions: true },
+            },
           },
         },
 
@@ -94,9 +97,23 @@ export default class AttemptRepo {
         exam: {
           include: {
             questions: {
+              select: {
+                id: true,
+                question: true,
+                optionA: true,
+                optionB: true,
+                optionC: true,
+                optionD: true,
+                optionE: true,
+                correctAnswer: true,
+                difficulty: true,
+                correctScore: true,
+                wrongScore: true,
+                emptyScore: true,
+                order: true,
+              },
               orderBy: {
-                createdAt:
-                  'asc',
+                order: 'asc',
               },
             },
           },

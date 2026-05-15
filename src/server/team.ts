@@ -6,7 +6,6 @@ import { z } from "zod"
 import { registerSchema } from "~/schemas/auth.schema"
 import { createMembersSchema, } from "~/schemas/team.member.schema"
 import { Uuid } from "~/schemas/general.schema"
-import { SafeTeam, TeamsResponse } from "~/types/team.type"
 import { queryTeam, updateTeamSchema } from "~/schemas/team.schema"
 import { loginFn } from "./auth"
 import { createMentorSchema } from "~/schemas/team.mentor.schema"
@@ -16,25 +15,25 @@ const teamService = new TeamService()
 export const getTeams = createServerFn({ method: "GET" })
   .inputValidator(queryTeam)
   .handler(
-    withErrorHandling(async ({ data }): Promise<ApiSuccess<TeamsResponse>> => {
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
       const result = await teamService.findAll(data)
-      return successResponse<TeamsResponse>(result.data, result.message)
+      return successResponse<any>(result.data, result.message)
     })
   )
 
 export const getTeam = createServerFn({ method: "GET" })
   .inputValidator(Uuid)
   .handler(
-    withErrorHandling(async ({ data }): Promise<ApiSuccess<SafeTeam>> => {
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
       const result = await teamService.findOne(data)
-      return successResponse<SafeTeam>(result.data, result.message)
+      return successResponse<any>(result.data, result.message)
     })
   )
 
 export const createTeam = createServerFn({ method: "POST" })
   .inputValidator(registerSchema)
   .handler(
-    withErrorHandling(async ({ data }): Promise<ApiSuccess<SafeTeam>> => {
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
       const result = await teamService.create(data)
       await loginFn({
         data:{
@@ -42,7 +41,7 @@ export const createTeam = createServerFn({ method: "POST" })
           password:data.password
         }
       })
-      return successResponse<SafeTeam>(result.data, result.message)
+      return successResponse<any>(result.data, result.message)
     })
   )
 
@@ -76,10 +75,10 @@ export const updateTeam = createServerFn({ method: "POST" })
     body: updateTeamSchema
   }))
   .handler(
-    withErrorHandling(async ({ data }): Promise<ApiSuccess<SafeTeam>> => {
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
       const { id, body } = data as { id: string; body: typeof updateTeamSchema._type }
       const result = await teamService.update(id, body)
-      return successResponse<SafeTeam>(result.data, result.message)
+      return successResponse<any>(result.data, result.message)
     })
   )
 
@@ -92,12 +91,11 @@ export const deleteTeam = createServerFn({ method: "POST" })
     })
   )
 
-
-  export const createTeamMember=createServerFn({ method:'POST' })
+export const createTeamMember = createServerFn({ method:'POST' })
   .inputValidator(createMembersSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
-      const result=await teamService.createMember(data)
+      const result = await teamService.createMember(data)
       return successResponse<any>(result.data, result.message)
     })
   )
@@ -128,4 +126,3 @@ export const getTeamDashboard = createServerFn({ method: 'GET' })
       return successResponse<any>(result.data, result.message)
     })
   )
-

@@ -7,14 +7,14 @@ export default class TeamRepo {
   findByEmail(email: string) {
     return prisma.team.findUnique({
       where: { email },
-      include: { members: true, registration: { include: { competition: { include: { stages: { orderBy: { order: 'asc' } } } } } }, currentStage: true, mentor: true },
+      include: { members: true, registration: { include: { batch: true, competition: { include: { stages: { orderBy: { order: 'asc' } } } } } }, currentStage: true, mentor: true },
     })
   }
 
   findByName(name: string) {
     return prisma.team.findUnique({
       where: { name },
-      include: { members: true, registration: { include: { competition: { include: { stages: { orderBy: { order: 'asc' } } } } } }, currentStage: true, mentor: true },
+      include: { members: true, registration: { include: { batch: true, competition: { include: { stages: { orderBy: { order: 'asc' } } } } } }, currentStage: true, mentor: true },
     })
   }
 
@@ -41,7 +41,8 @@ export default class TeamRepo {
       orderBy: { createdAt: "desc" },
       include: {
         members: true,
-        registration: { include: { competition: { include: { stages: { orderBy: { order: 'asc' } } } } } },
+        mentor: true,
+        registration: { include: { batch: true, competition: { include: { stages: { orderBy: { order: 'asc' } } } } } },
         currentStage: true,
       },
     })
@@ -62,7 +63,7 @@ export default class TeamRepo {
   findById(id: string) {
     return prisma.team.findUnique({
       where: { id },
-      include: { members: true, registration: { include: { competition: { include: { stages: { orderBy: { order: 'asc' } } } } } }, currentStage: true, mentor: true },
+      include: { members: true, registration: { include: { batch: true, competition: { include: { stages: { orderBy: { order: 'asc' } } } } } }, currentStage: true, mentor: true },
     })
   }
 
