@@ -61,14 +61,22 @@ export default class ExamRepo {
     return prisma.examQuestion.findMany({
       where:{
         examId
-      }
+      },
+      orderBy: [
+        {
+          order: 'asc',
+        },
+        {
+          createdAt: 'asc',
+        },
+      ],
     })
   }
 
   createExamQuestion(data:ExamQuestionData){
     return prisma.examQuestion.create({
       data:{
-        ...data
+        ...data,
       }
     })
   }

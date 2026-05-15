@@ -25,7 +25,7 @@ const verifyDeviceSchema = z.object({
 const saveAnswerSchema = z.object({
   attemptId: z.string().uuid(),
   questionId: z.string().uuid(),
-  answer: z.enum(['A', 'B', 'C', 'D', 'E']),
+  answer: z.string().default(''),
   teamId: z.string().uuid(),
 })
 

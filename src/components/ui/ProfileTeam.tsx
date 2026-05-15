@@ -1,5 +1,4 @@
-import React, { useEffect, useRef } from "react"
-import TeamTree from "./TeamTree"
+import React, { useEffect, useRef } from 'react'
 import {
   School,
   Mail,
@@ -10,9 +9,12 @@ import {
   Info as InfoIcon,
   GraduationCap,
   Users,
-} from "lucide-react"
-import gsap from "gsap"
-import { TeamWithRelations } from "~/types/team.type"
+  UserCheck,
+} from 'lucide-react'
+import gsap from 'gsap'
+import { TeamWithRelations } from '~/types/team.type'
+import { Badge } from '~/components/ui/badge'
+import TeamTree from './TeamTree'
 
 type Props = {
   data: TeamWithRelations & {
@@ -25,16 +27,17 @@ type Props = {
 }
 
 const competitionLabel: Record<string, string> = {
-  OLIMPIADE: "Olimpiade",
-  LKTI: "LKTI",
-  INFOGRAFIS: "Infografis",
+  OLIMPIADE: 'Olimpiade',
+  LKTI: 'LKTI',
+  INFOGRAFIS: 'Infografis',
 }
 
 const competitionColor: Record<string, string> = {
-  OLIMPIADE: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  LKTI: "bg-violet-500/10 text-violet-600 border-violet-500/20",
-  INFOGRAFIS: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20",
+  OLIMPIADE: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+  LKTI: 'bg-violet-500/10 text-violet-600 border-violet-500/20',
+  INFOGRAFIS: 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20',
 }
+
 
 const ProfileTeam: React.FC<Props> = ({ data }) => {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -46,17 +49,25 @@ const ProfileTeam: React.FC<Props> = ({ data }) => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
       tl.from(cardRef.current, { opacity: 0, y: 40, scale: 0.97, duration: 0.7 })
-        .from(headingRef.current, { opacity: 0, x: -24, duration: 0.45 }, "-=0.3")
-        .from(infoGridRef.current?.children ?? [], { opacity: 0, y: 18, stagger: 0.08, duration: 0.4 }, "-=0.25")
-        .from(mentorRef.current, { opacity: 0, y: 20, duration: 0.45 }, "-=0.15")
-        .from(treeRef.current, { opacity: 0, y: 30, duration: 0.55 }, "-=0.1")
+        .from(headingRef.current, { opacity: 0, x: -24, duration: 0.45 }, '-=0.3')
+        .from(
+          infoGridRef.current?.children ?? [],
+          { opacity: 0, y: 18, stagger: 0.08, duration: 0.4 },
+          '-=0.25',
+        )
+        .from(mentorRef.current, { opacity: 0, y: 20, duration: 0.45 }, '-=0.15')
+        .from(treeRef.current, { opacity: 0, y: 30, duration: 0.55 }, '-=0.1')
 
-      containerRef.current?.querySelectorAll(".info-item").forEach((item) => {
+      containerRef.current?.querySelectorAll('.info-item').forEach((item) => {
         const el = item as HTMLElement
-        el.addEventListener("mouseenter", () => gsap.to(el, { scale: 1.03, duration: 0.2, ease: "power2.out" }))
-        el.addEventListener("mouseleave", () => gsap.to(el, { scale: 1, duration: 0.2, ease: "power2.in" }))
+        el.addEventListener('mouseenter', () =>
+          gsap.to(el, { scale: 1.03, duration: 0.2, ease: 'power2.out' }),
+        )
+        el.addEventListener('mouseleave', () =>
+          gsap.to(el, { scale: 1, duration: 0.2, ease: 'power2.in' }),
+        )
       })
     }, containerRef)
 
@@ -64,6 +75,8 @@ const ProfileTeam: React.FC<Props> = ({ data }) => {
   }, [])
 
   const mentor = data.mentor ?? null
+  const isLKTI = data.competitionType === 'LKTI'
+  const mentorLabel = isLKTI ? 'Pembina' : 'Pendamping'
 
   return (
     <div ref={containerRef} className="space-y-5 sm:space-y-6 w-full">
@@ -74,13 +87,13 @@ const ProfileTeam: React.FC<Props> = ({ data }) => {
               <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full border
-                    ${competitionColor[data.competitionType] ?? "bg-muted text-muted-foreground border-border"}`}
+                    ${competitionColor[data.competitionType] ?? 'bg-muted text-muted-foreground border-border'}`}
                 >
                   <Trophy size={11} />
                   {competitionLabel[data.competitionType] ?? data.competitionType}
                 </span>
                 <span className="text-[11px] text-muted-foreground font-mono bg-muted px-2 py-0.5 rounded-md border">
-                  #{data.code}
+                  #{(data as any).code}
                 </span>
               </div>
               <h1 ref={headingRef} className="text-2xl sm:text-3xl font-bold leading-tight truncate">
@@ -89,43 +102,53 @@ const ProfileTeam: React.FC<Props> = ({ data }) => {
             </div>
           </div>
 
-          <div ref={infoGridRef} className="grid grid-cols-1 xs:grid-cols-2 gap-2.5 sm:gap-3 text-sm">
+          <div
+            ref={infoGridRef}
+            className="grid grid-cols-1 xs:grid-cols-2 gap-2.5 sm:gap-3 text-sm"
+          >
             <InfoItem icon={School} label={data.schoolName} caption="Sekolah / Institusi" />
             <InfoItem icon={MapPin} label={data.schoolAddress} caption="Alamat" />
             <InfoItem icon={Mail} label={data.email} caption="Email Tim" />
             <InfoItem icon={Phone} label={data.phone} caption="WhatsApp Tim" />
-            {data.sourceInfo && (
-              <InfoItem icon={InfoIcon} label={data.sourceInfo} caption="Sumber Info" className="xs:col-span-2" />
+            {(data as any).sourceInfo && (
+              <InfoItem
+                icon={InfoIcon}
+                label={(data as any).sourceInfo}
+                caption="Sumber Info"
+                className="xs:col-span-2"
+              />
             )}
           </div>
         </div>
 
         {mentor && (
-          <div ref={mentorRef} className="border-t border-border/60 bg-muted/30 px-5 sm:px-7 md:px-8 py-4 sm:py-5">
+          <div
+            ref={mentorRef}
+            className="border-t border-border/60 bg-muted/30 px-5 sm:px-7 md:px-8 py-4 sm:py-5"
+          >
             <div className="flex items-center gap-2 mb-3">
               <GraduationCap size={15} className="text-primary" />
               <span className="text-xs font-semibold uppercase tracking-widest text-primary/80">
-                Pembimbing
+                {mentorLabel}
               </span>
             </div>
             <div className="grid grid-cols-1 xs:grid-cols-3 gap-2.5 text-sm">
-              <InfoItem icon={BookOpen} label={mentor.name} caption="Nama Pembimbing" />
-              <InfoItem icon={Mail} label={mentor.email} caption="Email Pembimbing" />
-              <InfoItem icon={Phone} label={mentor.phone} caption="WhatsApp Pembimbing" />
+              <InfoItem icon={BookOpen} label={mentor.name} caption={`Nama ${mentorLabel}`} />
+              <InfoItem icon={Mail} label={mentor.email} caption={`Email ${mentorLabel}`} />
+              <InfoItem icon={Phone} label={mentor.phone} caption={`WhatsApp ${mentorLabel}`} />
             </div>
           </div>
         )}
       </div>
 
       <div ref={treeRef} className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Users size={16} className="text-primary" />
-          <h2 className="text-base sm:text-lg font-semibold">Struktur Tim</h2>
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-base sm:text-lg font-semibold">Struktur Anggota Tim</span>
           <span className="ml-auto text-xs text-muted-foreground font-mono bg-muted px-2 py-0.5 rounded border">
             {data.members.length} anggota
           </span>
         </div>
-        <TeamTree team={data} />
+        <TeamTree team={data} isLKTI={isLKTI} />
       </div>
     </div>
   )
@@ -137,7 +160,7 @@ const InfoItem = ({
   icon: Icon,
   label,
   caption,
-  className = "",
+  className = '',
 }: {
   icon: React.ElementType
   label: string
@@ -153,7 +176,9 @@ const InfoItem = ({
       <Icon size={15} className="text-primary" />
     </div>
     <div className="min-w-0 flex flex-col">
-      <span className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">{caption}</span>
+      <span className="text-[10px] text-muted-foreground font-medium leading-none mb-0.5">
+        {caption}
+      </span>
       <span className="truncate text-sm font-medium text-foreground leading-snug">{label}</span>
     </div>
   </div>

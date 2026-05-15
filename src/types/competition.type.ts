@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client"
+import { Prisma, Stage } from "@prisma/client"
 
 export const competitionWithActiveBatch =
   Prisma.validator<Prisma.CompetitionDefaultArgs>()({
@@ -22,7 +22,8 @@ export const competitionWithActiveBatch =
         competitionId: string
         createdAt: Date
         updatedAt: Date
-    }[]
+    }[],
+    stages:Stage[]
   }
 
 

@@ -5,7 +5,7 @@ import {
   redirect,
   Link,
 } from '@tanstack/react-router'
-import { CheckCircle2, XCircle, MinusCircle, ArrowLeft, Trophy } from 'lucide-react'
+import { CheckCircle2, XCircle, MinusCircle, ArrowLeft } from 'lucide-react'
 import { examReviewQueryOptions } from '~/lib/api/exam-attempts/exam-attempt.query-options'
 import { Route as RootRoute } from '~/routes/__root'
 import { Button } from '~/components/ui/button'
@@ -61,7 +61,7 @@ function RouteComponent() {
 
       <Suspense
         fallback={
-          <Skeleton className="h-[500px] w-full rounded-2xl" />
+          <Skeleton className="h-125 w-full rounded-2xl" />
         }
       >
         <ReviewPage examId={examId} />
@@ -70,13 +70,8 @@ function RouteComponent() {
   )
 }
 
-function ReviewPage({
-  examId,
-}: {
-  examId: string
-}) {
+function ReviewPage({ examId }: { examId: string }) {
   const { user } = RootRoute.useRouteContext()
-
   const teamId = user?.userId
 
   if (!teamId) {
@@ -92,217 +87,178 @@ function ReviewPage({
   const questions = exam.questions
   const userAnswers = attempt.answers
 
+  const correct = userAnswers.filter(
+    (a: any) => a.answer && a.answer.trim() !== '' && a.isCorrect,
+  ).length
+  const wrong = userAnswers.filter(
+    (a: any) => a.answer && a.answer.trim() !== '' && !a.isCorrect,
+  ).length
+  const empty = questions.length - correct - wrong
+
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between rounded-2xl border bg-background p-6 shadow-sm">
-        <div>
-          <h2 className="text-lg font-semibold">
-            {exam.title}
-          </h2>
-
-          <p className="text-sm text-muted-foreground">
-            Total Skor:{' '}
-            <span className="font-bold text-foreground">
-              {attempt.totalScore}
-            </span>
-          </p>
+      <div className="rounded-2xl border bg-background p-6 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">{exam.title}</h2>
+            <p className="text-sm text-muted-foreground">
+              Total Skor:{' '}
+              <span className="font-bold text-foreground">{attempt.totalScore}</span>
+            </p>
+          </div>
+          <Badge variant="secondary" className="px-3 py-1 text-sm">
+            Selesai Dikerjakan
+          </Badge>
         </div>
 
-        <Badge
-          variant="secondary"
-          className="px-3 py-1 text-sm"
-        >
-          Selesai Dikerjakan
-        </Badge>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="rounded-xl border bg-emerald-500/10 border-emerald-500/20 p-3 text-center">
+            <p className="text-xl font-bold text-emerald-600">{correct}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Benar</p>
+          </div>
+          <div className="rounded-xl border bg-destructive/10 border-destructive/20 p-3 text-center">
+            <p className="text-xl font-bold text-destructive">{wrong}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Salah</p>
+          </div>
+          <div className="rounded-xl border bg-muted p-3 text-center">
+            <p className="text-xl font-bold text-muted-foreground">{empty}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Kosong</p>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-6">
-        {questions.map(
-          (question: any, index: number) => {
-            const userAnswerObj =
-              userAnswers.find(
-                (a: any) =>
-                  a.questionId === question.id,
-              )
+        {questions.map((question: any, index: number) => {
+          const userAnswerObj = userAnswers.find(
+            (a: any) => a.questionId === question.id,
+          )
 
-            const userAnswer =
-              userAnswerObj?.answer
+          const userAnswer =
+            userAnswerObj?.answer && userAnswerObj.answer.trim() !== ''
+              ? userAnswerObj.answer
+              : undefined
 
-            const isCorrect =
-              userAnswerObj?.isCorrect ??
-              false
+          const isCorrect = userAnswerObj?.isCorrect ?? false
+          const hasAnswered = !!userAnswer
 
-            const hasAnswered =
-              !!userAnswer
+          const earnedScore = !hasAnswered
+            ? question.emptyScore
+            : isCorrect
+              ? question.correctScore
+              : question.wrongScore
 
-            const options = [
-              {
-                label: 'A',
-                text: question.optionA,
-              },
-              {
-                label: 'B',
-                text: question.optionB,
-              },
-              {
-                label: 'C',
-                text: question.optionC,
-              },
-              {
-                label: 'D',
-                text: question.optionD,
-              },
-              {
-                label: 'E',
-                text: question.optionE,
-              },
-            ]
+          const options = [
+            { label: 'A', text: question.optionA },
+            { label: 'B', text: question.optionB },
+            { label: 'C', text: question.optionC },
+            { label: 'D', text: question.optionD },
+            { label: 'E', text: question.optionE },
+          ]
 
-            return (
-              <div
-                key={question.id}
-                className="space-y-5 rounded-2xl border bg-background p-6 shadow-sm"
-              >
-                <div className="flex items-center justify-between border-b pb-4">
-                  <h3 className="font-semibold">
-                    Soal {index + 1}
-                  </h3>
+          return (
+            <div
+              key={question.id}
+              className="space-y-5 rounded-2xl border bg-background p-6 shadow-sm"
+            >
+              <div className="flex items-center justify-between border-b pb-4">
+                <h3 className="font-semibold">Soal {index + 1}</h3>
 
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">
-                      Poin:{' '}
-                      {question.score}
-                    </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs">
+                    {question.difficulty === 'EASY'
+                      ? 'Mudah'
+                      : question.difficulty === 'MEDIUM'
+                        ? 'Sedang'
+                        : 'Sulit'}
+                  </Badge>
+                  <Badge
+                    variant="outline"
+                    className={`text-xs font-mono ${earnedScore > 0 ? 'text-emerald-600 border-emerald-300' : earnedScore < 0 ? 'text-destructive border-destructive/30' : 'text-muted-foreground'}`}
+                  >
+                    {earnedScore > 0 ? '+' : ''}
+                    {earnedScore} poin
+                  </Badge>
 
-                    {hasAnswered ? (
-                      isCorrect ? (
-                        <Badge className="gap-1 bg-emerald-500 hover:bg-emerald-600">
-                          <CheckCircle2
-                            size={12}
-                          />
-                          Benar
-                        </Badge>
-                      ) : (
-                        <Badge
-                          variant="destructive"
-                          className="gap-1"
-                        >
-                          <XCircle
-                            size={12}
-                          />
-                          Salah
-                        </Badge>
-                      )
-                    ) : (
-                      <Badge
-                        variant="secondary"
-                        className="gap-1"
-                      >
-                        <MinusCircle
-                          size={12}
-                        />
-                        Kosong
+                  {hasAnswered ? (
+                    isCorrect ? (
+                      <Badge className="gap-1 bg-emerald-500 hover:bg-emerald-600">
+                        <CheckCircle2 size={12} />
+                        Benar
                       </Badge>
-                    )}
-                  </div>
-                </div>
-
-                <div className="prose prose-sm max-w-none dark:prose-invert">
-                  <TipTapRenderer
-                    content={
-                      question.question
-                    }
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-2 pt-2">
-                  {options.map((opt) => {
-                    const isUserAnswer =
-                      userAnswer ===
-                      opt.label
-
-                    const isCorrectAnswer =
-                      question.correctAnswer ===
-                      opt.label
-
-                    let borderClass =
-                      'border-border bg-card hover:bg-accent'
-
-                    let badge =
-                      null
-
-                    if (
-                      isCorrectAnswer
-                    ) {
-                      borderClass =
-                        'border-emerald-500 bg-emerald-500/10'
-
-                      badge = (
-                        <Badge className="ml-auto shrink-0 bg-emerald-500">
-                          Kunci Jawaban
-                        </Badge>
-                      )
-                    }
-
-                    if (
-                      isUserAnswer &&
-                      !isCorrectAnswer
-                    ) {
-                      borderClass =
-                        'border-destructive bg-destructive/10'
-
-                      badge = (
-                        <Badge
-                          variant="destructive"
-                          className="ml-auto shrink-0"
-                        >
-                          Jawaban Kamu
-                        </Badge>
-                      )
-                    }
-
-                    if (
-                      isUserAnswer &&
-                      isCorrectAnswer
-                    ) {
-                      badge = (
-                        <Badge className="ml-auto shrink-0 bg-emerald-500">
-                          Jawaban Kamu
-                          & Benar
-                        </Badge>
-                      )
-                    }
-
-                    return (
-                      <div
-                        key={opt.label}
-                        className={`flex items-center justify-between rounded-xl border p-3 transition-colors ${borderClass}`}
-                      >
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border bg-background text-sm font-medium">
-                            {
-                              opt.label
-                            }
-                          </div>
-
-                          <div className="prose prose-sm max-w-none dark:prose-invert">
-                            <TipTapRenderer
-                              content={
-                                opt.text
-                              }
-                            />
-                          </div>
-                        </div>
-
-                        {badge}
-                      </div>
+                    ) : (
+                      <Badge variant="destructive" className="gap-1">
+                        <XCircle size={12} />
+                        Salah
+                      </Badge>
                     )
-                  })}
+                  ) : (
+                    <Badge variant="secondary" className="gap-1">
+                      <MinusCircle size={12} />
+                      Kosong
+                    </Badge>
+                  )}
                 </div>
               </div>
-            )
-          },
-        )}
+
+              <div className="prose prose-sm max-w-none dark:prose-invert">
+                <TipTapRenderer content={question.question} />
+              </div>
+
+              <div className="grid grid-cols-1 gap-2 pt-2">
+                {options.map((opt) => {
+                  const isUserAnswer = userAnswer === opt.label
+                  const isCorrectAnswer = question.correctAnswer === opt.label
+
+                  let borderClass = 'border-border bg-card hover:bg-accent'
+                  let badge = null
+
+                  if (isCorrectAnswer) {
+                    borderClass = 'border-emerald-500 bg-emerald-500/10'
+                    badge = (
+                      <Badge className="ml-auto shrink-0 bg-emerald-500">
+                        Kunci Jawaban
+                      </Badge>
+                    )
+                  }
+
+                  if (isUserAnswer && !isCorrectAnswer) {
+                    borderClass = 'border-destructive bg-destructive/10'
+                    badge = (
+                      <Badge variant="destructive" className="ml-auto shrink-0">
+                        Jawaban Kamu
+                      </Badge>
+                    )
+                  }
+
+                  if (isUserAnswer && isCorrectAnswer) {
+                    badge = (
+                      <Badge className="ml-auto shrink-0 bg-emerald-500">
+                        Jawaban Kamu & Benar
+                      </Badge>
+                    )
+                  }
+
+                  return (
+                    <div
+                      key={opt.label}
+                      className={`flex items-center justify-between rounded-xl border p-3 transition-colors ${borderClass}`}
+                    >
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border bg-background text-sm font-medium">
+                          {opt.label}
+                        </div>
+                        <div className="prose prose-sm max-w-none dark:prose-invert">
+                          <TipTapRenderer content={opt.text} />
+                        </div>
+                      </div>
+                      {badge}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

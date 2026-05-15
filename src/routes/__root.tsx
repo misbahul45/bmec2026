@@ -133,12 +133,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         {children}
 
         {!isAuthPage && !isExamPage && <Footer />}
-        {import.meta.env.DEV && (
-          <>
-            <TanStackRouterDevtools position="bottom-right" />
-            <ReactQueryDevtools buttonPosition="bottom-left" />
-          </>
-        )}
         <Toaster
           position="top-right"
           richColors

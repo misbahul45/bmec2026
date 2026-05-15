@@ -14,6 +14,7 @@ import { ExamDeviceLockScreen } from './ExamDeviceLockScreen'
 import { ExamBlockedScreen } from './ExamBlockedScreen'
 import { saveAnswer } from '~/server/exam-attempt'
 import { ExamQuestion } from '~/types/exam.type'
+import { ExamType } from '@prisma/client'
 
 interface ExamAttemptData {
   id: string
@@ -28,6 +29,7 @@ interface ExamData {
   endDate: string | Date
   duration: number
   stage?: { name: string }
+  type : ExamType
 }
 
 interface ExamShellProps {
@@ -69,7 +71,7 @@ export function ExamShell({ attempt, exam, questions, teamId }: ExamShellProps) 
     useExamNavigation(questions)
 
   const { isSubmitting, submitManual, submitAuto, showConfirmDialog, setShowConfirmDialog } =
-    useExamSubmit({ attemptId: attempt.id, teamId })
+    useExamSubmit({ attemptId: attempt.id, teamId, examType:exam.type })
 
   useExamAntiCheat({ attemptId: attempt.id, isFinished: false })
 
@@ -80,21 +82,23 @@ export function ExamShell({ attempt, exam, questions, teamId }: ExamShellProps) 
   }, [currentIndex, currentQuestion?.id, answers, setSelectedAnswer])
 
   const handleDoubt = useCallback(() => {
-    if (!currentQuestion || !selectedAnswer) return
-    markAsDoubt(currentQuestion.id, selectedAnswer)
+    if (!currentQuestion) return
+    const answerToSave = selectedAnswer ?? ''
+    markAsDoubt(currentQuestion.id, answerToSave)
     goToNext()
   }, [currentQuestion, selectedAnswer, markAsDoubt, goToNext])
 
   const handleSave = useCallback(async () => {
-    if (!currentQuestion || !selectedAnswer) return
+    if (!currentQuestion) return
+    const answerToSave = selectedAnswer ?? ''
     const previous = answers[currentQuestion.id]
-    markAsSaved(currentQuestion.id, selectedAnswer)
+    markAsSaved(currentQuestion.id, answerToSave)
     try {
       await saveAnswer({
         data: {
           attemptId: attempt.id,
           questionId: currentQuestion.id,
-          answer: selectedAnswer as 'A' | 'B' | 'C' | 'D' | 'E',
+          answer: answerToSave,
           teamId,
         },
       })

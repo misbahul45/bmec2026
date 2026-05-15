@@ -92,16 +92,23 @@ function TeamDashboard({ teamId }: { teamId: string }) {
     approvedAt: registration?.updatedAt ?? new Date(),
   }
 
+
+  console.log(activeBatch)
+
   return (
     <div className="space-y-8">
       <div className="space-y-4">
         <ProfileTeam data={team} />
-        <EditTeamForm team={team} queryKey={queryKey} registrationStatus={registrationStatus} />
-        <PembimbingForm
-          teamId={teamId}
-          existing={team.mentor ?? null}
-          queryKey={queryKey}
-        />
+        {!isApproved &&(
+          <>
+            <EditTeamForm team={team} queryKey={queryKey} registrationStatus={registrationStatus} />
+              <PembimbingForm
+                teamId={teamId}
+                existing={team.mentor ?? null}
+                queryKey={queryKey}
+              />
+          </>
+        )}
       </div>
 
       {allStages.length > 0 && (

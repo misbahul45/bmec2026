@@ -3,13 +3,14 @@ import { useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { saveAnswer, finishExam } from '~/server/exam-attempt'
 import { getAllDoubts, clearAllDoubts } from '~/lib/exam/exam-local-storage'
-
+import { ExamType } from '@prisma/client'
 interface UseExamSubmitOptions {
   attemptId: string
   teamId: string
+  examType:ExamType
 }
 
-export function useExamSubmit({ attemptId, teamId }: UseExamSubmitOptions) {
+export function useExamSubmit({ attemptId, teamId, examType }: UseExamSubmitOptions) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const router = useRouter()
@@ -17,7 +18,7 @@ export function useExamSubmit({ attemptId, teamId }: UseExamSubmitOptions) {
   const flushDoubtsAndFinish = useCallback(async () => {
     const doubts = getAllDoubts(attemptId)
     for (const { questionId, answer } of doubts) {
-      await saveAnswer({ data: { attemptId, questionId, answer: answer as 'A' | 'B' | 'C' | 'D' | 'E', teamId } })
+      await saveAnswer({ data: { attemptId, questionId, answer: answer ?? '', teamId } })
     }
     await finishExam({ data: { attemptId } })
     clearAllDoubts(attemptId)
@@ -27,7 +28,11 @@ export function useExamSubmit({ attemptId, teamId }: UseExamSubmitOptions) {
     setIsSubmitting(true)
     try {
       await flushDoubtsAndFinish()
-      router.navigate({ to: `/dashboard/team/exam/result/$attemptId`, params: { attemptId } })
+      if(examType == 'TRYOUT'){
+        router.navigate({ to: `/dashboard/team/exam/result/$attemptId`, params: { attemptId } })
+      }else{
+        router.navigate({ to: `/dashboard/team`})
+      }
     } catch {
       toast.error('Gagal mengumpulkan ujian. Coba lagi.')
     } finally {
@@ -40,7 +45,11 @@ export function useExamSubmit({ attemptId, teamId }: UseExamSubmitOptions) {
     try {
       await flushDoubtsAndFinish()
       toast.success('Waktu habis, ujian dikumpulkan otomatis.')
-      router.navigate({ to: `/dashboard/team/exam/result/$attemptId`, params: { attemptId } })
+      if(examType == 'TRYOUT'){
+        router.navigate({ to: `/dashboard/team/exam/result/$attemptId`, params: { attemptId } })
+      }else{
+        router.navigate({ to: `/dashboard/team`})
+      }
     } catch {
       toast.error('Gagal mengumpulkan ujian secara otomatis.')
     } finally {

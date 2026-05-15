@@ -1,3 +1,4 @@
+import { Exam, QuestionDifficulty, Stage } from '@prisma/client'
 export interface ExamQuestion {
   id: string
   question: string
@@ -6,9 +7,11 @@ export interface ExamQuestion {
   optionC: string
   optionD: string
   optionE: string
-  score: number
-}
+  difficulty: QuestionDifficulty
 
-import { Exam, Stage } from '@prisma/client'
+  correctScore: number
+  wrongScore: number
+  emptyScore: number
+}
 
 export type ExamWithStage = Exam & { stage: Stage }

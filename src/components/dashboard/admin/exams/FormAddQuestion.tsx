@@ -1,30 +1,72 @@
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { examQuestionSchema, ExamQuestionData } from '~/schemas/exam'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  examQuestionSchema,
+  ExamQuestionFormData,
+  ExamQuestionData,
+} from '~/schemas/exam'
+import {
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { useEffect, useRef } from 'react'
+import {
+  useEffect,
+  useRef,
+} from 'react'
 import gsap from 'gsap'
 import RichTextEditorComments from '~/components/editor/RichTextEditorComments'
-import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '~/components/ui/card'
-import { Field, FieldError, FieldGroup, FieldLabel } from '~/components/ui/field'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
+import {
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card'
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '~/components/ui/field'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select'
 import { Button } from '~/components/ui/button'
-import { Input } from '~/components/ui/input'
 import { createExamQuestion } from '~/server/exam'
 
 const ANSWER_OPTIONS = ['A', 'B', 'C', 'D', 'E'] as const
 
+const DIFFICULTY_OPTIONS = [
+  { value: 'EASY', label: 'Mudah', description: '+2 / -1 / 0' },
+  { value: 'MEDIUM', label: 'Sedang', description: '+4 / -2 / -1' },
+  { value: 'HARD', label: 'Sulit', description: '+6 / -3 / -2' },
+] as const
+
 interface Props {
   examId: string
+  totalQuestion?: number
 }
 
-const FormAddQuestion = ({ examId, }: Props) => {
+const FormAddQuestion = ({
+  examId,
+  totalQuestion = 0,
+}: Props) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
+  const nextOrder = totalQuestion + 1
 
-  const form = useForm<ExamQuestionData>({
+  const form = useForm<
+    ExamQuestionFormData,
+    any,
+    ExamQuestionData
+  >({
     resolver: zodResolver(examQuestionSchema),
+    mode:'onChange',
     defaultValues: {
       question: '',
       optionA: '',
@@ -33,10 +75,15 @@ const FormAddQuestion = ({ examId, }: Props) => {
       optionD: '',
       optionE: '',
       correctAnswer: undefined,
-      score: 5,
+      difficulty: 'EASY',
       examId,
+      order: nextOrder,
     },
   })
+
+  useEffect(() => {
+    form.setValue('order', totalQuestion + 1)
+  }, [totalQuestion, form])
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -47,7 +94,6 @@ const FormAddQuestion = ({ examId, }: Props) => {
         ease: 'power3.out',
         stagger: 0.1,
       })
-
       gsap.from('.input-anim', {
         y: 20,
         opacity: 0,
@@ -57,7 +103,6 @@ const FormAddQuestion = ({ examId, }: Props) => {
         ease: 'power2.out',
         stagger: 0.08,
       })
-
       gsap.from('.button-anim', {
         y: 20,
         opacity: 0,
@@ -72,17 +117,28 @@ const FormAddQuestion = ({ examId, }: Props) => {
 
   const mutation = useMutation({
     mutationFn: async (formData: ExamQuestionData) => {
-        return createExamQuestion({
-            data:formData
-        })
+      return createExamQuestion({ data: formData })
     },
     onError: (error: any) => {
       toast.error(error?.message ?? 'Something went wrong')
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success('Soal berhasil ditambahkan')
-      form.reset()
-    queryClient.invalidateQueries({ queryKey: ['exam-questions', examId] })
+      await queryClient.invalidateQueries({
+        queryKey: ['exam-questions', examId],
+      })
+      form.reset({
+        question: '',
+        optionA: '',
+        optionB: '',
+        optionC: '',
+        optionD: '',
+        optionE: '',
+        correctAnswer: undefined,
+        difficulty: 'EASY',
+        examId,
+        order: totalQuestion + 2,
+      })
     },
   })
 
@@ -93,7 +149,9 @@ const FormAddQuestion = ({ examId, }: Props) => {
   return (
     <div ref={containerRef} className="w-full mx-auto">
       <CardHeader className="mb-6 px-0 fade-up">
-        <CardTitle className="text-center font-bold text-lg">Tambah Soal</CardTitle>
+        <CardTitle className="text-center font-bold text-lg">
+          Tambah Soal
+        </CardTitle>
         <CardDescription className="text-center text-xs">
           Isi pertanyaan, pilihan jawaban, dan jawaban yang benar
         </CardDescription>
@@ -112,7 +170,9 @@ const FormAddQuestion = ({ examId, }: Props) => {
                     content={field.value}
                     onChange={field.onChange}
                   />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />
@@ -121,16 +181,21 @@ const FormAddQuestion = ({ examId, }: Props) => {
               {ANSWER_OPTIONS.map((option) => (
                 <Controller
                   key={option}
-                  name={`option${option}` as keyof ExamQuestionData}
+                  name={`option${option}` as keyof ExamQuestionFormData}
                   control={form.control}
                   render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid} className="input-anim">
+                    <Field
+                      data-invalid={fieldState.invalid}
+                      className="input-anim"
+                    >
                       <FieldLabel>Pilihan {option}</FieldLabel>
                       <RichTextEditorComments
                         content={field.value as string}
                         onChange={field.onChange}
                       />
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
                     </Field>
                   )}
                 />
@@ -144,43 +209,55 @@ const FormAddQuestion = ({ examId, }: Props) => {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid} className="input-anim">
                     <FieldLabel>Jawaban Benar</FieldLabel>
-                    <Select value={field.value ?? ''} onValueChange={field.onChange}>
-                      <SelectTrigger
-                        className="rounded-md text-xs h-9 focus:ring-2 focus:ring-primary/40 transition-all"
-                        aria-invalid={fieldState.invalid}
-                      >
+                    <Select
+                      value={field.value ?? ''}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="rounded-md text-xs h-9">
                         <SelectValue placeholder="Pilih jawaban..." />
                       </SelectTrigger>
                       <SelectContent>
                         {ANSWER_OPTIONS.map((opt) => (
-                          <SelectItem key={opt} value={opt} className="text-xs">
+                          <SelectItem key={opt} value={opt}>
                             Pilihan {opt}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
 
               <Controller
-                name="score"
+                name="difficulty"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid} className="input-anim">
-                    <FieldLabel>Skor</FieldLabel>
-                    <Input
-                      {...field}
-                      id="score"
-                      type="number"
-                      min={0}
-                      placeholder="5"
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      aria-invalid={fieldState.invalid}
-                      className="rounded-md text-xs h-9 focus:ring-2 focus:ring-primary/40 transition-all"
-                    />
-                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    <FieldLabel>Tingkat Kesulitan</FieldLabel>
+                    <Select
+                      value={field.value ?? 'EASY'}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="rounded-md text-xs h-9">
+                        <SelectValue placeholder="Pilih kesulitan..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DIFFICULTY_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            <span>{opt.label}</span>
+                            <span className="ml-2 text-muted-foreground">
+                              {opt.description}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
                   </Field>
                 )}
               />
@@ -194,7 +271,7 @@ const FormAddQuestion = ({ examId, }: Props) => {
           type="submit"
           form="form-question"
           disabled={mutation.isPending}
-          className="rounded-md active:scale-95 w-full hover:scale-[1.02] transition-all"
+          className="w-full rounded-md"
         >
           {mutation.isPending ? 'Menyimpan...' : 'Simpan Soal'}
         </Button>

@@ -10,7 +10,8 @@ interface Attempt {
   startTime: string | Date
   endTime: string | Date | null
   team: { id: string; name: string; schoolName: string; competitionType: any }
-  answers: { isCorrect: boolean }[]
+  exam: { _count: { questions: number } }
+  answers: { answer: string; isCorrect: boolean }[]
 }
 
 interface Props {
@@ -31,7 +32,7 @@ export function TableAttempts({ attempts, meta, onPageChange }: Props) {
               <TableHead>Kompetisi</TableHead>
               <TableHead className="text-center">Benar</TableHead>
               <TableHead className="text-center">Salah</TableHead>
-              <TableHead className="text-center">Total Soal</TableHead>
+              <TableHead className="text-center">Kosong</TableHead>
               <TableHead className="text-center">Skor</TableHead>
               <TableHead className="text-center">Status</TableHead>
               <TableHead>Mulai</TableHead>
@@ -49,16 +50,29 @@ export function TableAttempts({ attempts, meta, onPageChange }: Props) {
             )}
 
             {attempts.map((attempt, i) => {
-              const correct = attempt.answers.filter((a) => a.isCorrect).length
-              const wrong = attempt.answers.filter((a) => !a.isCorrect).length
-              const total = attempt.answers.length
+              const totalQ = attempt.exam._count.questions
+              const correct = attempt.answers.filter(
+                (a) => a.answer && a.answer.trim() !== '' && a.isCorrect,
+              ).length
+              const wrong = attempt.answers.filter(
+                (a) => a.answer && a.answer.trim() !== '' && !a.isCorrect,
+              ).length
+              const empty = totalQ - correct - wrong
               const rank = (meta.page - 1) * meta.limit + i + 1
 
               return (
                 <TableRow key={attempt.id}>
                   <TableCell className="text-center font-bold">
                     {rank <= 3 ? (
-                      <span className={rank === 1 ? 'text-yellow-500' : rank === 2 ? 'text-slate-400' : 'text-amber-600'}>
+                      <span
+                        className={
+                          rank === 1
+                            ? 'text-yellow-500'
+                            : rank === 2
+                              ? 'text-slate-400'
+                              : 'text-amber-600'
+                        }
+                      >
                         #{rank}
                       </span>
                     ) : (
@@ -78,7 +92,7 @@ export function TableAttempts({ attempts, meta, onPageChange }: Props) {
                   </TableCell>
 
                   <TableCell className="text-center">
-                    <span className="text-xs font-medium text-green-600">{correct}</span>
+                    <span className="text-xs font-medium text-emerald-600">{correct}</span>
                   </TableCell>
 
                   <TableCell className="text-center">
@@ -86,7 +100,7 @@ export function TableAttempts({ attempts, meta, onPageChange }: Props) {
                   </TableCell>
 
                   <TableCell className="text-center">
-                    <span className="text-xs text-muted-foreground">{total}</span>
+                    <span className="text-xs font-medium text-muted-foreground">{empty}</span>
                   </TableCell>
 
                   <TableCell className="text-center">
@@ -103,14 +117,20 @@ export function TableAttempts({ attempts, meta, onPageChange }: Props) {
 
                   <TableCell>
                     <span className="text-xs">
-                      {new Date(attempt.startTime).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' })}
+                      {new Date(attempt.startTime).toLocaleString('id-ID', {
+                        dateStyle: 'short',
+                        timeStyle: 'short',
+                      })}
                     </span>
                   </TableCell>
 
                   <TableCell>
                     <span className="text-xs">
                       {attempt.endTime
-                        ? new Date(attempt.endTime).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' })
+                        ? new Date(attempt.endTime).toLocaleString('id-ID', {
+                            dateStyle: 'short',
+                            timeStyle: 'short',
+                          })
                         : '—'}
                     </span>
                   </TableCell>

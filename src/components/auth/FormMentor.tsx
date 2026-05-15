@@ -9,9 +9,10 @@ type FormValues = z.infer<typeof createMentorSchema>
 type Props = {
   form: UseFormReturn<FormValues>
   teamId: string
+  educationLevel:'SMA'|'MAHASISWA'
 }
 
-const FormMentor = ({ form }: Props) => {
+const FormMentor = ({ form, educationLevel }: Props) => {
   return (
     <div className="mt-6">
       <FieldGroup>
@@ -20,10 +21,10 @@ const FormMentor = ({ form }: Props) => {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Nama Pembimbing</FieldLabel>
+              <FieldLabel>Nama {educationLevel === 'MAHASISWA'?'Pembina':'Pendamping'}</FieldLabel>
               <Input
                 {...field}
-                placeholder="Masukkan nama pembimbing"
+                placeholder={`Masukkan nama ${educationLevel === 'MAHASISWA'?'Pembina':'Pendamping'}`}
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -40,7 +41,7 @@ const FormMentor = ({ form }: Props) => {
               <Input
                 {...field}
                 type="email"
-                placeholder="pembimbing@email.com"
+                placeholder={`${educationLevel === 'MAHASISWA'?'Pembina@gmail.com':'Pendamping@gmail.com'}`}
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

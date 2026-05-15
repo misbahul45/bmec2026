@@ -6,8 +6,6 @@ const baseMemberSchema = z.object({
   name: z.string().min(3).max(100),
   email: z.string().email("Email tidak valid"),
   phone: z.string().min(9, "Nomor WhatsApp tidak valid"),
-
-  studentId: z.string(),
   educationLevel: z.enum(["SMA", "MAHASISWA"]),
 
   teamId: z.string().uuid(),
@@ -18,21 +16,6 @@ const baseMemberSchema = z.object({
 })
 
 export const memberSchema = baseMemberSchema.superRefine((data, ctx) => {
-  if (data.educationLevel === "SMA" && !/^\d{8,12}$/.test(data.studentId)) {
-    ctx.addIssue({
-      path: ["studentId"],
-      message: "NIS harus berupa angka 8-12 digit",
-      code: z.ZodIssueCode.custom,
-    })
-  }
-
-  if (data.educationLevel === "MAHASISWA" && !/^\d{8,15}$/.test(data.studentId)) {
-    ctx.addIssue({
-      path: ["studentId"],
-      message: "NIM harus berupa angka 8-15 digit",
-      code: z.ZodIssueCode.custom,
-    })
-  }
 
   if (!/^08\d{8,13}$/.test(data.phone)) {
     ctx.addIssue({
@@ -59,22 +42,6 @@ export const createMembersSchema = z
     }
 
     data.members.forEach((member, index) => {
-      if (member.educationLevel === "SMA" && !/^\d{8,12}$/.test(member.studentId)) {
-        ctx.addIssue({
-          path: ["members", index, "studentId"],
-          message: "NIS harus berupa angka 8-12 digit",
-          code: z.ZodIssueCode.custom,
-        })
-      }
-
-      if (member.educationLevel === "MAHASISWA" && !/^\d{8,15}$/.test(member.studentId)) {
-        ctx.addIssue({
-          path: ["members", index, "studentId"],
-          message: "NIM harus berupa angka 8-15 digit",
-          code: z.ZodIssueCode.custom,
-        })
-      }
-
       if (!/^08\d{8,13}$/.test(member.phone)) {
         ctx.addIssue({
           path: ["members", index, "phone"],

@@ -24,7 +24,7 @@ function RouteComponent() {
 
   return (
     <div className="mx-auto space-y-6 pt-20 w-full max-w-6xl px-8">
-      <FormAddQuestion examId={examId} />
+      <FormAddQuestion examId={examId} totalQuestion={questions?.length} />
 
       <div className="border rounded p-4">
         <h2 className="text-sm font-semibold mb-2">Questions</h2>
@@ -35,7 +35,14 @@ function RouteComponent() {
 
         <div className="space-y-2">
           {questions?.map((q, index) => (
-            <QuestionCard key={q.id} data={q} number={index + 1} />
+            <QuestionCard
+              key={q.id}
+              data={{
+                ...q,
+                correctAnswer: q.correctAnswer as 'A' | 'B' | 'C' | 'D' | 'E',
+              }}
+              number={index + 1}
+            />
           ))}
         </div>
       </div>

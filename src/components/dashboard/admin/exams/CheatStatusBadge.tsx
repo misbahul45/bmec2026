@@ -1,12 +1,18 @@
 import { Badge } from '~/components/ui/badge'
 import { ShieldAlert, ShieldCheck } from 'lucide-react'
 
-export function CheatStatusBadge({ flagged, cheatCount }: { flagged: boolean; cheatCount: number }) {
+export function CheatStatusBadge({
+  flagged,
+  cheatCount,
+}: {
+  flagged: boolean
+  cheatCount: number
+}) {
   if (flagged) {
     return (
       <Badge variant="destructive" className="gap-1">
         <ShieldAlert className="size-3" />
-        Flagged ({cheatCount})
+        Terindikasi ({cheatCount})
       </Badge>
     )
   }

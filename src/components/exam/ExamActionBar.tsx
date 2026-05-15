@@ -48,9 +48,10 @@ export function ExamActionBar({
         size="sm"
         className="rounded-xl gap-1.5 text-xs"
         onClick={onSave}
-        disabled={!hasAnswer}
       >
-        {isLast ? 'Simpan' : (
+        {isLast ? (
+          'Simpan'
+        ) : (
           <>
             Simpan & Lanjut
             <ChevronRight size={14} />
