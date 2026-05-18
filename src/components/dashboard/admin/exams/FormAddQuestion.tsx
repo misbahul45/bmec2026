@@ -43,8 +43,8 @@ const ANSWER_OPTIONS = ['A', 'B', 'C', 'D', 'E'] as const
 
 const DIFFICULTY_OPTIONS = [
   { value: 'EASY', label: 'Mudah', description: '+2 / -1 / 0' },
-  { value: 'MEDIUM', label: 'Sedang', description: '+4 / -2 / -1' },
-  { value: 'HARD', label: 'Sulit', description: '+6 / -3 / -2' },
+  { value: 'MEDIUM', label: 'Sedang', description: '+4 / -2 / 0' },
+  { value: 'HARD', label: 'Sulit', description: '+6 / -3 / 0' },
 ] as const
 
 interface Props {

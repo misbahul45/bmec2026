@@ -26,14 +26,14 @@ function RouteComponent() {
     <div className="mx-auto space-y-6 pt-20 w-full max-w-6xl px-8">
       <FormAddQuestion examId={examId} totalQuestion={questions?.length} />
 
-      <div className="border rounded p-4">
+      <div className="border rounded  w-full">
         <h2 className="text-sm font-semibold mb-2">Questions</h2>
 
         {questions?.length === 0 && (
           <p className="text-sm text-muted-foreground">Belum ada soal</p>
         )}
 
-        <div className="space-y-2">
+        <div className="space-y-2 w-full">
           {questions?.map((q, index) => (
             <QuestionCard
               key={q.id}

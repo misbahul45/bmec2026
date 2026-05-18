@@ -77,11 +77,11 @@ const difficultyLabel = {
   },
   MEDIUM: {
     label: 'Sedang',
-    score: '+4 / -2 / -1',
+    score: '+4 / -2 / 0',
   },
   HARD: {
     label: 'Sulit',
-    score: '+6 / -3 / -2',
+    score: '+6 / -3 / 0',
   },
 }
 
@@ -199,7 +199,7 @@ const QuestionCard = ({
     ]
 
   return (
-    <>
+    <div className='w-full'>
       <Card className="rounded-lg border">
         <CardHeader className="flex flex-row items-start justify-between gap-2">
           <div className="flex-1">
@@ -362,7 +362,7 @@ const QuestionCard = ({
           />
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   )
 }
 
