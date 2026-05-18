@@ -8,9 +8,10 @@ interface UseExamSubmitOptions {
   attemptId: string
   teamId: string
   examType:ExamType
+  examId:string
 }
 
-export function useExamSubmit({ attemptId, teamId, examType }: UseExamSubmitOptions) {
+export function useExamSubmit({ attemptId, teamId, examType, examId }: UseExamSubmitOptions) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const router = useRouter()
@@ -29,7 +30,7 @@ export function useExamSubmit({ attemptId, teamId, examType }: UseExamSubmitOpti
     try {
       await flushDoubtsAndFinish()
       if(examType == 'TRYOUT'){
-        router.navigate({ to: `/dashboard/team/exam/result/$attemptId`, params: { attemptId } })
+        router.navigate({ to: `/dashboard/team/exam/$examId/review`, params: { examId } })
       }else{
         router.navigate({ to: `/dashboard/team`})
       }
@@ -46,7 +47,7 @@ export function useExamSubmit({ attemptId, teamId, examType }: UseExamSubmitOpti
       await flushDoubtsAndFinish()
       toast.success('Waktu habis, ujian dikumpulkan otomatis.')
       if(examType == 'TRYOUT'){
-        router.navigate({ to: `/dashboard/team/exam/result/$attemptId`, params: { attemptId } })
+        router.navigate({ to: `/dashboard/team/exam/$examId/review`, params: { examId } })
       }else{
         router.navigate({ to: `/dashboard/team`})
       }

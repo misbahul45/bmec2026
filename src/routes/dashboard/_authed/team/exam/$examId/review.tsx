@@ -93,40 +93,9 @@ function ReviewPage({ examId }: { examId: string }) {
   const wrong = userAnswers.filter(
     (a: any) => a.answer && a.answer.trim() !== '' && !a.isCorrect,
   ).length
-  const empty = questions.length - correct - wrong
 
   return (
     <div className="space-y-8">
-      <div className="rounded-2xl border bg-background p-6 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold">{exam.title}</h2>
-            <p className="text-sm text-muted-foreground">
-              Total Skor:{' '}
-              <span className="font-bold text-foreground">{attempt.totalScore}</span>
-            </p>
-          </div>
-          <Badge variant="secondary" className="px-3 py-1 text-sm">
-            Selesai Dikerjakan
-          </Badge>
-        </div>
-
-        <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-xl border bg-emerald-500/10 border-emerald-500/20 p-3 text-center">
-            <p className="text-xl font-bold text-emerald-600">{correct}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Benar</p>
-          </div>
-          <div className="rounded-xl border bg-destructive/10 border-destructive/20 p-3 text-center">
-            <p className="text-xl font-bold text-destructive">{wrong}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Salah</p>
-          </div>
-          <div className="rounded-xl border bg-muted p-3 text-center">
-            <p className="text-xl font-bold text-muted-foreground">{empty}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Kosong</p>
-          </div>
-        </div>
-      </div>
-
       <div className="space-y-6">
         {questions.map((question: any, index: number) => {
           const userAnswerObj = userAnswers.find(

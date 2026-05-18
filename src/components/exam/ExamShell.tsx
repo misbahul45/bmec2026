@@ -37,9 +37,10 @@ interface ExamShellProps {
   exam: ExamData
   questions: ExamQuestion[]
   teamId: string
+  examId:string
 }
 
-export function ExamShell({ attempt, exam, questions, teamId }: ExamShellProps) {
+export function ExamShell({ attempt, exam, questions, teamId, examId }: ExamShellProps) {
   const deviceState = useDeviceVerification(attempt.id)
 
   const effectiveDeadline = (() => {
@@ -71,7 +72,7 @@ export function ExamShell({ attempt, exam, questions, teamId }: ExamShellProps) 
     useExamNavigation(questions)
 
   const { isSubmitting, submitManual, submitAuto, showConfirmDialog, setShowConfirmDialog } =
-    useExamSubmit({ attemptId: attempt.id, teamId, examType:exam.type })
+    useExamSubmit({ attemptId: attempt.id, teamId, examType:exam.type, examId })
 
   useExamAntiCheat({ attemptId: attempt.id, isFinished: false })
 

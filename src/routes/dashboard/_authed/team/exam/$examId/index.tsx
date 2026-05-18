@@ -1,16 +1,40 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  redirect,
+  Link,
+} from '@tanstack/react-router'
+
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Suspense } from 'react'
-import { Skeleton } from '~/components/ui/skeleton'
-import { ExamShell } from '~/components/exam/ExamShell'
-import { examSessionQueryOptions } from '~/lib/api/exam-attempts/exam-attempt.query-options'
-import { startExam } from '~/server/exam-attempt'
-import { ExamType, QuestionDifficulty } from '@prisma/client'
 
-export const Route = createFileRoute('/dashboard/_authed/team/exam/$examId/')({
+import { Skeleton } from '~/components/ui/skeleton'
+import { Button } from '~/components/ui/button'
+
+import { ExamShell } from '~/components/exam/ExamShell'
+
+import { examSessionQueryOptions } from '~/lib/api/exam-attempts/exam-attempt.query-options'
+
+import { startExam } from '~/server/exam-attempt'
+
+import {
+  ExamType,
+  QuestionDifficulty,
+} from '@prisma/client'
+
+import {
+  AlertTriangle,
+  Home,
+} from 'lucide-react'
+
+export const Route = createFileRoute(
+  '/dashboard/_authed/team/exam/$examId/',
+)({
   loader: async ({ context, params }) => {
     const teamId = context.user?.userId
-    if (!teamId) throw redirect({ to: '/auth/login' })
+
+    if (!teamId) {
+      throw redirect({ to: '/auth/login' })
+    }
 
     await startExam({
       data: {
@@ -26,34 +50,92 @@ export const Route = createFileRoute('/dashboard/_authed/team/exam/$examId/')({
       examSessionQueryOptions(teamId, params.examId),
     )
   },
+
   component: RouteComponent,
+
+  errorComponent: ({ error }) => {
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Terjadi kesalahan'
+
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-md border rounded-2xl p-8 text-center space-y-5 bg-background">
+          <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+            <AlertTriangle className="size-8 text-destructive" />
+          </div>
+
+          <div className="space-y-2">
+            <h1 className="text-xl font-bold">
+              Ujian Tidak Dapat Dibuka
+            </h1>
+
+            <p className="text-sm text-muted-foreground">
+              {message}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Button asChild>
+              <Link to="/dashboard/team">
+                <Home className="size-4 mr-2" />
+                Kembali ke Dashboard
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  },
 })
 
 function RouteComponent() {
   const { user } = Route.useRouteContext()
   const { examId } = Route.useParams()
+
   const teamId = user?.userId!
 
   return (
     <Suspense fallback={<ExamLoadingSkeleton />}>
-      <ExamPage teamId={teamId} examId={examId} />
+      <ExamPage
+        teamId={teamId}
+        examId={examId}
+      />
     </Suspense>
   )
 }
 
-function ExamPage({ teamId, examId }: { teamId: string; examId: string }) {
-  const { data: res } = useSuspenseQuery(examSessionQueryOptions(teamId, examId))
+function ExamPage({
+  teamId,
+  examId,
+}: {
+  teamId: string
+  examId: string
+}) {
+  const { data: res } = useSuspenseQuery(
+    examSessionQueryOptions(teamId, examId),
+  )
+
   const session = res.data as {
     attemptId: string
     remainingSeconds: number
     effectiveDeadline: string
-    answers: { questionId: string; answer: string }[]
+    answers: {
+      questionId: string
+      answer: string
+    }[]
+
     exam: {
       id: string
       title: string
       endDate: string
       duration: number
-      stage?: { name: string }
+
+      stage?: {
+        name: string
+      }
+
       questions: {
         id: string
         question: string
@@ -62,20 +144,30 @@ function ExamPage({ teamId, examId }: { teamId: string; examId: string }) {
         optionC: string
         optionD: string
         optionE: string
+
         difficulty: QuestionDifficulty
 
         correctScore: number
         wrongScore: number
         emptyScore: number
       }[]
-      type:ExamType
+
+      type: ExamType
     }
   }
 
   const attempt = {
     id: session.attemptId,
-    startTime: new Date(new Date().getTime() - (session.exam.duration * 60 - session.remainingSeconds) * 1000),
+
+    startTime: new Date(
+      new Date().getTime() -
+        (session.exam.duration * 60 -
+          session.remainingSeconds) *
+          1000,
+    ),
+
     deviceId: null as string | null,
+
     answers: session.answers,
   }
 
@@ -85,6 +177,7 @@ function ExamPage({ teamId, examId }: { teamId: string; examId: string }) {
       exam={session.exam}
       questions={session.exam.questions}
       teamId={teamId}
+      examId={examId}
     />
   )
 }
@@ -96,21 +189,32 @@ function ExamLoadingSkeleton() {
         <Skeleton className="h-5 w-48" />
         <Skeleton className="h-5 w-16 ml-auto" />
       </div>
+
       <div className="flex flex-1">
         <div className="hidden lg:block w-64 border-r p-4 space-y-3">
           <Skeleton className="h-4 w-24" />
+
           <div className="grid grid-cols-5 gap-1.5">
             {Array.from({ length: 20 }).map((_, i) => (
-              <Skeleton key={i} className="h-8 w-8 rounded-lg" />
+              <Skeleton
+                key={i}
+                className="h-8 w-8 rounded-lg"
+              />
             ))}
           </div>
         </div>
+
         <div className="flex-1 p-6 space-y-4">
           <Skeleton className="h-4 w-32" />
+
           <Skeleton className="h-24 rounded-xl" />
+
           <div className="space-y-2">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-14 rounded-xl" />
+              <Skeleton
+                key={i}
+                className="h-14 rounded-xl"
+              />
             ))}
           </div>
         </div>
