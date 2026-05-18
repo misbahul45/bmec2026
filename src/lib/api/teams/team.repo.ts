@@ -19,8 +19,16 @@ export default class TeamRepo {
   }
 
   createMentor(data: { teamId: string; name: string; email: string; phone: string }) {
-    return prisma.mentor.create({
-      data: {
+    return prisma.mentor.upsert({
+      where: {
+        teamId: data.teamId, 
+      },
+      update: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+      },
+      create: {
         teamId: data.teamId,
         name: data.name,
         email: data.email,
@@ -29,6 +37,18 @@ export default class TeamRepo {
     })
   }
 
+ findExistingEmail(data: string[]) {
+    return prisma.member.findMany({
+      where: {
+        email: {
+          in: data,
+        },
+      },
+      select: {
+        email: true,
+      },
+    })
+  }
   create(data: Prisma.TeamCreateInput) {
     return prisma.team.create({ data })
   }
@@ -98,19 +118,34 @@ export default class TeamRepo {
     })
   }
 
-  createMember(data: MemberData[]) {
-    return prisma.member.createMany({
-      data: data.map((t) => ({
-        name: t.name,
-        email: t.email,
-        phone: t.phone,
-        role: t.role,
-        teamId: t.teamId!,
-        major: t.major ?? null,
-        faculty: t.faculty ?? null,
-      })),
-    })
-  };
+  async createMember(data: MemberData[]) {
+    return Promise.all(
+      data.map((t) =>
+        prisma.member.upsert({
+          where: {
+            email: t.email,
+          },
+          update: {
+            name: t.name,
+            phone: t.phone,
+            role: t.role,
+            teamId: t.teamId!,
+            major: t.major ?? null,
+            faculty: t.faculty ?? null,
+          },
+          create: {
+            name: t.name,
+            email: t.email,
+            phone: t.phone,
+            role: t.role,
+            teamId: t.teamId!,
+            major: t.major ?? null,
+            faculty: t.faculty ?? null,
+          },
+        })
+      )
+    )
+  }
 
   updateStage(teamId: string, stageId: string) {
     return prisma.team.update({

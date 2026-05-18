@@ -56,6 +56,7 @@ export default class TeamService {
 
     return `${prefix}-${String(nextNumber).padStart(3, "0")}`
   }
+
   private sanitizeTeam(team: any) {
     const { password, ...rest } = team
     if (rest.registration?.batch?.price) {
@@ -235,6 +236,20 @@ export default class TeamService {
     if (!existingTeam) {
       throw new AppError('Tim tidak ditemukan', 404);
     }
+
+    const emails = payload.members.map((m) => m.email)
+
+    const existingEmails = await this.repo.findExistingEmail(emails)
+
+    if (existingEmails.length > 0) {
+      throw new AppError(
+        `Email sudah digunakan: ${existingEmails
+          .map((e) => e.email)
+          .join(", ")}`,
+        400
+      )
+    }
+
     const result = await this.repo.createMember(payload.members);
 
     return {

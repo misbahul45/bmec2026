@@ -134,10 +134,16 @@ function RouteComponent() {
 
   const currentMemberIndex = MEMBER_TABS.indexOf(activeTab)
   const isLastMemberTab = currentMemberIndex === MEMBER_TABS.length - 1
-
+  
   const handleMemberNext = async () => {
-    const isValid = await memberForm.trigger(`members.${currentMemberIndex}` as any)
-    if (!isValid) return
+    const isValid = await memberForm.trigger(
+      `members.${currentMemberIndex}` as any
+    )
+
+    if (!isValid) {
+      toast.error('Maaf, lengkapi data anggota terlebih dahulu')
+      return
+    }
 
     if (!isLastMemberTab) {
       setActiveTab(MEMBER_TABS[currentMemberIndex + 1])
@@ -145,7 +151,11 @@ function RouteComponent() {
     }
 
     const allValid = await memberForm.trigger('members')
-    if (!allValid) return
+
+    if (!allValid) {
+      toast.error('Maaf, lengkapi seluruh data anggota')
+      return
+    }
 
     memberMutation.mutate(memberForm.getValues())
   }

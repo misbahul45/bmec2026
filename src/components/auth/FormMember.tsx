@@ -14,7 +14,6 @@ type Props = {
 
 const FormMember = ({ form, index, educationLevel }: Props) => {
   const isMahasiswa = educationLevel === "MAHASISWA"
-  const studentLabel = isMahasiswa ? "NIM" : "NIS"
   const nameLabel = index === 0 ? "Nama Ketua" : `Nama Anggota ${index}`
 
   return (
