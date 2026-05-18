@@ -149,15 +149,18 @@ function RouteComponent() {
         <div className="space-y-3">
           {attempt.exam.questions.map((q: any, idx: number) => {
             const ans = answerMap.get(q.id)
-            const hasAnswer = ans?.answer && ans.answer.trim() !== ''
-            const isCorrect = hasAnswer && ans?.isCorrect
+            const hasAnswer = Boolean(
+              ans?.answer && ans.answer.trim() !== ''
+            )
+
+            const isCorrect = hasAnswer && ans?.isCorrect === true
             const isEmpty = !hasAnswer
 
             const earnedScore = isEmpty
-              ? q.emptyScore ?? 0
-              : isCorrect
-                ? q.correctScore ?? 0
-                : q.wrongScore ?? 0
+            ? (q.emptyScore ?? 0)
+            : isCorrect
+              ? (q.correctScore ?? 0)
+              : (q.wrongScore ?? 0)
 
             const options = [
               { key: 'A', val: q.optionA },

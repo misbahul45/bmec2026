@@ -11,15 +11,17 @@ const difficultyScoring = {
     wrongScore: -1,
     emptyScore: 0,
   },
+
   [QuestionDifficulty.MEDIUM]: {
     correctScore: 4,
     wrongScore: -2,
-    emptyScore: -1,
+    emptyScore: 0,
   },
+
   [QuestionDifficulty.HARD]: {
     correctScore: 6,
     wrongScore: -3,
-    emptyScore: -2,
+    emptyScore: 0,
   },
 }
 
@@ -39,7 +41,7 @@ const questions = [
     `,
     optionA: '<p>Sensor ultrasonik</p>',
     optionB:
-      '<p><strong>Pulse oximeter</strong> berbasis fotolistrik</p>',
+      '<p><strong>Pulse oximeter berbasis fotolistrik</strong></p>',
     optionC: '<p>Sensor kapasitif</p>',
     optionD: '<p>Sensor piezoelektrik</p>',
     optionE: '<p>Sensor resistif</p>',
@@ -66,7 +68,7 @@ const questions = [
     optionA:
       '<p>Hamburan sinar-X pada jaringan tubuh</p>',
     optionB:
-      '<p><strong>Resonansi inti atom hidrogen</strong> dalam medan magnet kuat</p>',
+      '<p><strong>Resonansi inti atom hidrogen dalam medan magnet kuat</strong></p>',
     optionC:
       '<p>Pantulan gelombang ultrasonik</p>',
     optionD:
@@ -98,7 +100,7 @@ const questions = [
     optionA:
       '<p>Menghasilkan arus listrik ke jantung</p>',
     optionB:
-      '<p>Mendeteksi aktivitas listrik jantung dari permukaan kulit</p>',
+      '<p><strong>Mendeteksi aktivitas listrik jantung dari permukaan kulit</strong></p>',
     optionC:
       '<p>Mengukur tekanan darah secara invasif</p>',
     optionD:
@@ -111,114 +113,73 @@ const questions = [
 ]
 
 export async function seedExamQuestions() {
-  const stage =
-    await prisma.stage.findFirst({
-      where: {
-        name:
-          StageType.PENYISIHAN,
+  const exams = await prisma.exam.findMany({
+    where: {
+      stage: {
+        name: StageType.PENYISIHAN,
         competition: {
-          name:
-            'OLIMPIADE',
+          name: 'OLIMPIADE',
         },
       },
-    })
 
-  if (!stage) {
-    console.log(
-      '❌ Stage PENYISIHAN OLIMPIADE tidak ditemukan'
-    )
-    return
-  }
-
-  const exam =
-    await prisma.exam.findFirst({
-      where: {
-        stageId:
-          stage.id,
-        type:
-          ExamType.TRYOUT,
+      type: {
+        in: [ExamType.TRYOUT, ExamType.OLYMPIAD],
       },
-      orderBy: {
-        createdAt:
-          'asc',
-      },
-    })
+    },
 
-  if (!exam) {
-    console.log(
-      '❌ Exam Tryout tidak ditemukan'
-    )
-    return
-  }
+    include: {
+      stage: true,
+    },
 
-  const existing =
-    await prisma.examQuestion.count(
-      {
-        where: {
-          examId:
-            exam.id,
-        },
-      }
-    )
-
-  if (existing > 0) {
-    console.log(
-      `⏭️ Soal sudah ada (${existing}) untuk: ${exam.title}`
-    )
-    return
-  }
-
-  await prisma.examQuestion.createMany({
-    data: questions.map(
-      (
-        q,
-        index
-      ) => {
-        const scoring =
-          difficultyScoring[
-            q.difficulty
-          ]
-
-        return {
-          question:
-            q.question,
-          optionA:
-            q.optionA,
-          optionB:
-            q.optionB,
-          optionC:
-            q.optionC,
-          optionD:
-            q.optionD,
-          optionE:
-            q.optionE,
-
-          correctAnswer:
-            q.correctAnswer,
-
-          difficulty:
-            q.difficulty,
-
-          correctScore:
-            scoring.correctScore,
-
-          wrongScore:
-            scoring.wrongScore,
-
-          emptyScore:
-            scoring.emptyScore,
-
-          order:
-            index + 1,
-
-          examId:
-            exam.id,
-        }
-      }
-    ),
+    orderBy: {
+      createdAt: 'asc',
+    },
   })
 
-  console.log(
-    `✅ ${questions.length} soal ditambahkan ke: ${exam.title}`
-  )
+  if (exams.length === 0) {
+    console.log('❌ Tidak ada exam ditemukan')
+    return
+  }
+
+  for (const exam of exams) {
+    await prisma.examQuestion.deleteMany({
+      where: {
+        examId: exam.id,
+      },
+    })
+
+    await prisma.examQuestion.createMany({
+      data: questions.map((q, index) => {
+        const scoring = difficultyScoring[q.difficulty]
+
+        return {
+          question: q.question,
+
+          optionA: q.optionA,
+          optionB: q.optionB,
+          optionC: q.optionC,
+          optionD: q.optionD,
+          optionE: q.optionE,
+
+          correctAnswer: q.correctAnswer,
+
+          difficulty: q.difficulty,
+
+          correctScore: scoring.correctScore,
+          wrongScore: scoring.wrongScore,
+          emptyScore: scoring.emptyScore,
+
+          order: index + 1,
+
+          examId: exam.id,
+        }
+      }),
+    })
+
+    console.log(
+      `✅ ${questions.length} soal berhasil ditambahkan ke ${exam.title}`
+    )
+  }
+
+  console.log('🎉 Seeder soal selesai')
 }
