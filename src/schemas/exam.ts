@@ -34,12 +34,12 @@ export const examQuestionSchema = z
       MEDIUM: {
         correctScore: 4,
         wrongScore: -2,
-        emptyScore: -1,
+        emptyScore: 0,
       },
       HARD: {
         correctScore: 6,
         wrongScore: -3,
-        emptyScore: -2,
+        emptyScore: 0,
       },
     }
 
