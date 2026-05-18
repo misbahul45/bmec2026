@@ -12,6 +12,7 @@ interface Submission {
   orsinalitasUrl?: string | null
   score: number | null
   feedback: string | null
+  abstractUrl:string | null
   status: string
   createdAt: string | Date
   team: {
@@ -46,6 +47,7 @@ export function TableSubmissions({ submissions, meta, adminId, queryKey, onPageC
               <TableHead>Stage</TableHead>
               <TableHead>Judul</TableHead>
               <TableHead>File</TableHead>
+              <TableHead>Abstract</TableHead>
               <TableHead>Turnitin</TableHead>
               <TableHead>Orisinalitas</TableHead>
               <TableHead>Bukti Bayar</TableHead>
@@ -94,6 +96,16 @@ export function TableSubmissions({ submissions, meta, adminId, queryKey, onPageC
                 <TableCell>
                   {sub.fileUrl ? (
                     <a href={sub.fileUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline text-xs">
+                      Lihat File
+                    </a>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  )}
+                </TableCell>
+
+                <TableCell>
+                  {sub.abstractUrl ? (
+                    <a href={sub.abstractUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline text-xs">
                       Lihat File
                     </a>
                   ) : (
