@@ -18,7 +18,7 @@ import {
   createAbstractSubmissionSchema,
 } from "~/schemas/auth.schema"
 
-const MAX_SIZE = 4 * 1024 * 1024
+const MAX_SIZE = 10 * 1024 * 1024
 
 type Props = {
   type: CompetitionType
@@ -51,15 +51,15 @@ const FormMahasiswa: React.FC<Props> = ({ type: _ }) => {
   const mutation = useMutation({
     mutationFn: async (data: CreateAbstractSubmissionData) => {
       if (data.abstractFile.size > MAX_SIZE) {
-        throw new AppError("File abstrak maksimal 4MB")
+        throw new AppError("File abstrak maksimal 10MB")
       }
 
       if (data.turnitinFile && data.turnitinFile.size > MAX_SIZE) {
-        throw new AppError("File turnitin maksimal 4MB")
+        throw new AppError("File turnitin maksimal 10MB")
       }
 
       if (data.orsinalitasFile && data.orsinalitasFile.size > MAX_SIZE) {
-        throw new AppError("File orisinalitas maksimal 4MB")
+        throw new AppError("File orisinalitas maksimal 10MB")
       }
 
       const toastId = toast.loading("Mengunggah abstrak...")
@@ -127,7 +127,7 @@ const FormMahasiswa: React.FC<Props> = ({ type: _ }) => {
             dan pembayaran dilakukan setelah abstrak lolos seleksi.
           </p>
           <p className="text-[11px] font-medium text-yellow-600">
-            Maksimal ukuran setiap file: 4MB
+            Maksimal ukuran setiap file: 10MB
           </p>
         </div>
       </CardHeader>

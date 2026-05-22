@@ -145,7 +145,6 @@ const RegisterForm = () => {
         <form id="form-register" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup className="gap-4">
 
-            {/* ── Nama Tim ── */}
             <Controller
               name="teamName"
               control={form.control}
@@ -164,7 +163,6 @@ const RegisterForm = () => {
               )}
             />
 
-            {/* ── Jenis Lomba (lebih awal supaya label email/telp langsung berubah) ── */}
             <Controller
               name="competitionType"
               control={form.control}
@@ -181,7 +179,6 @@ const RegisterForm = () => {
               )}
             />
 
-            {/* ── Institusi / Sekolah ── */}
             <Controller
               name="institution"
               control={form.control}
@@ -206,7 +203,6 @@ const RegisterForm = () => {
               )}
             />
 
-            {/* ── Email + Telepon (label berubah sesuai konteks) ── */}
             <div className="grid grid-cols-2 gap-3">
               <Controller
                 name="email"
@@ -264,6 +260,7 @@ const RegisterForm = () => {
                     value={field.value}
                     onChange={field.onChange}
                     error={fieldState.invalid}
+                    competitionType={competitionType}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>

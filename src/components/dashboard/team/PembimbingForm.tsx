@@ -17,9 +17,10 @@ interface Props {
   teamId: string
   existing?: Pembimbing | null
   queryKey: unknown[]
+  mentorLabel:string
 }
 
-export function PembimbingForm({ teamId, existing, queryKey }: Props) {
+export function PembimbingForm({ teamId, existing, queryKey, mentorLabel }: Props) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(existing?.name ?? '')
   const [email, setEmail] = useState(existing?.email ?? '')
@@ -34,11 +35,11 @@ export function PembimbingForm({ teamId, existing, queryKey }: Props) {
       return createMentor({ data: { teamId, name, email, phone } })
     },
     onSuccess: () => {
-      toast.success(existing ? 'Data pembimbing berhasil diperbarui' : 'Pembimbing berhasil ditambahkan')
+      toast.success(existing ? `Data ${mentorLabel} berhasil diperbarui` : `${mentorLabel} berhasil ditambahkan`)
       queryClient.invalidateQueries({ queryKey: queryKey as any })
       setOpen(false)
     },
-    onError: (e: any) => toast.error(e?.message ?? 'Gagal menyimpan data pembimbing'),
+    onError: (e: any) => toast.error(e?.message ?? `Gagal menyimpan data ${mentorLabel} `),
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -60,12 +61,12 @@ export function PembimbingForm({ teamId, existing, queryKey }: Props) {
         {existing ? (
           <>
             <Pencil size={12} />
-            Edit Pembimbing
+            Edit {mentorLabel}
           </>
         ) : (
           <>
             <Plus size={12} />
-            Tambah Pembimbing
+            Tambah {mentorLabel}
           </>
         )}
       </Button>
@@ -77,14 +78,14 @@ export function PembimbingForm({ teamId, existing, queryKey }: Props) {
       <div className="flex items-center gap-2">
         <GraduationCap size={15} className="text-primary" />
         <span className="text-sm font-semibold">
-          {existing ? 'Edit Pembimbing' : 'Tambah Pembimbing'}
+          {existing ? `Edit ${mentorLabel}` : `Tambah ${mentorLabel}`}
         </span>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="space-y-1.5">
-            <Label className="text-xs">Nama Pembimbing</Label>
+            <Label className="text-xs">Nama {mentorLabel}</Label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}

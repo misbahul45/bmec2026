@@ -119,11 +119,10 @@ export function DocumentUploadTab({ teamId, existingDocumentUrl, onSuccess }: Pr
       <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-2">
         <div className="flex items-center gap-2">
           <LinkIcon size={14} className="text-primary" />
-          <p className="text-xs font-semibold text-primary">Link Drive Twibbon & Dokumentasi</p>
+          <p className="text-xs font-semibold text-primary">Link Drive Twibbon & Instastory</p>
         </div>
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Masukkan link Google Drive yang berisi twibbon tim dan dokumentasi pendukung lainnya.
-          Pastikan akses file sudah diatur ke publik (Anyone with the link can view) agar dapat diverifikasi oleh panitia.
+          Masukkan link Google Drive yang berisi twibbon tim dan instastory. Pastikan akses file sudah diatur ke publik (Anyone with the link can view) agar dapat diverifikasi oleh panitia.
         </p>
         <Input
           placeholder="https://drive.google.com/..."

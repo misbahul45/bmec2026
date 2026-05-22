@@ -14,6 +14,7 @@ import { Skeleton } from '~/components/ui/skeleton'
 import { MapPin, ChevronRight } from 'lucide-react'
 import { Badge } from '~/components/ui/badge'
 import { competitionQueryOptions } from '~/lib/api/competitions/competition.query-options'
+import { mapCompetitionToEducation } from '~/lib/utils'
 
 export const Route = createFileRoute('/dashboard/_authed/team/')({
   loader: async ({ context }) => {
@@ -53,6 +54,9 @@ function TeamDashboard({ teamId }: { teamId: string }) {
   const abstractStatus = team.submissions[0]?.status ?? null
   const competition = competitionRes.data
   const activeBatch = competition?.batches?.[0] ?? null
+
+  const educationLevel: 'SMA' | 'MAHASISWA' = mapCompetitionToEducation(team.competitionType)
+  const mentorLabel = educationLevel === 'MAHASISWA' ? 'Pembina' : 'Pendamping'
 
   const invoiceStorageKey = `bmec_invoice_viewed_${teamId}`
   const isApproved = registrationStatus === 'APPROVED'
@@ -104,6 +108,7 @@ function TeamDashboard({ teamId }: { teamId: string }) {
                 teamId={teamId}
                 existing={team.mentor ?? null}
                 queryKey={queryKey}
+                mentorLabel={mentorLabel}
               />
           </>
         )}

@@ -112,7 +112,7 @@ function RouteComponent() {
     mutationFn: (data: CreateMentorInput) => createMentor({ data }),
     onError: (error: any) => toast.error(error.message),
     onSuccess: (res: any) => {
-      toast.success(res.message)
+      toast.success(`${mentorLabel} berhasil ditambahkan `)
       mentorForm.reset()
       setMentorSubmitted(true)
       setActiveTab('member-0')
@@ -172,7 +172,6 @@ function RouteComponent() {
     { label: 'Data Tim',    done: membersSubmitted,  active: mentorSubmitted && !membersSubmitted },
     { label: 'Dokumen',     done: false,             active: membersSubmitted },
   ]
-
   return (
     <div ref={containerRef} className="min-h-screen flex items-center justify-center p-6">
       <Card className="w-full max-w-4xl shadow-xl shadow-primary/10 rounded-2xl fade-up">

@@ -322,11 +322,8 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
 
               <div className="space-y-2">
                 <p className="text-xs font-semibold">
-                  Surat
-                  Orisinalitas{' '}
-                  <span className="text-muted-foreground font-normal">
-                    (opsional)
-                  </span>
+                    Surat Orisinalitas{" "}
+                    <span className="text-destructive">*</span>
                 </p>
 
                 <FileUploadField
