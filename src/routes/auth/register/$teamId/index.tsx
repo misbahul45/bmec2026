@@ -78,6 +78,7 @@ function RouteComponent() {
 
   const team = res.data!
   const educationLevel: 'SMA' | 'MAHASISWA' = mapCompetitionToEducation(team.competitionType)
+  const mentorLabel = educationLevel === 'MAHASISWA' ? 'Pembina' : 'Pendamping'
 
   const mentorForm = useForm<MentorFormValues>({
     resolver: zodResolver(createMentorSchema),
@@ -134,7 +135,7 @@ function RouteComponent() {
 
   const currentMemberIndex = MEMBER_TABS.indexOf(activeTab)
   const isLastMemberTab = currentMemberIndex === MEMBER_TABS.length - 1
-  
+
   const handleMemberNext = async () => {
     const isValid = await memberForm.trigger(
       `members.${currentMemberIndex}` as any
@@ -167,9 +168,9 @@ function RouteComponent() {
   ]
 
   const steps = [
-    { label: 'Mentor',   done: mentorSubmitted,  active: !mentorSubmitted },
-    { label: 'Data Tim', done: membersSubmitted,  active: mentorSubmitted && !membersSubmitted },
-    { label: 'Dokumen',  done: false,             active: membersSubmitted },
+    { label: mentorLabel,   done: mentorSubmitted,  active: !mentorSubmitted },
+    { label: 'Data Tim',    done: membersSubmitted,  active: mentorSubmitted && !membersSubmitted },
+    { label: 'Dokumen',     done: false,             active: membersSubmitted },
   ]
 
   return (
@@ -180,7 +181,7 @@ function RouteComponent() {
             Lengkapi Data Tim <span className="text-primary">{team.name}</span>
           </CardTitle>
           <CardDescription className="text-sm text-center">
-            Isi data {educationLevel === 'MAHASISWA' ? 'Pembina' : 'Pendamping'} & anggota terlebih dahulu, lalu upload dokumen kelengkapan tim.
+            Isi data {mentorLabel} & anggota terlebih dahulu, lalu upload dokumen kelengkapan tim.
           </CardDescription>
 
           <div className="flex items-center justify-center gap-2 pt-2">
@@ -216,7 +217,7 @@ function RouteComponent() {
             <TabsList className="grid grid-cols-5 w-full">
               <TabsTrigger value="mentor" disabled={mentorSubmitted}>
                 <span className="flex items-center gap-1">
-                  {educationLevel === 'MAHASISWA' ? 'Pembina' : 'Pendamping'}
+                  {mentorLabel}
                   {mentorSubmitted && <CheckCircle2 size={11} className="text-green-600" />}
                 </span>
               </TabsTrigger>
@@ -244,14 +245,14 @@ function RouteComponent() {
                 <FormMentor educationLevel={educationLevel} form={mentorForm} teamId={teamId} />
                 <div className="flex items-center justify-between pt-2">
                   <p className="text-xs text-muted-foreground">
-                    Isi data {educationLevel === 'MAHASISWA' ? 'Pembina' : 'Pendamping'} tim
+                    Isi data {mentorLabel} tim
                   </p>
                   <Button
                     type="submit"
                     className="active:scale-95 rounded-xl"
                     disabled={mentorMutation.isPending}
                   >
-                    {mentorMutation.isPending ? 'Menyimpan...' : 'Simpan Mentor →'}
+                    {mentorMutation.isPending ? 'Menyimpan...' : `${mentorLabel} →`}
                   </Button>
                 </div>
               </form>
