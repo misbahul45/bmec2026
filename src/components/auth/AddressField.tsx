@@ -20,7 +20,7 @@ export function AddressField({ value, onChange, error, competitionType }: Props)
       <Textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={`Masukkan {competitionType === 'LKTI' ? 'alamat Kampus' : 'alamat Sekolah'} lengkap...`}
+        placeholder={`Masukkan ${competitionType === 'LKTI' ? 'alamat Kampus' : 'alamat Sekolah'} lengkap...`}
         aria-invalid={error}
         rows={3}
         className="pl-9 text-xs resize-none"
