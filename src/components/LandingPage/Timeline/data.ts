@@ -77,7 +77,7 @@ export const processes: TimelineProcess[] = [
     accent: 'secondary',
     events: [
       {
-        date: '25 Mei - 24 Juli',
+        date: '25 Mei - 24 Juni',
         label: 'Open Submission Abstract',
       },
       {

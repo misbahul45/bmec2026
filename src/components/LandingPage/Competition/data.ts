@@ -39,7 +39,7 @@ export const competitions = [
         reward: 'Rp1.000.000 + Medali + Sertifikat',
       },
     ],
-    guideUrl: '#',
+    guideUrl: 'https://drive.google.com/file/d/1nUftS1PxrpzB_ey4FpnbgQWEAA6SOW3g/view',
   },
   {
     id: 'lkti',
@@ -75,7 +75,7 @@ export const competitions = [
         reward: 'Rp750.000 + Medali + Sertifikat',
       },
     ],
-    guideUrl: '#',
+    guideUrl: 'https://drive.google.com/file/d/1Ah_paE_znQV7wUbEff9FwYCIclvCJxK6/view',
   },
   {
     id: 'infografis',
@@ -111,7 +111,7 @@ export const competitions = [
         reward: 'Rp300.000 + Medali + Sertifikat',
       },
     ],
-    guideUrl: '#',
+    guideUrl: 'https://drive.google.com/file/d/1irFLW8G1iIgxAu9kS1bKxcezFPw9TU_X/view',
   },
 ]
 
