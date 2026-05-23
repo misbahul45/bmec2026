@@ -302,9 +302,6 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
 
                 <p className="text-[11px] text-muted-foreground">
                   Format
-                  PNG,
-                  JPG,
-                  atau
                   PDF.
                   Maksimal
                   10MB.

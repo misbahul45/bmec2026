@@ -14,8 +14,8 @@ export function formatDate(date: Date | string): string {
   }).format(new Date(date))
 }
 
-export function generateInvoiceNumber(competitionType: string, teamId: string): string {
-  return `INV-${competitionType}-${teamId.slice(0, 6).toUpperCase()}`
+export function generateInvoiceNumber(code: string): string {
+  return `INV-${code}`
 }
 
 export function generateParticipantNumber(teamId: string): string {

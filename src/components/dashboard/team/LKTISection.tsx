@@ -289,10 +289,18 @@ function FullPaperUpload({
                 <p className="text-sm font-medium">
                   LKTI — {batchName}
                 </p>
-
-                <p className="text-xs text-muted-foreground">
-                  Transfer ke: BCA • 091891981 (Nayla)
+                <p className="text-xs text-muted-foreground mb-1">
+                  Transfer pembayaran ke:
                 </p>
+                <ul>
+                  <li className="font-semibold">
+                    BRI • 058001042204505 (Alexa Putri Marinda)
+                  </li>
+
+                  <li className="font-semibold">
+                    Bank Mandiri • 1420024862970 (Amelia Husna Arrania)
+                  </li>
+                </ul>
               </div>
 
               <p className="text-lg font-bold">

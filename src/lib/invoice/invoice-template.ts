@@ -17,6 +17,7 @@ interface InvoiceData {
   price: number
   batchName?: string
   approvedAt?: Date | string
+  code:string
 }
 
 const COMPETITION_LABELS: Record<CompetitionType, string> = {
@@ -38,7 +39,7 @@ const SUCCESS_MESSAGES: Record<CompetitionType, string> = {
 }
 
 export function generateInvoiceHtml(data: InvoiceData): string {
-  const invoiceNo = generateInvoiceNumber(data.competitionType, data.teamId)
+  const invoiceNo = generateInvoiceNumber(data.code)
   const participantNo = generateParticipantNumber(data.teamId)
   const dateStr = formatDate(data.approvedAt ?? new Date())
   const label = COMPETITION_LABELS[data.competitionType]
@@ -234,7 +235,7 @@ export function generateInvoiceHtml(data: InvoiceData): string {
 <div class="card">
   <div class="header">
     <div class="header-left">
-      <img src="https://bmec2026.com/logo.png" class="logo" alt="BMEC Logo" onerror="this.style.display='none'" />
+      <img src="https://www.bmec2026.com/logo.png" class="logo" alt="BMEC Logo" onerror="this.style.display='none'" />
       <div>
         <div class="org-name">BMEC 2026</div>
         <div class="invoice-subtitle">Invoice ${label}</div>
@@ -289,7 +290,7 @@ export function generateInvoiceHtml(data: InvoiceData): string {
       <div>
         <div class="price-meta-label">Total Pembayaran</div>
         <div class="price-meta-desc">HTM ${label} BMEC 2026</div>
-      </div>
+      </div>c
       <div class="price-value">${formatRupiah(data.price)}</div>
     </div>
 

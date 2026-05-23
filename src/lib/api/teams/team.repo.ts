@@ -1,6 +1,6 @@
 import { MemberData } from "~/schemas/team.member.schema"
 import { prisma } from "../../utils/prisma"
-import { Prisma } from "@prisma/client"
+import { CompetitionType, Prisma } from "@prisma/client"
 
 export default class TeamRepo {
 
@@ -49,6 +49,39 @@ export default class TeamRepo {
       },
     })
   }
+
+  findActiveBatchByCompetitionType(competitionType: CompetitionType) {
+    const now = new Date()
+
+    return prisma.batch.findFirst({
+      where: {
+        startDate: {
+          lte: now,
+        },
+        endDate: {
+          gte: now,
+        },
+        competition: {
+          name: competitionType,
+        },
+      },
+      orderBy: {
+        startDate: "asc",
+      },
+      include: {
+        competition: {
+          include: {
+            stages: {
+              orderBy: {
+                order: "asc",
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+
   create(data: Prisma.TeamCreateInput) {
     return prisma.team.create({ data })
   }

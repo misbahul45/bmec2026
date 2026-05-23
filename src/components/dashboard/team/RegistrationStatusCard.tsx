@@ -97,7 +97,6 @@ export function RegistrationStatusCard({
         )}
       </div>
 
-      {/* Success Message */}
       {isApproved && (
         <div className="rounded-xl border bg-muted/40 p-4 text-sm space-y-2">
           <div className="font-semibold flex items-center gap-2">
@@ -125,8 +124,6 @@ export function RegistrationStatusCard({
           </p>
         </div>
       )}
-
-      {/* Actions */}
       <div className="flex flex-wrap gap-2">
         {isApproved && invoiceUrl && (
           <Button

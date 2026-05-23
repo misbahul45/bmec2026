@@ -30,6 +30,7 @@ interface InvoiceDialogProps {
   price: number
   batchName?: string
   approvedAt?: Date | string
+  code:string
 }
 
 const COMPETITION_LABELS: Record<CompetitionType, string> = {
@@ -55,6 +56,7 @@ export function InvoiceDialog({
   price,
   batchName,
   approvedAt,
+  code
 }: InvoiceDialogProps) {
   const handleDownload = useCallback(() => {
     try {
@@ -67,14 +69,15 @@ export function InvoiceDialog({
         price,
         batchName,
         approvedAt,
+        code
       })
       toast.success('Invoice berhasil diunduh')
     } catch {
       toast.error('Gagal mengunduh invoice')
     }
-  }, [teamId, teamName, competitionType, members, schoolOrUniversity, price, batchName, approvedAt])
+  }, [teamId, code,teamName, competitionType, members, schoolOrUniversity, price, batchName, approvedAt])
 
-  const invoiceNo = generateInvoiceNumber(competitionType, teamId)
+  const invoiceNo = generateInvoiceNumber(code)
   const participantNo = generateParticipantNumber(teamId)
   const dateStr = formatDate(approvedAt ?? new Date())
   const label = COMPETITION_LABELS[competitionType]

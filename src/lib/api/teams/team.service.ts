@@ -25,9 +25,6 @@ export default class TeamService {
     const team = await this.repo.findById(payload.teamId)
     if (!team) throw new AppError('Tim tidak ditemukan', 404)
 
-    const existing = await this.repo.findMentorByTeamId(payload.teamId)
-    if (existing) throw new AppError('Pembimbing sudah terdaftar untuk tim ini', 400)
-
     const mentor = await this.repo.createMentor({
       teamId: payload.teamId,
       name: payload.name,
@@ -296,11 +293,30 @@ export default class TeamService {
 
   async getDashboard(teamId: string): Promise<ServiceResponse<any>> {
     const team = await this.repo.findDashboard(teamId)
-    if (!team) throw new AppError('Tim tidak ditemukan', 404)
+
+    if (!team) {
+      throw new AppError("Tim tidak ditemukan", 404)
+    }
+
     const { password, ...rest } = team as any
+
     if (rest.registration?.batch?.price) {
       rest.registration.batch.price = Number(rest.registration.batch.price)
     }
+
+    if (!rest.registration) {
+      const activeBatch = await this.repo.findActiveBatchByCompetitionType(
+        rest.competitionType
+      )
+
+      rest.activeBatch = activeBatch
+        ? {
+            ...activeBatch,
+            price: Number(activeBatch.price),
+          }
+        : null
+    }
+
     return { data: rest }
   }
 }

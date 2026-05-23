@@ -13,15 +13,14 @@ import { PembimbingForm } from '~/components/dashboard/team/PembimbingForm'
 import { Skeleton } from '~/components/ui/skeleton'
 import { MapPin, ChevronRight } from 'lucide-react'
 import { Badge } from '~/components/ui/badge'
-import { competitionQueryOptions } from '~/lib/api/competitions/competition.query-options'
 import { mapCompetitionToEducation } from '~/lib/utils'
 
 export const Route = createFileRoute('/dashboard/_authed/team/')({
   loader: async ({ context }) => {
     const userId = context.user?.userId
+
     if (userId) {
       await context.queryClient.ensureQueryData(teamDashboardQueryOptions(userId))
-      await context.queryClient.ensureQueryData(competitionQueryOptions('LKTI'))
     }
   },
   component: RouteComponent,
@@ -41,21 +40,32 @@ function RouteComponent() {
 }
 
 function TeamDashboard({ teamId }: { teamId: string }) {
-  const queryKey = teamDashboardQueryOptions(teamId).queryKey
-  const { data: res } = useSuspenseQuery(teamDashboardQueryOptions(teamId))
-  const { data: competitionRes } = useSuspenseQuery(competitionQueryOptions('LKTI'))
+  const queryOptions = teamDashboardQueryOptions(teamId)
+  const queryKey = queryOptions.queryKey
+  const { data: res } = useSuspenseQuery(queryOptions)
 
   const team = res.data
-  const registration = team.registration
+
+  const registration = team.registration ?? null
   const registrationStatus = registration?.status ?? null
   const competitionType = team.competitionType
-  const currentStage = team.currentStage
-  const allStages = registration?.competition?.stages ?? []
-  const abstractStatus = team.submissions[0]?.status ?? null
-  const competition = competitionRes.data
-  const activeBatch = competition?.batches?.[0] ?? null
+  const currentStage = team.currentStage ?? null
 
-  const educationLevel: 'SMA' | 'MAHASISWA' = mapCompetitionToEducation(team.competitionType)
+  const batch = registration?.batch ?? team.activeBatch ?? null
+
+  const competition =
+    registration?.competition ??
+    team.activeBatch?.competition ??
+    null
+
+  const allStages = competition?.stages ?? []
+
+  const abstractStatus = team.submissions?.[0]?.status ?? null
+
+  const educationLevel: 'SMA' | 'MAHASISWA' = mapCompetitionToEducation(
+    team.competitionType,
+  )
+
   const mentorLabel = educationLevel === 'MAHASISWA' ? 'Pembina' : 'Pendamping'
 
   const invoiceStorageKey = `bmec_invoice_viewed_${teamId}`
@@ -65,7 +75,9 @@ function TeamDashboard({ teamId }: { teamId: string }) {
 
   useEffect(() => {
     if (!isApproved) return
+
     const viewed = localStorage.getItem(invoiceStorageKey)
+
     if (!viewed) {
       setInvoiceOpen(true)
     }
@@ -74,6 +86,7 @@ function TeamDashboard({ teamId }: { teamId: string }) {
   const handleInvoiceOpenChange = useCallback(
     (open: boolean) => {
       setInvoiceOpen(open)
+
       if (!open) {
         localStorage.setItem(invoiceStorageKey, 'true')
       }
@@ -89,27 +102,36 @@ function TeamDashboard({ teamId }: { teamId: string }) {
     teamId,
     teamName: team.name,
     competitionType,
-    members: team.members.map((m: any) => ({ name: m.name, role: m.role })),
+    members: team.members.map((m: any) => ({
+      name: m.name,
+      role: m.role,
+    })),
     schoolOrUniversity: team.schoolName,
     price: registration?.batch?.price ? Number(registration.batch.price) : 0,
     batchName: registration?.batch?.name,
     approvedAt: registration?.updatedAt ?? new Date(),
+    code: team.code,
   }
-
 
   return (
     <div className="space-y-8">
       <div className="space-y-4">
         <ProfileTeam data={team} />
-        {!isApproved &&(
+
+        {!isApproved && (
           <>
-            <EditTeamForm team={team} queryKey={queryKey} registrationStatus={registrationStatus} />
-              <PembimbingForm
-                teamId={teamId}
-                existing={team.mentor ?? null}
-                queryKey={queryKey}
-                mentorLabel={mentorLabel}
-              />
+            <EditTeamForm
+              team={team}
+              queryKey={queryKey}
+              registrationStatus={registrationStatus}
+            />
+
+            <PembimbingForm
+              teamId={teamId}
+              existing={team.mentor ?? null}
+              queryKey={queryKey}
+              mentorLabel={mentorLabel}
+            />
           </>
         )}
       </div>
@@ -120,30 +142,47 @@ function TeamDashboard({ teamId }: { teamId: string }) {
             <MapPin size={15} className="text-primary" />
             Stage Saat Ini
           </div>
+
           <div className="flex items-center gap-1 flex-wrap">
             {allStages
               .slice()
               .sort((a: any, b: any) => a.order - b.order)
               .map((stage: any, idx: number, arr: any[]) => {
                 const isCurrent = stage.id === currentStage?.id
-                const isPast = currentStage ? stage.order < currentStage.order : false
+                const isPast = currentStage
+                  ? stage.order < currentStage.order
+                  : false
+
                 return (
                   <div key={stage.id} className="flex items-center gap-1">
                     <Badge
-                      variant={isCurrent ? 'default' : isPast ? 'secondary' : 'outline'}
+                      variant={
+                        isCurrent
+                          ? 'default'
+                          : isPast
+                            ? 'secondary'
+                            : 'outline'
+                      }
                       className={isCurrent ? 'ring-2 ring-primary/40' : 'opacity-60'}
                     >
                       {stage.name}
                     </Badge>
+
                     {idx < arr.length - 1 && (
-                      <ChevronRight size={13} className="text-muted-foreground shrink-0" />
+                      <ChevronRight
+                        size={13}
+                        className="text-muted-foreground shrink-0"
+                      />
                     )}
                   </div>
                 )
               })}
           </div>
+
           {!currentStage && (
-            <p className="text-xs text-muted-foreground">Belum ada stage yang ditetapkan</p>
+            <p className="text-xs text-muted-foreground">
+              Belum ada stage yang ditetapkan
+            </p>
           )}
         </div>
       )}
@@ -155,12 +194,16 @@ function TeamDashboard({ teamId }: { teamId: string }) {
           {competitionType === 'INFOGRAFIS' && 'Infografis'}
         </h2>
 
-        {registration && (
+        {registration?.createdAt && (
           <RegistrationStatusCard
             status={registrationStatus}
             batchName={registration.batch?.name}
             competitionType={competitionType}
-            moduleUrl={competitionType === 'OLIMPIADE' ? registration.batch?.module_bacth : null}
+            moduleUrl={
+              competitionType === 'OLIMPIADE'
+                ? registration.batch?.module_bacth
+                : null
+            }
             onOpenInvoice={isApproved ? handleOpenInvoice : undefined}
           />
         )}
@@ -190,7 +233,11 @@ function TeamDashboard({ teamId }: { teamId: string }) {
             registrationStatus={registrationStatus}
             teamId={teamId}
             stageId={team.currentStageId ?? null}
-            existingSubmission={team.submissions?.find((s: any) => s.stageId === team.currentStageId) ?? null}
+            existingSubmission={
+              team.submissions?.find(
+                (s: any) => s.stageId === team.currentStageId,
+              ) ?? null
+            }
             queryKey={queryKey}
           />
         )}
@@ -201,10 +248,14 @@ function TeamDashboard({ teamId }: { teamId: string }) {
             teamId={teamId}
             stageId={team.currentStageId ?? null}
             competitionId={competition?.id}
-            batchId={activeBatch?.id}
-            batchName={registration?.batch?.name}
-            batchPrice={registration?.batch?.price ? Number(registration.batch.price) : undefined}
-            existingSubmission={team.submissions?.find((s: any) => s.stageId === team.currentStageId) ?? null}
+            batchId={batch?.id}
+            batchName={batch?.name}
+            batchPrice={batch?.price ? Number(batch.price) : undefined}
+            existingSubmission={
+              team.submissions?.find(
+                (s: any) => s.stageId === team.currentStageId,
+              ) ?? null
+            }
             queryKey={queryKey}
           />
         )}
@@ -228,6 +279,7 @@ function DashboardSkeleton() {
         <Skeleton className="h-48 rounded-3xl" />
         <Skeleton className="h-32 rounded-2xl" />
       </div>
+
       <Skeleton className="h-64 rounded-2xl" />
     </div>
   )

@@ -6,11 +6,12 @@ import { logExamEvent } from '~/server/exam-attempt'
 interface UseExamAntiCheatOptions {
   attemptId: string
   isFinished: boolean
+  enabled: boolean
 }
 
 function debounce<T extends (...args: unknown[]) => void>(
   fn: T,
-  ms: number
+  ms: number,
 ): T {
   let timer: ReturnType<typeof setTimeout>
 
@@ -23,6 +24,7 @@ function debounce<T extends (...args: unknown[]) => void>(
 export function useExamAntiCheat({
   attemptId,
   isFinished,
+  enabled = true,
 }: UseExamAntiCheatOptions) {
   const isFinishedRef = useRef(isFinished)
   isFinishedRef.current = isFinished
@@ -30,6 +32,8 @@ export function useExamAntiCheat({
   const lastTabSwitchRef = useRef(0)
 
   useEffect(() => {
+    if (!enabled) return
+
     const showWarning = (message: string) => {
       toast.error('⚠️ Peringatan Ujian', {
         description: message,
@@ -39,7 +43,7 @@ export function useExamAntiCheat({
 
     const log = (
       type: ExamEventType,
-      metadata?: Record<string, unknown>
+      metadata?: Record<string, unknown>,
     ) => {
       if (isFinishedRef.current) return
 
@@ -54,13 +58,13 @@ export function useExamAntiCheat({
       switch (type) {
         case ExamEventType.TAB_SWITCH:
           showWarning(
-            'Terdeteksi berpindah tab/browser. Aktivitas ini telah tercatat.'
+            'Terdeteksi berpindah tab/browser. Aktivitas ini telah tercatat.',
           )
           break
 
         case ExamEventType.WINDOW_BLUR:
           showWarning(
-            'Jendela ujian tidak aktif. Mohon tetap fokus pada halaman ujian.'
+            'Jendela ujian tidak aktif. Mohon tetap fokus pada halaman ujian.',
           )
           break
 
@@ -80,13 +84,13 @@ export function useExamAntiCheat({
 
         case ExamEventType.FULLSCREEN_EXIT:
           showWarning(
-            'Anda keluar dari mode fullscreen. Mohon kembali ke mode ujian.'
+            'Anda keluar dari mode fullscreen. Mohon kembali ke mode ujian.',
           )
           break
 
         case ExamEventType.DEVTOOLS_OPEN:
           showWarning(
-            'Developer tools terdeteksi. Aktivitas ini telah dicatat.'
+            'Developer tools terdeteksi. Aktivitas ini telah dicatat.',
           )
           break
       }
@@ -94,12 +98,12 @@ export function useExamAntiCheat({
 
     const debouncedBlur = debounce(
       () => log(ExamEventType.WINDOW_BLUR),
-      2000
+      2000,
     )
 
     const debouncedFocus = debounce(
       () => log(ExamEventType.WINDOW_FOCUS),
-      2000
+      2000,
     )
 
     const handleVisibilityChange = () => {
@@ -149,32 +153,20 @@ export function useExamAntiCheat({
       }
     }
 
-    document.addEventListener(
-      'visibilitychange',
-      handleVisibilityChange
-    )
+    document.addEventListener('visibilitychange', handleVisibilityChange)
     window.addEventListener('blur', handleBlur)
     document.addEventListener('copy', handleCopy)
     document.addEventListener('paste', handlePaste)
-    document.addEventListener(
-      'fullscreenchange',
-      handleFullscreenChange
-    )
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
     window.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      document.removeEventListener(
-        'visibilitychange',
-        handleVisibilityChange
-      )
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
       window.removeEventListener('blur', handleBlur)
       document.removeEventListener('copy', handleCopy)
       document.removeEventListener('paste', handlePaste)
-      document.removeEventListener(
-        'fullscreenchange',
-        handleFullscreenChange
-      )
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [attemptId])
+  }, [attemptId, enabled])
 }

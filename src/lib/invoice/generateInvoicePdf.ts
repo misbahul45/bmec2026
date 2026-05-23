@@ -17,6 +17,7 @@ interface GenerateInvoiceOptions {
   price: number
   batchName?: string
   approvedAt?: Date | string
+  code:string
 }
 
 const COMPETITION_LABELS: Record<CompetitionType, string> = {
@@ -58,7 +59,7 @@ export async function downloadInvoiceHtml(options: GenerateInvoiceOptions): Prom
 
   const label = COMPETITION_LABELS[options.competitionType]
   const institutionLabel = INSTITUTION_LABEL[options.competitionType]
-  const invoiceNo = generateInvoiceNumber(options.competitionType, options.teamId)
+  const invoiceNo = generateInvoiceNumber(options.code)
   const participantNo = generateParticipantNumber(options.teamId)
   const dateStr = formatDate(options.approvedAt ?? new Date())
   const message = SUCCESS_MESSAGES[options.competitionType]

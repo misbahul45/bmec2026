@@ -74,7 +74,7 @@ export function ExamShell({ attempt, exam, questions, teamId, examId }: ExamShel
   const { isSubmitting, submitManual, submitAuto, showConfirmDialog, setShowConfirmDialog } =
     useExamSubmit({ attemptId: attempt.id, teamId, examType:exam.type, examId })
 
-  useExamAntiCheat({ attemptId: attempt.id, isFinished: false })
+  useExamAntiCheat({ enabled:exam.type ==='OLYMPIAD',attemptId: attempt.id, isFinished: false })
 
   useEffect(() => {
     if (!currentQuestion) return

@@ -7,6 +7,12 @@ export async function seedCompetition() {
     LKTI: [125000, 150000],
   } as const
 
+  const olimpiadeModules = [
+    "https://drive.google.com/drive/folders/1xeZjjKWAJrmDzA7b4J5nirM2agHWcYAu",
+    "https://drive.google.com/drive/folders/1AOkcD3gp3DNkf-6bN5SfziqQmvmmQ2XK",
+    "https://drive.google.com/drive/folders/1_TgPcaJ-vps_6iU-Uz472ttE5SBaiUQx",
+  ] as const
+
   const baseStartDate = new Date()
 
   for (const [compName, prices] of Object.entries(competitionConfig)) {
@@ -27,6 +33,11 @@ export async function seedCompetition() {
       const endDate = new Date(startDate)
       endDate.setDate(startDate.getDate() + 5)
 
+      const moduleBatch =
+        compName === "OLIMPIADE"
+          ? olimpiadeModules[i]
+          : ""
+
       await prisma.batch.upsert({
         where: {
           name_competitionId: {
@@ -38,14 +49,14 @@ export async function seedCompetition() {
           startDate,
           endDate,
           price: prices[i],
-          module_bacth: `module-${compName.toLowerCase()}-${i + 1}`,
+          module_bacth: moduleBatch,
         },
         create: {
           name: `Batch ${i + 1}`,
           startDate,
           endDate,
           price: prices[i],
-          module_bacth: `module-${compName.toLowerCase()}-${i + 1}`,
+          module_bacth: moduleBatch,
           competitionId: competition.id,
         },
       })
