@@ -46,18 +46,21 @@ export async function seedExam() {
         type: ExamType.TRYOUT,
         startDate: new Date("2026-08-01"),
         endDate: new Date("2026-08-01"),
+        duration:120
       },
       {
         title: `Tryout 2 ${stage.competition.name}`,
         type: ExamType.TRYOUT,
         startDate: new Date("2026-09-06"),
         endDate: new Date("2026-09-06"),
+        duration:120
       },
       {
         title: `Penyisihan ${stage.competition.name}`,
         type: ExamType.OLYMPIAD,
         startDate: new Date("2026-09-12"),
         endDate: new Date("2026-09-12"),
+        duration:120
       },
     ]
 

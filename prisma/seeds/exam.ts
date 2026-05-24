@@ -35,21 +35,21 @@ export async function seedExam() {
         type: ExamType.TRYOUT,
         startDate: addDays(today, 0),
         endDate: addDays(today, 1),
-        duration: 60,
+        duration: 120,
       },
       {
         title: `Tryout 2 ${stage.competition.name}`,
         type: ExamType.TRYOUT,
         startDate: addDays(today, 0),
         endDate: addDays(today, 1),
-        duration: 60,
+        duration: 120,
       },
       {
         title: `Penyisihan ${stage.competition.name}`,
         type: ExamType.OLYMPIAD,
         startDate: addDays(today, 0),
         endDate: addDays(today, 1),
-        duration: 90,
+        duration: 120,
       },
     ]
 
