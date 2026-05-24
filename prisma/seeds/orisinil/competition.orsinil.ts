@@ -1,12 +1,11 @@
-import { prisma } from "~/lib/utils/prisma";
+import { prisma } from "~/lib/utils/prisma"
 
 export async function seedCompetitionOrsinil() {
   const competitionConfig = {
     OLIMPIADE: [90000, 120000, 150000],
     INFOGRAFIS: [60000, 75000, 90000],
     LKTI: [125000, 150000],
-  } as const;
-
+  } as const
 
   const olimpiadeModules = [
     "https://drive.google.com/drive/folders/1xeZjjKWAJrmDzA7b4J5nirM2agHWcYAu",
@@ -20,22 +19,22 @@ export async function seedCompetitionOrsinil() {
       batches: [
         {
           name: "Batch 1",
-          startDate: new Date("2026-05-25"),
-          endDate: new Date("2026-06-24"),
+          startDate: new Date(2026, 4, 25, 0, 0, 0),
+          endDate: new Date(2026, 5, 24, 23, 59, 59),
           price: competitionConfig.OLIMPIADE[0],
           module_bacth: olimpiadeModules[0],
         },
         {
           name: "Batch 2",
-          startDate: new Date("2026-07-01"),
-          endDate: new Date("2026-07-31"),
+          startDate: new Date(2026, 6, 1, 0, 0, 0),
+          endDate: new Date(2026, 6, 31, 23, 59, 59),
           price: competitionConfig.OLIMPIADE[1],
           module_bacth: olimpiadeModules[1],
         },
         {
           name: "Batch 3",
-          startDate: new Date("2026-08-03"),
-          endDate: new Date("2026-09-04"),
+          startDate: new Date(2026, 7, 3, 0, 0, 0),
+          endDate: new Date(2026, 8, 4, 23, 59, 59),
           price: competitionConfig.OLIMPIADE[2],
           module_bacth: olimpiadeModules[2],
         },
@@ -46,15 +45,15 @@ export async function seedCompetitionOrsinil() {
       batches: [
         {
           name: "Batch 1 (Full Paper)",
-          startDate: new Date("2026-07-16"),
-          endDate: new Date("2026-07-31"),
+          startDate: new Date(2026, 6, 16, 0, 0, 0),
+          endDate: new Date(2026, 6, 31, 23, 59, 59),
           price: competitionConfig.LKTI[0],
           module_bacth: "",
         },
         {
           name: "Batch 2 (Full Paper)",
-          startDate: new Date("2026-08-03"),
-          endDate: new Date("2026-09-04"),
+          startDate: new Date(2026, 7, 3, 0, 0, 0),
+          endDate: new Date(2026, 8, 4, 23, 59, 59),
           price: competitionConfig.LKTI[1],
           module_bacth: "",
         },
@@ -65,35 +64,39 @@ export async function seedCompetitionOrsinil() {
       batches: [
         {
           name: "Batch 1",
-          startDate: new Date("2026-05-25"),
-          endDate: new Date("2026-06-24"),
+          startDate: new Date(2026, 4, 25, 0, 0, 0),
+          endDate: new Date(2026, 5, 24, 23, 59, 59),
           price: competitionConfig.INFOGRAFIS[0],
           module_bacth: "",
         },
         {
           name: "Batch 2",
-          startDate: new Date("2026-07-01"),
-          endDate: new Date("2026-07-31"),
+          startDate: new Date(2026, 6, 1, 0, 0, 0),
+          endDate: new Date(2026, 6, 31, 23, 59, 59),
           price: competitionConfig.INFOGRAFIS[1],
           module_bacth: "",
         },
         {
           name: "Batch 3",
-          startDate: new Date("2026-08-03"),
-          endDate: new Date("2026-09-04"),
+          startDate: new Date(2026, 7, 3, 0, 0, 0),
+          endDate: new Date(2026, 8, 4, 23, 59, 59),
           price: competitionConfig.INFOGRAFIS[2],
           module_bacth: "",
         },
       ],
     },
-  ];
+  ]
 
   for (const comp of competitions) {
     const competition = await prisma.competition.upsert({
-      where: { name: comp.name },
+      where: {
+        name: comp.name,
+      },
       update: {},
-      create: { name: comp.name },
-    });
+      create: {
+        name: comp.name,
+      },
+    })
 
     for (const batch of comp.batches) {
       await prisma.batch.upsert({
@@ -117,9 +120,9 @@ export async function seedCompetitionOrsinil() {
           module_bacth: batch.module_bacth,
           competitionId: competition.id,
         },
-      });
+      })
     }
   }
 
-  console.log("✅ Competition + Batch seeded with real timeline");
+  console.log("✅ Competition + Batch seeded with real timeline")
 }

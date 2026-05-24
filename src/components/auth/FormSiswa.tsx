@@ -175,6 +175,7 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
       const comp =
         res.data ?? null
 
+
       setCompetition(comp)
 
       if (!comp) {
@@ -213,6 +214,8 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
 
   const activeBatch =
     competition?.batches?.[0]
+
+    console.log(competition)
 
   const onSubmit = (
     data: CreateCompetitionRegistrationData
@@ -253,6 +256,9 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
     mutation.isPending ||
     uploading
 
+  
+    console.log(activeBatch)
+
   return (
     <Card className="rounded-md shadow-xl">
       <CardHeader>
@@ -290,11 +296,11 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
             className="rounded-xl"
             onClick={() =>
               navigate({
-                to: '/dashboard/team',
+                to: '/',
               })
             }
           >
-            Kembali ke Dashboard
+            Kembali ke Home
           </Button>
         </div>
       </CardContent>
