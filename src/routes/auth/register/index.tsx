@@ -10,9 +10,9 @@ export const Route = createFileRoute('/auth/register/')({
 function RouteComponent() {
   const TARGET_DATE = new Date('2026-05-25T00:00:00')
   const isPast = TARGET_DATE.getTime() <= Date.now()
-  if (!isPast) {
-     return <CountdownWaiting />
-  }
+  // if (!isPast) {
+  //    return <CountdownWaiting />
+  // }
   return (
     <div className="min-h-screen w-full flex">
       <div className="hidden lg:flex flex-1 items-center justify-center bg-muted/30 border-r border-border px-8 py-12">

@@ -17,7 +17,7 @@ interface GenerateInvoiceOptions {
   price: number
   batchName?: string
   approvedAt?: Date | string
-  code:string
+  code: string
 }
 
 const COMPETITION_LABELS: Record<CompetitionType, string> = {
@@ -52,6 +52,22 @@ function wrapText(doc: any, text: string, maxWidth: number): string[] {
   return doc.splitTextToSize(text, maxWidth)
 }
 
+async function loadImageAsBase64(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return null
+    const blob = await res.blob()
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = () => reject(null)
+      reader.readAsDataURL(blob)
+    })
+  } catch {
+    return null
+  }
+}
+
 export async function downloadInvoiceHtml(options: GenerateInvoiceOptions): Promise<void> {
   const { jsPDF } = await import('jspdf')
 
@@ -64,9 +80,19 @@ export async function downloadInvoiceHtml(options: GenerateInvoiceOptions): Prom
   const dateStr = formatDate(options.approvedAt ?? new Date())
   const message = SUCCESS_MESSAGES[options.competitionType]
 
+  const logoBase64 = await loadImageAsBase64('https://www.bmec2026.com/logo.png')
+
   let y = MARGIN
 
-  const drawRect = (x: number, ry: number, w: number, h: number, r: number, fillColor: string, strokeColor?: string) => {
+  const drawRect = (
+    x: number,
+    ry: number,
+    w: number,
+    h: number,
+    r: number,
+    fillColor: string,
+    strokeColor?: string,
+  ) => {
     doc.setFillColor(...hex(fillColor))
     if (strokeColor) {
       doc.setDrawColor(...hex(strokeColor))
@@ -77,108 +103,147 @@ export async function downloadInvoiceHtml(options: GenerateInvoiceOptions): Prom
     }
   }
 
-  const text = (str: string, x: number, ty: number, size: number, color: string, style: 'normal' | 'bold' = 'normal', align: 'left' | 'center' | 'right' = 'left') => {
+  const text = (
+    str: string,
+    x: number,
+    ty: number,
+    size: number,
+    color: string,
+    style: 'normal' | 'bold' = 'normal',
+    align: 'left' | 'center' | 'right' = 'left',
+  ) => {
     doc.setFontSize(size)
     doc.setTextColor(...hex(color))
     doc.setFont('helvetica', style)
     doc.text(str, x, ty, { align })
   }
 
-  const label2 = (str: string, x: number, ty: number) => text(str, x, ty, 7, '#94a3b8', 'bold')
-  const value = (str: string, x: number, ty: number) => text(str, x, ty, 9.5, '#111827', 'bold')
+  const sectionLabel = (str: string, x: number, ty: number) =>
+    text(str, x, ty, 7, '#94a3b8', 'bold')
 
-  drawRect(MARGIN, y, CONTENT_W, 22, 4, '#fafafa', '#e2e8f0')
+  const fieldLabel = (str: string, x: number, ty: number) =>
+    text(str, x, ty, 6.5, '#94a3b8', 'bold')
 
-  text('BMEC 2026', MARGIN + 8, y + 8, 13, '#111827', 'bold')
-  text(`Invoice ${label}`, MARGIN + 8, y + 14, 8.5, '#6b7280')
+  const fieldValue = (str: string, x: number, ty: number) =>
+    text(str, x, ty, 9.5, '#111827', 'bold')
 
-  drawRect(PAGE_W - MARGIN - 28, y + 5, 26, 8, 4, '#f0fdf4', '#86efac')
-  text('✓ LUNAS', PAGE_W - MARGIN - 15, y + 10.5, 7.5, '#16a34a', 'bold', 'center')
+  const HEADER_H = 24
+  drawRect(MARGIN, y, CONTENT_W, HEADER_H, 4, '#fafafa', '#e2e8f0')
 
-  y += 28
+  const LOGO_SIZE = 12
+  const logoX = MARGIN + 6
+  const logoY = y + (HEADER_H - LOGO_SIZE) / 2
 
-  text('INFORMASI INVOICE', MARGIN, y, 7, '#94a3b8', 'bold')
-  y += 5
+  if (logoBase64) {
+    const formatMatch = logoBase64.match(/^data:image\/(\w+);/)
+    const imgFormat = formatMatch ? formatMatch[1].toUpperCase() : 'PNG'
+    doc.addImage(logoBase64, imgFormat, logoX, logoY, LOGO_SIZE, LOGO_SIZE)
+  } else {
+    drawRect(logoX, logoY, LOGO_SIZE, LOGO_SIZE, 2, '#e2e8f0')
+  }
+
+  const textX = MARGIN + 6 + LOGO_SIZE + 5
+  text('BMEC 2026', textX, y + 10, 13, '#111827', 'bold')
+  text(`Invoice ${label}`, textX, y + 16, 8.5, '#6b7280')
+
+  text('LUNAS', PAGE_W - MARGIN - 2, y + HEADER_H / 2 + 2.5, 7, '#16a34a', 'bold', 'right')
+
+  y += HEADER_H + 8
+
+  sectionLabel('INFORMASI INVOICE', MARGIN, y)
+  y += 6
 
   const colW = CONTENT_W / 3
-  const infoItems: [string, string][] = [
+  const infoRow1: [string, string][] = [
     ['No. Invoice', invoiceNo],
     ['No. Peserta', participantNo],
     ['Tanggal', dateStr],
+  ]
+  const infoRow2: [string, string][] = [
     ['Nama Tim', options.teamName],
     [institutionLabel, options.schoolOrUniversity],
   ]
 
-  const row1 = infoItems.slice(0, 3)
-  const row2 = infoItems.slice(3)
-
-  row1.forEach(([lbl, val], i) => {
+  infoRow1.forEach(([lbl, val], i) => {
     const x = MARGIN + i * colW
-    label2(lbl, x, y)
-    value(val, x, y + 5)
+    fieldLabel(lbl, x, y)
+    fieldValue(val, x, y + 5.5)
   })
-  y += 13
+  y += 14
 
-  row2.forEach(([lbl, val], i) => {
-    const x = MARGIN + i * colW * (i === 1 ? 1 : 0)
-    label2(lbl, MARGIN + i * colW, y)
-    const wrapped = wrapText(doc, val, i === 1 ? colW * 2 - 4 : colW - 4)
+  infoRow2.forEach(([lbl, val], i) => {
+    const x = MARGIN + i * colW
+    fieldLabel(lbl, x, y)
+    const maxW = i === 1 ? colW * 2 - 4 : colW - 4
+    const wrapped = wrapText(doc, val, maxW)
     doc.setFontSize(9.5)
     doc.setTextColor(...hex('#111827'))
     doc.setFont('helvetica', 'bold')
-    doc.text(wrapped, MARGIN + i * colW, y + 5)
+    doc.text(wrapped, x, y + 5.5)
   })
   y += 14
 
   doc.setDrawColor(...hex('#f1f5f9'))
   doc.setLineWidth(0.3)
   doc.line(MARGIN, y, MARGIN + CONTENT_W, y)
-  y += 6
+  y += 7
 
-  text('ANGGOTA TIM', MARGIN, y, 7, '#94a3b8', 'bold')
+  sectionLabel('ANGGOTA TIM', MARGIN, y)
   y += 5
 
-  drawRect(MARGIN, y, CONTENT_W, 7, 2, '#f8fafc', '#e2e8f0')
-  text('Nama', MARGIN + 4, y + 4.5, 7, '#94a3b8', 'bold')
-  text('Peran', MARGIN + CONTENT_W - 4, y + 4.5, 7, '#94a3b8', 'bold', 'right')
-  y += 7
+  const ROW_H = 7
+  drawRect(MARGIN, y, CONTENT_W, ROW_H, 2, '#f8fafc', '#e2e8f0')
+  fieldLabel('NAMA', MARGIN + 4, y + 4.8)
+  doc.setFontSize(6.5)
+  doc.setTextColor(...hex('#94a3b8'))
+  doc.setFont('helvetica', 'bold')
+  doc.text('PERAN', MARGIN + CONTENT_W - 4, y + 4.8, { align: 'right' })
+  y += ROW_H
 
   options.members.forEach((m, i) => {
     const bg = i % 2 === 0 ? '#ffffff' : '#fafafa'
-    drawRect(MARGIN, y, CONTENT_W, 7, 0, bg)
+    drawRect(MARGIN, y, CONTENT_W, ROW_H, 0, bg)
     doc.setDrawColor(...hex('#f1f5f9'))
     doc.setLineWidth(0.2)
-    doc.line(MARGIN, y + 7, MARGIN + CONTENT_W, y + 7)
+    doc.line(MARGIN, y + ROW_H, MARGIN + CONTENT_W, y + ROW_H)
     text(m.name, MARGIN + 4, y + 4.8, 8.5, '#111827', 'bold')
     text(m.role.toLowerCase(), MARGIN + CONTENT_W - 4, y + 4.8, 8, '#6b7280', 'normal', 'right')
-    y += 7
+    y += ROW_H
   })
 
-  y += 4
+  y += 5
   doc.setDrawColor(...hex('#f1f5f9'))
   doc.line(MARGIN, y, MARGIN + CONTENT_W, y)
-  y += 6
+  y += 7
 
-  drawRect(MARGIN, y, CONTENT_W, 16, 4, '#f0fdf4', '#86efac')
-  text('Total Pembayaran', MARGIN + 5, y + 5.5, 7, '#6b7280')
-  text(`HTM ${label} BMEC 2026`, MARGIN + 5, y + 11, 8.5, '#374151', 'normal')
-  text(formatRupiah(options.price), MARGIN + CONTENT_W - 5, y + 9.5, 14, '#16a34a', 'bold', 'right')
-  y += 22
+  drawRect(MARGIN, y, CONTENT_W, 18, 4, '#f0fdf4', '#86efac')
+  text('Total Pembayaran', MARGIN + 6, y + 6, 7, '#6b7280')
+  text(`HTM ${label} BMEC 2026`, MARGIN + 6, y + 12, 8.5, '#374151')
+  text(formatRupiah(options.price), MARGIN + CONTENT_W - 6, y + 11, 14, '#16a34a', 'bold', 'right')
+  y += 24
 
-  const msgLines = wrapText(doc, message, CONTENT_W - 10)
-  const msgH = msgLines.length * 4.5 + 10
+  const msgLines = wrapText(doc, message, CONTENT_W - 12)
+  const msgH = msgLines.length * 4.8 + 12
   drawRect(MARGIN, y, CONTENT_W, msgH, 4, '#f8fafc', '#e2e8f0')
   doc.setFontSize(8)
   doc.setTextColor(...hex('#475569'))
   doc.setFont('helvetica', 'normal')
-  doc.text(msgLines, MARGIN + 5, y + 7)
-  y += msgH + 6
+  doc.text(msgLines, MARGIN + 6, y + 8)
+  y += msgH + 8
 
   doc.setDrawColor(...hex('#f1f5f9'))
   doc.line(MARGIN, y, MARGIN + CONTENT_W, y)
   y += 6
 
-  text('BMEC 2026 — Biomedical Engineering Competition • Universitas Airlangga', PAGE_W / 2, y, 7, '#94a3b8', 'normal', 'center')
+  text(
+    'BMEC 2026 — Biomedical Engineering Competition • Universitas Airlangga',
+    PAGE_W / 2,
+    y,
+    7,
+    '#94a3b8',
+    'normal',
+    'center',
+  )
 
   const filename = `invoice-${options.competitionType.toLowerCase()}-${options.teamName.replace(/\s+/g, '-')}.pdf`
   doc.save(filename)
