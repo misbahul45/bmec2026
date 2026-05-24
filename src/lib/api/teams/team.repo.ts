@@ -139,11 +139,63 @@ export default class TeamRepo {
       },
     })
   }
+  async delete(id: string) {
+    return prisma.$transaction(async (tx) => {
+      await tx.registration.deleteMany({
+        where: {
+          teamId: id,
+        },
+      })
 
-  delete(id: string) {
-    return prisma.team.delete({ where: { id } })
+      await tx.examAnswer.deleteMany({
+        where: {
+          attempt: {
+            teamId: id,
+          },
+        },
+      })
+
+      await tx.examEventLog.deleteMany({
+        where: {
+          attempt: {
+            teamId: id,
+          },
+        },
+      })
+
+      await tx.examAttempt.deleteMany({
+        where: {
+          teamId: id,
+        },
+      })
+
+      await tx.submission.deleteMany({
+        where: {
+          teamId: id,
+        },
+      })
+
+      await tx.member.deleteMany({
+        where: {
+          teamId: id,
+        },
+      })
+
+      await tx.mentor.deleteMany({
+        where: {
+          teamId: id,
+        },
+      })
+
+      await tx.team.delete({
+        where: {
+          id,
+        },
+      })
+
+      return null
+    })
   }
-
   update(id: string, data: Prisma.TeamUpdateInput) {
     return prisma.team.update({
       where: { id },
