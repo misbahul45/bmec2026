@@ -1,6 +1,6 @@
 import { prisma } from "~/lib/utils/prisma";
 
-export async function seedCompetition() {
+export async function seedCompetitionOrsinil() {
   const competitionConfig = {
     OLIMPIADE: [90000, 120000, 150000],
     INFOGRAFIS: [60000, 75000, 90000],

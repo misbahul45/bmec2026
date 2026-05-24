@@ -263,15 +263,43 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
               batch={activeBatch}
             />
           )}
-
-        {loadError && (
-          <p className="text-sm text-destructive text-center">
-            {loadError}
-          </p>
-        )}
       </CardHeader>
+      
+      {
+        !activeBatch?
+        <CardContent>
+        <div className="rounded-2xl border border-dashed p-6 text-center space-y-3">
+          <h3 className="text-base font-semibold">
+            Batch belum tersedia saat ini
+          </h3>
 
-      <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Silakan login ulang atau coba kembali nanti ketika batch
+            pendaftaran sudah tersedia.
+          </p>
+
+          {loadError && (
+            <p className="text-xs text-destructive">
+              {loadError}
+            </p>
+          )}
+
+          <Button
+            type="button"
+            variant="outline"
+            className="rounded-xl"
+            onClick={() =>
+              navigate({
+                to: '/dashboard/team',
+              })
+            }
+          >
+            Kembali ke Dashboard
+          </Button>
+        </div>
+      </CardContent>
+        :
+        <CardContent>
         <form
           onSubmit={form.handleSubmit(
             onSubmit,
@@ -411,6 +439,7 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
           </FieldGroup>
         </form>
       </CardContent>
+      }
     </Card>
   )
 }

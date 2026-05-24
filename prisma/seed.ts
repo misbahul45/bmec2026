@@ -1,16 +1,14 @@
 import { prisma } from "~/lib/utils/prisma";
-import { seedCompetition } from "./seeds/competition";
 import { seedAdmin } from "./seeds/admin";
 import { seedStage } from "./seeds/stage";
-import { seedExam } from "./seeds/exam";
-import { seedExamQuestions } from "./seeds/exam-questions";
+import { seedCompetitionOrsinil } from "./seeds/orisinil/competition.orsinil";
+import { seedExamOrsinil } from "./seeds/orisinil/exam.orsinil";
 
 const seeds = [
-  seedCompetition,
+  seedCompetitionOrsinil,
   seedStage,
   seedAdmin,
-  seedExam,
-  seedExamQuestions,
+  seedExamOrsinil,
 ]
 
 async function main() {

@@ -114,7 +114,7 @@ export const fetchUser = createServerFn({ method: "GET" })
         redirect = "/dashboard/team"
       }
     } else if (!registration) {
-      redirect = `/auth/register/${team.id}/?tab=dokumen`
+      redirect = `/auth/register/${team.id}/completed`
     } else {
       redirect = "/dashboard/team"
     }

@@ -128,11 +128,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="bg-background">
-        {!isAuthPage && !isExamPage && <Header />}
+        {!isExamPage && <Header />}
 
         {children}
 
-        {!isAuthPage && !isExamPage && <Footer />}
+        {!isExamPage && <Footer />}
         <Toaster
           position="top-right"
           richColors
