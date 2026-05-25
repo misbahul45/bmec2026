@@ -6,42 +6,42 @@ export interface GalleryItem {
 export const bmecGallery: GalleryItem[] = [
   {
     id: "opening",
-    image: "/images/gallery/1.jpeg",
+    image: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwQZsFeXgyM5fmdCKhboA9iYaXB7kIL3gp8VWG",
   },
   {
     id: "olimpiade",
-    image: "/images/gallery/2.jpeg",
+    image: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwiQ4UKR56fSQRepsgoGqtPk29h4XUJAxEY15y",
   },
   {
     id: "lkti",
-    image: "/images/gallery/3.jpeg",
+    image: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vw0v2qYJIv1CYzLNqBEfMhnSRWZQmHXkxOl5ey",
   },
   {
     id: "infografis",
-    image: "/images/gallery/4.jpeg",
+    image: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwxjRt4A2CNrVcOFQXULmnqbYu3PZDsBlCwxf7",
   },
   {
     id: "webinar",
-    image: "/images/gallery/5.jpeg",
+    image: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwQ7AnRngyM5fmdCKhboA9iYaXB7kIL3gp8VWG",
   },
   {
     id: "tryout",
-    image: "/images/gallery/6.jpeg",
+    image: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vw99vvpEAMJsfcyitZ3x0ouB5Oq8T7zaHGY6FI",
   },
   {
     id: "final",
-    image: "/images/gallery/7.jpeg",
+    image: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwaXSj1EfCBgPwEfd5ZA8yKMpl9z4YvRSaqLso",
   },
   {
     id: "awarding",
-    image: "/images/gallery/8.jpeg",
+    image: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwyGlPwhvkvbFSpO0iohutgwcGl256xqIT4DUX",
   },
   {
     id: "networking",
-    image: "/images/gallery/9.jpeg",
+    image: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwa5jVMYfCBgPwEfd5ZA8yKMpl9z4YvRSaqLso",
   },
   {
     id: "closing",
-    image: "/images/gallery/10.jpeg",
+    image: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwhsmpXOZauBKi0FzCW4LGnbxj59MrXwfDJTdY",
   },
 ]

@@ -97,7 +97,7 @@ const HeroSection = () => {
       <div ref={wrapperRef} className="absolute inset-0">
         <Image
           alt="hero bg"
-          src="/images/app/hero.png"
+          src="https://xltn7i57i8.ufs.sh/f/KPvneZksE9vw8NNnUWMxamD65zudQYUSvqLGclo1tHA4rieO"
           layout="fullWidth"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -149,7 +149,7 @@ const HeroSection = () => {
       <div ref={maskotLeftRef} className="absolute bottom-[12%] left-[5%]">
         <Image
           alt="maskot"
-          src="/images/app/maskot.png"
+          src="https://xltn7i57i8.ufs.sh/f/KPvneZksE9vw2YdVGXBwB7qDuh5MX4HpE3CO9JiyvkQKaTPe"
           layout="fullWidth"
           className="w-full max-w-40 sm:max-w-28 lg:max-w-40 drop-shadow-2xl"
         />
@@ -158,7 +158,7 @@ const HeroSection = () => {
       <div ref={maskotRightRef} className="absolute top-[10%] right-[5%]">
         <Image
           alt="maskot"
-          src="/images/app/maskot.png"
+          src="https://xltn7i57i8.ufs.sh/f/KPvneZksE9vw2YdVGXBwB7qDuh5MX4HpE3CO9JiyvkQKaTPe"
           layout="fullWidth"
           className="w-full max-w-40 sm:max-w-28 lg:max-w-40 drop-shadow-2xl"
         />

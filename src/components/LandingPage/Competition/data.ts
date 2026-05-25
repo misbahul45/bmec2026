@@ -13,7 +13,7 @@ export const competitions = [
     id: 'olimpiade',
     title: 'Olimpiade',
     desc: 'Lomba Olimpiade BMEC 2026 ini merupakan kompetisi yang ditujukan bagi siswa/siswi SMA sederajat di seluruh Indonesia. Kompetisi ini dirancang untuk menguji dan mengasah pemahaman peserta dalam Ilmu Pengetahuan Alam serta dasar-dasar Teknik Biomedis.',
-    image:'/images/detail/3.jpeg',
+    image:'https://xltn7i57i8.ufs.sh/f/KPvneZksE9vw9a4jOiAMJsfcyitZ3x0ouB5Oq8T7zaHGY6FI',
     accent: 'primary',
     Icon: FlaskConical,
     registerFees: [
@@ -45,7 +45,7 @@ export const competitions = [
     id: 'lkti',
     title: 'LKTI',
     desc: 'Lomba LKTI BMEC 2026 merupakan ajang bagi mahasiswa untuk mengembangkan gagasan ilmiah yang solutif dan inovatif di bidang Teknik Biomedis. Tahapannya meliputi seleksi abstrak, full paper, hingga final dengan penilaian pada kualitas penyajian argumen, validitas data, dan prototipe yg ditawarkan.',
-    image:'/images/detail/1.jpeg',
+    image:'https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwKS0480ksE9vwf3YCnRM7S8FT6ZadrIztbkDU',
     accent: 'secondary',
     Icon: FileText,
     registerFees: [
@@ -81,7 +81,7 @@ export const competitions = [
     id: 'infografis',
     title: 'Infografis',
     desc: 'Lomba Infografis BMEC 2026 adalah kompetisi bagi siswa/siswi SMA sederajat di seluruh Indonesia untuk menyajikan ide inovasi di bidang Teknik Biomedis melalui visual yang menarik dan komunikatif, dengan fokus pada teknologi kesehatan terkini. Terdiri dari seleksi online dan final offline berupa presentasi filosofi & gagasan ide.',
-    image:'/images/detail/2.jpeg',
+    image:'https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwChs5vvNQqSI5PrhU89ceMmoyp0nxDTFak27b',
     accent: 'accent',
     Icon: BarChart3,
     registerFees: [

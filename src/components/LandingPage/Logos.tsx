@@ -6,10 +6,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(ScrollTrigger)
 
 const images = [
-  '/images/logos/unair.png',
-  '/images/logos/hmtb.png',
-  '/images/logos/Metamorfosa.png',
-  '/images/logos/bmec.png',
+  'https://xltn7i57i8.ufs.sh/f/KPvneZksE9vw0Y2yncIv1CYzLNqBEfMhnSRWZQmHXkxOl5ey',
+  'https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwFaBvdVHCQYUyF1uf4g2lLjXqDv3nH9ksIEpa',
+  'https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwS2c9P4Q46NZ8YrcKfMCWGkLQiapxAhlqjm1d',
+  'https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwAzQ6oM2gEIYKarU9Zpcbw8HoeFhLn5SG4XiP',
 ]
 
 const Logos = () => {

@@ -10,7 +10,7 @@ export const NAV_ITEMS = [
 
 export const ABOUT_IMAGES =  [
     {
-      src: "/images/about/a-1.jpeg",
+      src: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwwust5PbXK06jdSMipmk3tVOgQzBx9yP2TuEh",
       size: 120,
       style: {
         top: "50%",
@@ -19,7 +19,7 @@ export const ABOUT_IMAGES =  [
       },
     },
     {
-      src: "/images/about/a-2.jpeg",
+      src: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwAytrtp72gEIYKarU9Zpcbw8HoeFhLn5SG4Xi",
       size: 120,
       style: {
         top: "50%",
@@ -28,7 +28,7 @@ export const ABOUT_IMAGES =  [
       },
     },
     {
-      src: "/images/about/a-3.jpeg",
+      src: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vw8sQYX6xamD65zudQYUSvqLGclo1tHA4rieOT",
       size: 140,
       style: {
         top: "50%",
@@ -37,7 +37,7 @@ export const ABOUT_IMAGES =  [
       },
     },
     {
-      src: "/images/about/a-4.jpeg",
+      src: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwhkCuiTZauBKi0FzCW4LGnbxj59MrXwfDJTdY",
       size: 120,
       style: {
         top: "50%",
@@ -55,7 +55,7 @@ export const ABOUT_IMAGES =  [
     title: "Olimpiade Teknik Biomedis",
     description:
       "Uji kemampuan Matematika, Fisika, Kimia, Biologi, dan Teknik Biomedis dasar dengan soal bertingkat dan tryout eksklusif.",
-    img: "/images/detail/3.jpeg",
+    img: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vw9a4jOiAMJsfcyitZ3x0ouB5Oq8T7zaHGY6FI",
     accent: "primary" as const,
     className: "rounded-xl overflow-hidden bg-card border border-border shadow-sm"
   },
@@ -64,7 +64,7 @@ export const ABOUT_IMAGES =  [
     title: "Lomba Karya Tulis Ilmiah",
     description:
       "Tuangkan ide inovatif Teknik Biomedis berbasis keberlanjutan dan presentasikan karya terbaikmu di babak final.",
-    img: "/images/detail/1.jpeg",
+    img: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwKS0480ksE9vwf3YCnRM7S8FT6ZadrIztbkDU",
     accent: "secondary" as const,
     className: "rounded-xl overflow-hidden bg-card border border-border shadow-sm"
   },
@@ -73,7 +73,7 @@ export const ABOUT_IMAGES =  [
     title: "Lomba Infografis Biomedis",
     description:
       "Kembangkan kreativitasmu dalam menyampaikan informasi Teknik Biomedis melalui desain infografis yang inovatif.",
-    img: "/images/detail/2.jpeg",
+    img: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwChs5vvNQqSI5PrhU89ceMmoyp0nxDTFak27b",
     accent: "accent" as const,
     className: "rounded-xl overflow-hidden bg-card border border-border shadow-sm"
   }
