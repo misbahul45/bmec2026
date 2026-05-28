@@ -113,6 +113,8 @@ export const fetchUser = createServerFn({ method: "GET" })
       } else {
         redirect = "/dashboard/team"
       }
+    }else if(!team.documentUrl || !team.twibbonUrl){
+      redirect = `/auth/register/${team.id}/?tab=dokumen`
     } else if (!registration) {
       redirect = `/auth/register/${team.id}/completed`
     } else {
