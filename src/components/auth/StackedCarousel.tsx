@@ -44,6 +44,7 @@ export function StackedCarousel() {
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
+        
       </div>
     </div>
   )
