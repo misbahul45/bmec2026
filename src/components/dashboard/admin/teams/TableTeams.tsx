@@ -231,7 +231,7 @@ const TableTeams = ({ teams, meta, queryKey }: Props) => {
                   Twibbon
                 </TableHead>
                 <TableHead className="text-center text-[11px] font-semibold w-24">
-                  Tgl Daftar
+                  Tgl Pendaftaran
                 </TableHead>
                 <TableHead className="text-center text-[11px] font-semibold w-16">Aksi</TableHead>
               </TableRow>
@@ -406,11 +406,15 @@ const TableTeams = ({ teams, meta, queryKey }: Props) => {
                     </TableCell>
 
                     <TableCell className="text-center tabular-nums text-muted-foreground text-[11px]">
-                      {new Date(team.createdAt).toLocaleDateString('id-ID', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: '2-digit',
-                      })}
+                      {team.registration?.createdAt ? (
+                        new Date(team.registration.createdAt).toLocaleDateString('id-ID', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: '2-digit',
+                        })
+                      ) : (
+                        <span className="text-[10px] text-muted-foreground">—</span>
+                      )}
                     </TableCell>
 
                     <TableCell className="text-right">
