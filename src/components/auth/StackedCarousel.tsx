@@ -31,6 +31,7 @@ export function StackedCarousel() {
             />
           </div>
         ))}
+        
       </div>
 
       <div className="flex gap-2">
@@ -44,7 +45,7 @@ export function StackedCarousel() {
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
-        
+
       </div>
     </div>
   )
