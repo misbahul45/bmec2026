@@ -174,7 +174,7 @@ const TableTeams = ({ teams, meta, queryKey }: Props) => {
           'Alamat Sekolah / Universitas': team.schoolAddress,
           Stage: team.currentStage?.name ?? '—',
           'Status Registrasi': registration?.status ?? 'BELUM_DAFTAR',
-          'Tanggal Daftar': new Date(registration?.createdAt ?? team.createdAt).toLocaleString('id-ID'),
+          'Tanggal Pendaftaran': new Date(registration?.createdAt ?? team.createdAt).toLocaleString('id-ID'),
           'Twibbon URL': team.twibbonUrl ?? '—',
           'Dokumen URL': team.documentUrl ?? '—',
           'Bukti Pembayaran': registration?.paymentProof ?? '—',
