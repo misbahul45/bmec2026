@@ -42,7 +42,10 @@ export const registerSchema = z
       institution.includes('universitas') ||
       institution.includes('univ') ||
       institution.includes('politeknik') ||
-      institution.includes('kampus')
+      institution.includes('kampus') || 
+      institution.includes('akademi') ||
+      institution.includes('institute') ||
+      institution.includes('institusi')
 
     const isSchool =
       institution.includes('sma') ||
