@@ -6,7 +6,7 @@ import { CreateMemberData } from "~/schemas/team.member.schema"
 import { CompetitionType, Prisma } from "@prisma/client"
 import * as bcrypt from "bcrypt"
 import TeamRepo from "./team.repo"
-import { QueryTeam } from "~/schemas/team.schema"
+import { QueryTeam, UpdateTeamData } from "~/schemas/team.schema"
 import { prisma } from "~/lib/utils/prisma"
 import { CreateMentorInput } from "~/schemas/team.mentor.schema"
 
@@ -194,7 +194,7 @@ export default class TeamService {
 
   async update(
     id: string,
-    payload: Partial<RegisterFormData>
+    payload: UpdateTeamData
   ): Promise<ServiceResponse<any>> {
     const team = await this.repo.findById(id)
 
@@ -206,13 +206,15 @@ export default class TeamService {
       payload.password=bcrypt.hashSync(payload.password,10)
     }
     const updated = await this.repo.update(id, {
-      ...(payload.teamName && { name: payload.teamName }),
-      ...(payload.institution && { schoolName: payload.institution }),
-      ...(payload.address && { schoolAddress: payload.address }),
-      ...(payload.competitionType && { competitionType: payload.competitionType }),
+      ...('name' in payload && { name: payload.name }),
+      ...('email' in payload && { email: payload.email }),
+      ...('phone' in payload && { phone: payload.phone }),
+      ...('schoolName' in payload && { schoolName: payload.schoolName }),
+      ...('schoolAddress' in payload && { schoolAddress: payload.schoolAddress }),
+      ...('competitionType' in payload && { competitionType: payload.competitionType }),
       ...('documentUrl' in payload && { documentUrl: payload.documentUrl as string | null }),
       ...('twibbonUrl' in payload && { twibbonUrl: payload.twibbonUrl as string | null }),
-      ...('password' in payload && {password:payload.password})
+      ...('password' in payload && payload.password && {password:payload.password})
     })
 
     return {

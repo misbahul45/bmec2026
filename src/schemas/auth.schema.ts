@@ -45,7 +45,7 @@ export const registerSchema = z
       institution.includes('kampus') || 
       institution.includes('akademi') ||
       institution.includes('institute') ||
-      institution.includes('institusi')
+      institution.includes('instit')
 
     const isSchool =
       institution.includes('sma') ||

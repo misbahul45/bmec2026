@@ -43,20 +43,20 @@ export const updateTeamSchema = z.object({
     .min(5, "Alamat sekolah wajib diisi")
     .optional(),
 
-  documentUrl: z
-    .string()
-    .url("URL dokumen tidak valid")
-    .nullable()
-    .optional(),
-  twibbonUrl: z
-    .string()
-    .url("URL twibbon tidak valid")
-    .nullable()
-    .optional(),
+  documentUrl: z.union([
+    z.literal("").transform(() => null),
+    z.string().url("URL dokumen tidak valid").nullable().optional(),
+  ]),
+  twibbonUrl: z.union([
+    z.literal("").transform(() => null),
+    z.string().url("URL twibbon tidak valid").nullable().optional(),
+  ]),
   competitionType: z
     .nativeEnum(CompetitionType)
     .optional(),
 })
+
+export type UpdateTeamData = z.infer<typeof updateTeamSchema>
 
 
 export const teamsSearchParams = {
