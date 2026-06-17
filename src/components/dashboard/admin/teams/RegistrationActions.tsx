@@ -22,9 +22,10 @@ export function RegistrationActions({ teamId, adminId, teamName, paymentProof, s
 
   const refreshTeams = async () => {
     await qc.invalidateQueries({ queryKey, exact: true })
-    await qc.invalidateQueries({ queryKey: ['teams', teamId] })
-    await qc.invalidateQueries({ queryKey: ['dashboard-summary'] })
     await qc.refetchQueries({ queryKey, exact: true })
+    await qc.invalidateQueries({ queryKey: ['teams', teamId] })
+    await qc.invalidateQueries({ queryKey: ['teams'] })
+    await qc.invalidateQueries({ queryKey: ['dashboard-summary'] })
   }
 
   const approveMutation = useMutation({
@@ -33,7 +34,7 @@ export function RegistrationActions({ teamId, adminId, teamName, paymentProof, s
       toast.success(`Registrasi ${teamName} disetujui`)
       await refreshTeams()
     },
-    onError: (e: any) => toast.error(e?.message ?? 'Gagal menyetujui'),
+    onError: (e: any) => toast.error(e?.message ?? 'Gagal menyetujui registrasi'),
   })
 
   const rejectMutation = useMutation({
@@ -42,7 +43,7 @@ export function RegistrationActions({ teamId, adminId, teamName, paymentProof, s
       toast.success(`Registrasi ${teamName} ditolak`)
       await refreshTeams()
     },
-    onError: (e: any) => toast.error(e?.message ?? 'Gagal menolak'),
+    onError: (e: any) => toast.error(e?.message ?? 'Gagal menolak registrasi'),
   })
 
   const isPending = approveMutation.isPending || rejectMutation.isPending

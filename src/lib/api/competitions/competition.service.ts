@@ -1,12 +1,62 @@
-import { CompetitionType } from "@prisma/client";
+import { CompetitionType, PaymentStatus, Prisma } from "@prisma/client";
 import CompetitionRepo from "./competition.repo";
 import { AppError } from "~/lib/utils/app-error";
 import { RegistrationAction, RegistrationCompetitionData } from "~/schemas/competition.schema";
 import TeamRepo from "../teams/team.repo";
+import { prisma } from "~/lib/utils/prisma";
 
 export default class CompetitionService {
   private repo = new CompetitionRepo();
   private teamRepo = new TeamRepo();
+
+  private getCompetitionPrefix(type: CompetitionType) {
+    if (type === "OLIMPIADE") return "olm";
+    if (type === "INFOGRAFIS") return "ifs";
+    if (type === "LKTI") return "lk";
+    return "tm";
+  }
+
+  private async generateUniqueTeamCodeTx(
+    tx: Prisma.TransactionClient,
+    prefix: string
+  ) {
+    const teams = await tx.team.findMany({
+      where: {
+        code: {
+          startsWith: `${prefix}-`,
+        },
+      },
+      select: {
+        code: true,
+      },
+    });
+
+    const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const codePattern = new RegExp(`^${escapedPrefix}-(\\d+)$`);
+
+    const maxNumber = teams.reduce((max, team) => {
+      const match = team.code.match(codePattern);
+      if (!match) return max;
+
+      const num = Number(match[1]);
+      if (!Number.isFinite(num)) return max;
+
+      return Math.max(max, num);
+    }, 0);
+
+    return `${prefix}-${String(maxNumber + 1).padStart(3, "0")}`;
+  }
+
+  private isUniqueCodeError(error: unknown) {
+    if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return false;
+
+    const target = error.meta?.target;
+    const targetIncludesCode = Array.isArray(target)
+      ? target.includes("code")
+      : target === "code";
+
+    return error.code === "P2002" && targetIncludesCode;
+  }
 
   async findOneByName(name: CompetitionType) {
     const existedcompetition =
@@ -43,8 +93,6 @@ export default class CompetitionService {
   async registrationCompetition(
     data: RegistrationCompetitionData
   ) {
-
-    console.log('input',data)
     const teamAlreadyRegister =
       await this.repo.findRegistrationByTeamid(
         data.teamId
@@ -55,8 +103,6 @@ export default class CompetitionService {
         "Team already registered"
       );
     }
-
-    console.log('team', teamAlreadyRegister)
 
     const created =
       await this.repo.createRegistration(
@@ -84,17 +130,86 @@ export default class CompetitionService {
     const team = await this.teamRepo.findById(data.teamId)
     if (!team) throw new AppError("Team not found", 404)
 
-    const prefixMap: Record<string, string> = { OLIMPIADE: 'olm', LKTI: 'lk', INFOGRAFIS: 'ifs' }
-    const codePrefix = prefixMap[team.competitionType] ?? 'tm'
-    const updated = await this.repo.approveRegistrationTransaction({
-      teamId: data.teamId,
-      adminId: data.adminId,
-      firstStageId: firstStage.id,
-      codePrefix,
-      shouldFinalizeCode: team.code.startsWith('pending-'),
-    })
+    const maxRetries = 5
 
-    return { data: updated, message: "Registration approved successfully" }
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const result = await prisma.$transaction(async (tx) => {
+          const freshTeam = await tx.team.findUnique({
+            where: { id: data.teamId },
+            select: {
+              id: true,
+              code: true,
+              competitionType: true,
+            },
+          })
+
+          if (!freshTeam) throw new AppError("Team not found", 404)
+
+          let finalCode: string | undefined
+
+          if (freshTeam.code.startsWith("pending-")) {
+            const prefix = this.getCompetitionPrefix(freshTeam.competitionType)
+            finalCode = await this.generateUniqueTeamCodeTx(tx, prefix)
+          }
+
+          const updatedRegistration = await tx.registration.update({
+            where: { teamId: data.teamId },
+            data: {
+              status: PaymentStatus.APPROVED,
+              approvedBy: data.adminId,
+            },
+          })
+
+          const updatedTeam = await tx.team.update({
+            where: { id: data.teamId },
+            data: {
+              currentStageId: firstStage.id,
+              ...(finalCode ? { code: finalCode } : {}),
+            },
+            include: {
+              members: true,
+              mentor: true,
+              currentStage: true,
+              registration: {
+                include: {
+                  batch: true,
+                  competition: {
+                    include: {
+                      stages: {
+                        orderBy: { order: "asc" },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          })
+
+          return {
+            registration: updatedRegistration,
+            team: updatedTeam,
+          }
+        })
+
+        return {
+          data: result,
+          message: "Registration approved successfully",
+        }
+      } catch (error) {
+        if (this.isUniqueCodeError(error) && attempt < maxRetries) {
+          continue
+        }
+
+        if (this.isUniqueCodeError(error)) {
+          throw new AppError("Gagal generate kode tim unik. Coba approve lagi.", 409)
+        }
+
+        throw error
+      }
+    }
+
+    throw new AppError("Gagal approve registration", 500)
   }
 
   async rejectRegistration(data: RegistrationAction) {
@@ -105,8 +220,46 @@ export default class CompetitionService {
     const registration = await this.repo.findRegistrationByTeamid(data.teamId)
     if (!registration) throw new AppError("Registration not found", 404)
 
-    const updated = await this.repo.rejectRegistrationTransaction(data.teamId, data.adminId)
-    return { data: updated, message: "Registration rejected successfully" }
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedRegistration = await tx.registration.update({
+        where: { teamId: data.teamId },
+        data: {
+          status: PaymentStatus.REJECTED,
+          approvedBy: data.adminId,
+        },
+      })
+
+      const updatedTeam = await tx.team.update({
+        where: { id: data.teamId },
+        data: {
+          currentStageId: null,
+        },
+        include: {
+          members: true,
+          mentor: true,
+          currentStage: true,
+          registration: {
+            include: {
+              batch: true,
+              competition: {
+                include: {
+                  stages: {
+                    orderBy: { order: "asc" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+
+      return {
+        registration: updatedRegistration,
+        team: updatedTeam,
+      }
+    })
+
+    return { data: result, message: "Registration rejected successfully" }
   }
 
   async getAllCompetitionsWithBatches() {
