@@ -1,6 +1,5 @@
 import { useQueryStates } from 'nuqs'
 import Pagination from '~/components/ui/Pagination'
-import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { teamsSearchParams } from '~/schemas/team.schema'
 import CompetitionBadge from '~/components/ui/CompetitionBadge'
@@ -8,6 +7,7 @@ import TeamActions from './TeamAction'
 import { exportToExcel } from '~/lib/utils/export-excel'
 import { Download, FileText, Link, AlertCircle } from 'lucide-react'
 import { StageCell } from './StageCell'
+import { RegistrationActions } from './RegistrationActions'
 import {
   Table,
   TableHeader,
@@ -92,7 +92,7 @@ const BelumDaftar = () => (
   </span>
 )
 
-const TableTeams = ({ teams, meta, queryKey }: Props) => {
+const TableTeams = ({ teams, meta, queryKey, adminId }: Props) => {
   const [query, setQuery] = useQueryStates(teamsSearchParams)
 
   const handleExport = () => {
@@ -222,7 +222,7 @@ const TableTeams = ({ teams, meta, queryKey }: Props) => {
                   Pendamping / Pembina
                 </TableHead>
                 <TableHead className="text-center text-[11px] font-semibold w-24">
-                  Bukti Bayar
+                  Registrasi
                 </TableHead>
                 <TableHead className="text-center text-[11px] font-semibold w-20">
                   Dokumen
@@ -380,10 +380,15 @@ const TableTeams = ({ teams, meta, queryKey }: Props) => {
                     </TableCell>
 
                     <TableCell className="text-center">
-                      {team.registration?.paymentProof ? (
-                        <LinkCell href={team.registration.paymentProof} />
-                      ) : team.registration ? (
-                        <BelumUpload />
+                      {team.registration ? (
+                        <RegistrationActions
+                          teamId={team.id}
+                          adminId={adminId}
+                          teamName={team.name}
+                          paymentProof={team.registration.paymentProof ?? null}
+                          status={team.registration.status ?? 'NONE'}
+                          queryKey={queryKey}
+                        />
                       ) : (
                         <BelumDaftar />
                       )}

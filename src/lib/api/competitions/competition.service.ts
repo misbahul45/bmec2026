@@ -1,4 +1,4 @@
-import { CompetitionType, Prisma } from "@prisma/client";
+import { CompetitionType } from "@prisma/client";
 import CompetitionRepo from "./competition.repo";
 import { AppError } from "~/lib/utils/app-error";
 import { RegistrationAction, RegistrationCompetitionData } from "~/schemas/competition.schema";
@@ -71,38 +71,41 @@ export default class CompetitionService {
     };
   }
   async approveRegistration(data: RegistrationAction) {
-    const registration = await this.repo.findRegistrationByTeamid(data.teamId)
-    if (!registration) throw new AppError("Registration not found")
+    if (data.action !== "APPROVED") {
+      throw new AppError("Invalid registration action")
+    }
 
-    const updated = await this.repo.approveRegistration(data.teamId, data.adminId)
+    const registration = await this.repo.findRegistrationByTeamid(data.teamId)
+    if (!registration) throw new AppError("Registration not found", 404)
 
     const firstStage = await this.repo.findFirstStageByCompetition(registration.competitionId)
-    if (!firstStage) throw new AppError("Stage not found")
-
-    await this.repo.updateTeamStage(data.teamId, firstStage.id)
+    if (!firstStage) throw new AppError("Stage not found", 404)
 
     const team = await this.teamRepo.findById(data.teamId)
-    if (team && team.code.startsWith('pending-')) {
-      const prefixMap: Record<string, string> = { OLIMPIADE: 'olm', LKTI: 'lk', INFOGRAFIS: 'ifs' }
-      const prefix = prefixMap[team.competitionType] ?? 'tm'
+    if (!team) throw new AppError("Team not found", 404)
 
-      let newCode = `${prefix}-001`
-      const latest = await this.teamRepo.findLatestCodeByType(prefix)
-      if (latest && !latest.code.startsWith('pending-')) {
-        const lastNum = parseInt(latest.code.split('-')[1] ?? '0')
-        newCode = `${prefix}-${String(lastNum + 1).padStart(3, '0')}`
-      }
-
-      await this.teamRepo.updateCode(data.teamId, newCode)
-    }
+    const prefixMap: Record<string, string> = { OLIMPIADE: 'olm', LKTI: 'lk', INFOGRAFIS: 'ifs' }
+    const codePrefix = prefixMap[team.competitionType] ?? 'tm'
+    const updated = await this.repo.approveRegistrationTransaction({
+      teamId: data.teamId,
+      adminId: data.adminId,
+      firstStageId: firstStage.id,
+      codePrefix,
+      shouldFinalizeCode: team.code.startsWith('pending-'),
+    })
 
     return { data: updated, message: "Registration approved successfully" }
   }
 
   async rejectRegistration(data: RegistrationAction) {
+    if (data.action !== "REJECTED") {
+      throw new AppError("Invalid registration action")
+    }
+
     const registration = await this.repo.findRegistrationByTeamid(data.teamId)
-    if (!registration) throw new AppError("Registration not found")
-    const updated = await this.repo.rejectRegistration(data.teamId, data.adminId)
+    if (!registration) throw new AppError("Registration not found", 404)
+
+    const updated = await this.repo.rejectRegistrationTransaction(data.teamId, data.adminId)
     return { data: updated, message: "Registration rejected successfully" }
   }
 

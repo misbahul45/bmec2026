@@ -2,11 +2,11 @@ import { AppError } from "./app-error"
 import { handleError } from "./handle-error"
 import { isNotFound, isRedirect } from "@tanstack/react-router"
 
-type Handler<TInput, TOutput> = (ctx: { data: TInput }) => Promise<TOutput>
+type Handler<TContext, TOutput> = (ctx: TContext) => Promise<TOutput>
 
-export function withErrorHandling<TInput, TOutput>(
-  handler: Handler<TInput, TOutput>,
-): Handler<TInput, TOutput> {
+export function withErrorHandling<TContext, TOutput>(
+  handler: Handler<TContext, TOutput>,
+): Handler<TContext, TOutput> {
   return async (ctx) => {
     try {
       return await handler(ctx)
