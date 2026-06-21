@@ -45,12 +45,6 @@ export const loginFn = createServerFn({ method: "POST" })
 
       const session = await useAppSession()
 
-     let registrationTeam;
-
-     if(role === 'TEAM'){
-      registrationTeam = await competitionRepo.findRegistrationByTeamid(user.id);
-     }
-
       await session.update({
         userId: user.id,
         email: user.email,

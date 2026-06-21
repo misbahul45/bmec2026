@@ -115,6 +115,8 @@ public/
   favicon.ico
   logo.png
   site.webmanifest
+scripts/
+  repair-approved-pending-codes.ts
 src/
   components/
     auth/
@@ -1096,6 +1098,154 @@ export async function seedAdmin() {
 
   console.log("✅ Admin seeded");
 }
+</file>
+
+<file path="scripts/repair-approved-pending-codes.ts">
+import { CompetitionType, Prisma } from "@prisma/client";
+import { prisma } from "../src/lib/utils/prisma";
+
+function getCompetitionPrefix(type: CompetitionType) {
+  if (type === "OLIMPIADE") return "olm";
+  if (type === "INFOGRAFIS") return "ifs";
+  if (type === "LKTI") return "lk";
+  return "tm";
+}
+
+async function generateUniqueTeamCodeTx(
+  tx: Prisma.TransactionClient,
+  prefix: string
+) {
+  const teams = await tx.team.findMany({
+    where: {
+      code: {
+        startsWith: `${prefix}-`,
+      },
+    },
+    select: {
+      code: true,
+    },
+  });
+
+  const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const codePattern = new RegExp(`^${escapedPrefix}-(\\d+)$`);
+
+  const maxNumber = teams.reduce((max, team) => {
+    const match = team.code.match(codePattern);
+    if (!match) return max;
+
+    const num = Number(match[1]);
+    if (!Number.isFinite(num)) return max;
+
+    return Math.max(max, num);
+  }, 0);
+
+  return `${prefix}-${String(maxNumber + 1).padStart(3, "0")}`;
+}
+
+function isUniqueCodeError(error: unknown) {
+  if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return false;
+
+  const target = error.meta?.target;
+  const targetIncludesCode = Array.isArray(target)
+    ? target.includes("code")
+    : target === "code";
+
+  return error.code === "P2002" && targetIncludesCode;
+}
+
+async function repairTeam(teamId: string) {
+  const maxRetries = 5;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await prisma.$transaction(async (tx) => {
+        const freshTeam = await tx.team.findUnique({
+          where: { id: teamId },
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            competitionType: true,
+            registration: {
+              select: {
+                status: true,
+              },
+            },
+          },
+        });
+
+        if (!freshTeam) return null;
+        if (freshTeam.registration?.status !== "APPROVED") return null;
+        if (!freshTeam.code.startsWith("pending-")) return freshTeam;
+
+        const prefix = getCompetitionPrefix(freshTeam.competitionType);
+        const code = await generateUniqueTeamCodeTx(tx, prefix);
+
+        return tx.team.update({
+          where: { id: freshTeam.id },
+          data: { code },
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            competitionType: true,
+          },
+        });
+      });
+    } catch (error) {
+      if (isUniqueCodeError(error) && attempt < maxRetries) {
+        continue;
+      }
+
+      throw error;
+    }
+  }
+
+  throw new Error(`Failed to repair team code after ${maxRetries} retries`);
+}
+
+async function main() {
+  const brokenTeams = await prisma.team.findMany({
+    where: {
+      code: {
+        startsWith: "pending-",
+      },
+      registration: {
+        status: "APPROVED",
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      competitionType: true,
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+
+  console.log(`Found ${brokenTeams.length} approved team(s) with pending code`);
+
+  for (const team of brokenTeams) {
+    const repaired = await repairTeam(team.id);
+    if (!repaired) {
+      console.log(`Skipped ${team.name} (${team.id})`);
+      continue;
+    }
+
+    console.log(`${team.name}: ${team.code} -> ${repaired.code}`);
+  }
+}
+
+main()
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
 </file>
 
 <file path="src/components/auth/CompetitionSelect.tsx">
@@ -8860,125 +9010,6 @@ const PasswordDialog: React.FC<Props> = ({
 export default PasswordDialog
 </file>
 
-<file path="src/components/dashboard/admin/teams/RegistrationActions.tsx">
-import { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import { CheckCircle, XCircle } from 'lucide-react'
-import { Button } from '~/components/ui/button'
-import { Badge } from '~/components/ui/badge'
-import ImageDialog from '~/components/ui/ImageDialog'
-import { approveRegistration, rejectRegistration } from '~/server/registration'
-
-interface Props {
-  teamId: string
-  adminId: string
-  teamName: string
-  paymentProof?: string | null
-  status: string
-  queryKey: unknown[]
-}
-
-export function RegistrationActions({ teamId, adminId, teamName, paymentProof, status, queryKey }: Props) {
-  const qc = useQueryClient()
-  const [dialogOpen, setDialogOpen] = useState(false)
-
-  const refreshTeams = async () => {
-    await qc.invalidateQueries({ queryKey, exact: true })
-    await qc.invalidateQueries({ queryKey: ['teams', teamId] })
-    await qc.invalidateQueries({ queryKey: ['dashboard-summary'] })
-    await qc.refetchQueries({ queryKey, exact: true })
-  }
-
-  const approveMutation = useMutation({
-    mutationFn: () => approveRegistration({ data: { teamId, adminId, action: 'APPROVED' } }),
-    onSuccess: async () => {
-      toast.success(`Registrasi ${teamName} disetujui`)
-      await refreshTeams()
-    },
-    onError: (e: any) => toast.error(e?.message ?? 'Gagal menyetujui'),
-  })
-
-  const rejectMutation = useMutation({
-    mutationFn: () => rejectRegistration({ data: { teamId, adminId, action: 'REJECTED' } }),
-    onSuccess: async () => {
-      toast.success(`Registrasi ${teamName} ditolak`)
-      await refreshTeams()
-    },
-    onError: (e: any) => toast.error(e?.message ?? 'Gagal menolak'),
-  })
-
-  const isPending = approveMutation.isPending || rejectMutation.isPending
-  const isPendingRegistration = status === 'PENDING'
-  const statusBadge = (() => {
-    if (status === 'APPROVED') {
-      return <Badge className="text-[10px] bg-green-500">Disetujui</Badge>
-    }
-
-    if (status === 'REJECTED') {
-      return <Badge variant="destructive" className="text-[10px]">Ditolak</Badge>
-    }
-
-    if (isPendingRegistration) {
-      return <Badge variant="outline" className="text-[10px]">Menunggu Verifikasi</Badge>
-    }
-
-    return <Badge variant="secondary" className="text-[10px]">Belum Daftar</Badge>
-  })()
-
-  return (
-    <div className="flex flex-col items-center gap-1.5">
-      {statusBadge}
-
-      {paymentProof ? (
-        <>
-          <button
-            onClick={() => setDialogOpen(true)}
-            className="text-primary underline text-sm hover:opacity-80"
-          >
-            Lihat Bukti
-          </button>
-
-          <ImageDialog
-            open={dialogOpen}
-            setOpen={setDialogOpen}
-            url={paymentProof}
-            title={`Bukti Pembayaran — ${teamName}`}
-          />
-        </>
-      ) : (
-        <Badge variant="outline" className="text-[10px]">Belum Upload</Badge>
-      )}
-
-      {isPendingRegistration && (
-        <div className="flex gap-1">
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            className="text-green-600 hover:text-green-700"
-            disabled={isPending}
-            onClick={() => approveMutation.mutate()}
-            title="Approve"
-          >
-            <CheckCircle className="size-3.5" />
-          </Button>
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            className="text-destructive hover:text-destructive"
-            disabled={isPending}
-            onClick={() => rejectMutation.mutate()}
-            title="Reject"
-          >
-            <XCircle className="size-3.5" />
-          </Button>
-        </div>
-      )}
-    </div>
-  )
-}
-</file>
-
 <file path="src/components/dashboard/team/InvoiceDialog.tsx">
 import { useCallback } from 'react'
 import { Download, X, CheckCircle2 } from 'lucide-react'
@@ -12818,6 +12849,126 @@ export function TableSubmissions({ submissions, meta, adminId, queryKey, onPageC
       </div>
 
       <Pagination page={meta.page} totalPages={meta.totalPages} setPage={onPageChange} />
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/dashboard/admin/teams/RegistrationActions.tsx">
+import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { CheckCircle, XCircle } from 'lucide-react'
+import { Button } from '~/components/ui/button'
+import { Badge } from '~/components/ui/badge'
+import ImageDialog from '~/components/ui/ImageDialog'
+import { approveRegistration, rejectRegistration } from '~/server/registration'
+
+interface Props {
+  teamId: string
+  adminId: string
+  teamName: string
+  paymentProof?: string | null
+  status: string
+  queryKey: unknown[]
+}
+
+export function RegistrationActions({ teamId, adminId, teamName, paymentProof, status, queryKey }: Props) {
+  const qc = useQueryClient()
+  const [dialogOpen, setDialogOpen] = useState(false)
+
+  const refreshTeams = async () => {
+    await qc.invalidateQueries({ queryKey, exact: true })
+    await qc.refetchQueries({ queryKey, exact: true })
+    await qc.invalidateQueries({ queryKey: ['teams', teamId] })
+    await qc.invalidateQueries({ queryKey: ['teams'] })
+    await qc.invalidateQueries({ queryKey: ['dashboard-summary'] })
+  }
+
+  const approveMutation = useMutation({
+    mutationFn: () => approveRegistration({ data: { teamId, adminId, action: 'APPROVED' } }),
+    onSuccess: async () => {
+      toast.success(`Registrasi ${teamName} disetujui`)
+      await refreshTeams()
+    },
+    onError: (e: any) => toast.error(e?.message ?? 'Gagal menyetujui registrasi'),
+  })
+
+  const rejectMutation = useMutation({
+    mutationFn: () => rejectRegistration({ data: { teamId, adminId, action: 'REJECTED' } }),
+    onSuccess: async () => {
+      toast.success(`Registrasi ${teamName} ditolak`)
+      await refreshTeams()
+    },
+    onError: (e: any) => toast.error(e?.message ?? 'Gagal menolak registrasi'),
+  })
+
+  const isPending = approveMutation.isPending || rejectMutation.isPending
+  const isPendingRegistration = status === 'PENDING'
+  const statusBadge = (() => {
+    if (status === 'APPROVED') {
+      return <Badge className="text-[10px] bg-green-500">Disetujui</Badge>
+    }
+
+    if (status === 'REJECTED') {
+      return <Badge variant="destructive" className="text-[10px]">Ditolak</Badge>
+    }
+
+    if (isPendingRegistration) {
+      return <Badge variant="outline" className="text-[10px]">Menunggu Verifikasi</Badge>
+    }
+
+    return <Badge variant="secondary" className="text-[10px]">Belum Daftar</Badge>
+  })()
+
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      {statusBadge}
+
+      {paymentProof ? (
+        <>
+          <button
+            onClick={() => setDialogOpen(true)}
+            className="text-primary underline text-sm hover:opacity-80"
+          >
+            Lihat Bukti
+          </button>
+
+          <ImageDialog
+            open={dialogOpen}
+            setOpen={setDialogOpen}
+            url={paymentProof}
+            title={`Bukti Pembayaran — ${teamName}`}
+          />
+        </>
+      ) : (
+        <Badge variant="outline" className="text-[10px]">Belum Upload</Badge>
+      )}
+
+      {isPendingRegistration && (
+        <div className="flex gap-1">
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            className="text-green-600 hover:text-green-700"
+            disabled={isPending}
+            onClick={() => approveMutation.mutate()}
+            title="Approve"
+          >
+            <CheckCircle className="size-3.5" />
+          </Button>
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            className="text-destructive hover:text-destructive"
+            disabled={isPending}
+            onClick={() => rejectMutation.mutate()}
+            title="Reject"
+          >
+            <XCircle className="size-3.5" />
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
@@ -17778,7 +17929,7 @@ export function LKTISection({
     return (
       <div className="animated-border flex flex-col items-center gap-3 rounded-2xl p-6 text-center">
         <CreditCard size={32} className="text-muted-foreground/50" />
-        <p className="text-base font-semibold">Pendaftaran Belum Tersedia</p>
+        <p className="text-base font-semibold">Menunggu </p>
         <p className="max-w-sm text-sm text-muted-foreground">
           Maaf, pendaftaran untuk tahap ini belum dibuka. Pantau terus informasi dari panitia.
         </p>
@@ -22220,162 +22371,6 @@ const TimelineSection = () => {
 export default TimelineSection
 </file>
 
-<file path="src/lib/api/competitions/competition.service.ts">
-import { CompetitionType } from "@prisma/client";
-import CompetitionRepo from "./competition.repo";
-import { AppError } from "~/lib/utils/app-error";
-import { RegistrationAction, RegistrationCompetitionData } from "~/schemas/competition.schema";
-import TeamRepo from "../teams/team.repo";
-
-export default class CompetitionService {
-  private repo = new CompetitionRepo();
-  private teamRepo = new TeamRepo();
-
-  async findOneByName(name: CompetitionType) {
-    const existedcompetition =
-      await this.repo.findByName(name);
-
-    if (!existedcompetition) {
-      throw new AppError(
-        "Competition not found"
-      );
-    }
-
-    return {
-      data: this.serializeCompetition(
-        existedcompetition
-      ),
-      message: "get competition",
-    };
-  }
-
-  serializeCompetition(data: any) {
-    if (!data) return data;
-
-    return {
-      ...data,
-      batches: data.batches.map(
-        (b: any) => ({
-          ...b,
-          price: b.price.toNumber(),
-        })
-      ),
-    };
-  }
-
-  async registrationCompetition(
-    data: RegistrationCompetitionData
-  ) {
-
-    console.log('input',data)
-    const teamAlreadyRegister =
-      await this.repo.findRegistrationByTeamid(
-        data.teamId
-      );
-
-    if (teamAlreadyRegister?.paymentProof) {
-      throw new AppError(
-        "Team already registered"
-      );
-    }
-
-    console.log('team', teamAlreadyRegister)
-
-    const created =
-      await this.repo.createRegistration(
-        data
-      );
-
-
-    return {
-      data: created,
-      message:
-        "Successfully registered competition",
-    };
-  }
-  async approveRegistration(data: RegistrationAction) {
-    if (data.action !== "APPROVED") {
-      throw new AppError("Invalid registration action")
-    }
-
-    const registration = await this.repo.findRegistrationByTeamid(data.teamId)
-    if (!registration) throw new AppError("Registration not found", 404)
-
-    const firstStage = await this.repo.findFirstStageByCompetition(registration.competitionId)
-    if (!firstStage) throw new AppError("Stage not found", 404)
-
-    const team = await this.teamRepo.findById(data.teamId)
-    if (!team) throw new AppError("Team not found", 404)
-
-    const prefixMap: Record<string, string> = { OLIMPIADE: 'olm', LKTI: 'lk', INFOGRAFIS: 'ifs' }
-    const codePrefix = prefixMap[team.competitionType] ?? 'tm'
-    const updated = await this.repo.approveRegistrationTransaction({
-      teamId: data.teamId,
-      adminId: data.adminId,
-      firstStageId: firstStage.id,
-      codePrefix,
-      shouldFinalizeCode: team.code.startsWith('pending-'),
-    })
-
-    return { data: updated, message: "Registration approved successfully" }
-  }
-
-  async rejectRegistration(data: RegistrationAction) {
-    if (data.action !== "REJECTED") {
-      throw new AppError("Invalid registration action")
-    }
-
-    const registration = await this.repo.findRegistrationByTeamid(data.teamId)
-    if (!registration) throw new AppError("Registration not found", 404)
-
-    const updated = await this.repo.rejectRegistrationTransaction(data.teamId, data.adminId)
-    return { data: updated, message: "Registration rejected successfully" }
-  }
-
-  async getAllCompetitionsWithBatches() {
-    const competitions = await this.repo.findAllWithBatches()
-    return {
-      data: competitions.map((c) => ({
-        ...c,
-        batches: c.batches.map((b) => ({ ...b, price: Number(b.price) })),
-      })),
-    }
-  }
-
-  async updateBatch(id: string, data: { name?: string; startDate?: Date; endDate?: Date; price?: number; module_bacth?: string }) {
-    const batch = await this.repo.findBatchById(id)
-    if (!batch) throw new AppError("Batch not found", 404)
-    const updated = await this.repo.updateBatch(id, {
-      ...(data.name && { name: data.name }),
-      ...(data.startDate && { startDate: data.startDate }),
-      ...(data.endDate && { endDate: data.endDate }),
-      ...(data.price !== undefined && { price: data.price }),
-      ...(data.module_bacth !== undefined && { module_bacth: data.module_bacth }),
-    })
-    return { data: { ...updated, price: Number(updated.price) }, message: "Batch updated" }
-  }
-
-  async createBatch(competitionId: string, data: { name: string; startDate: Date; endDate: Date; price: number; module_bacth: string }) {
-    const created = await this.repo.createBatch({
-      name: data.name,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      price: data.price,
-      module_bacth: data.module_bacth,
-      competition: { connect: { id: competitionId } },
-    })
-    return { data: { ...created, price: Number(created.price) }, message: "Batch created" }
-  }
-
-  async deleteBatch(id: string) {
-    const batch = await this.repo.findBatchById(id)
-    if (!batch) throw new AppError("Batch not found", 404)
-    await this.repo.deleteBatch(id)
-    return { data: null, message: "Batch deleted" }
-  }
-}
-</file>
-
 <file path="src/lib/api/exams/exam.repo.ts">
 import { prisma } from "~/lib/utils/prisma";
 import { ExamType } from "@prisma/client";
@@ -23829,6 +23824,315 @@ export default class CompetitionRepo {
             }
         })
     }
+}
+</file>
+
+<file path="src/lib/api/competitions/competition.service.ts">
+import { CompetitionType, PaymentStatus, Prisma } from "@prisma/client";
+import CompetitionRepo from "./competition.repo";
+import { AppError } from "~/lib/utils/app-error";
+import { RegistrationAction, RegistrationCompetitionData } from "~/schemas/competition.schema";
+import TeamRepo from "../teams/team.repo";
+import { prisma } from "~/lib/utils/prisma";
+
+export default class CompetitionService {
+  private repo = new CompetitionRepo();
+  private teamRepo = new TeamRepo();
+
+  private getCompetitionPrefix(type: CompetitionType) {
+    if (type === "OLIMPIADE") return "olm";
+    if (type === "INFOGRAFIS") return "ifs";
+    if (type === "LKTI") return "lk";
+    return "tm";
+  }
+
+  private async generateUniqueTeamCodeTx(
+    tx: Prisma.TransactionClient,
+    prefix: string
+  ) {
+    const teams = await tx.team.findMany({
+      where: {
+        code: {
+          startsWith: `${prefix}-`,
+        },
+      },
+      select: {
+        code: true,
+      },
+    });
+
+    const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const codePattern = new RegExp(`^${escapedPrefix}-(\\d+)$`);
+
+    const maxNumber = teams.reduce((max, team) => {
+      const match = team.code.match(codePattern);
+      if (!match) return max;
+
+      const num = Number(match[1]);
+      if (!Number.isFinite(num)) return max;
+
+      return Math.max(max, num);
+    }, 0);
+
+    return `${prefix}-${String(maxNumber + 1).padStart(3, "0")}`;
+  }
+
+  private isUniqueCodeError(error: unknown) {
+    if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return false;
+
+    const target = error.meta?.target;
+    const targetIncludesCode = Array.isArray(target)
+      ? target.includes("code")
+      : target === "code";
+
+    return error.code === "P2002" && targetIncludesCode;
+  }
+
+  async findOneByName(name: CompetitionType) {
+    const existedcompetition =
+      await this.repo.findByName(name);
+
+    if (!existedcompetition) {
+      throw new AppError(
+        "Competition not found"
+      );
+    }
+
+    return {
+      data: this.serializeCompetition(
+        existedcompetition
+      ),
+      message: "get competition",
+    };
+  }
+
+  serializeCompetition(data: any) {
+    if (!data) return data;
+
+    return {
+      ...data,
+      batches: data.batches.map(
+        (b: any) => ({
+          ...b,
+          price: b.price.toNumber(),
+        })
+      ),
+    };
+  }
+
+  async registrationCompetition(
+    data: RegistrationCompetitionData
+  ) {
+    const teamAlreadyRegister =
+      await this.repo.findRegistrationByTeamid(
+        data.teamId
+      );
+
+    if (teamAlreadyRegister?.paymentProof) {
+      throw new AppError(
+        "Team already registered"
+      );
+    }
+
+    const created =
+      await this.repo.createRegistration(
+        data
+      );
+
+
+    return {
+      data: created,
+      message:
+        "Successfully registered competition",
+    };
+  }
+  async approveRegistration(data: RegistrationAction) {
+    if (data.action !== "APPROVED") {
+      throw new AppError("Invalid registration action")
+    }
+
+    const registration = await this.repo.findRegistrationByTeamid(data.teamId)
+    if (!registration) throw new AppError("Registration not found", 404)
+
+    const firstStage = await this.repo.findFirstStageByCompetition(registration.competitionId)
+    if (!firstStage) throw new AppError("Stage not found", 404)
+
+    const team = await this.teamRepo.findById(data.teamId)
+    if (!team) throw new AppError("Team not found", 404)
+
+    const maxRetries = 5
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const result = await prisma.$transaction(async (tx) => {
+          const freshTeam = await tx.team.findUnique({
+            where: { id: data.teamId },
+            select: {
+              id: true,
+              code: true,
+              competitionType: true,
+            },
+          })
+
+          if (!freshTeam) throw new AppError("Team not found", 404)
+
+          let finalCode: string | undefined
+
+          if (freshTeam.code.startsWith("pending-")) {
+            const prefix = this.getCompetitionPrefix(freshTeam.competitionType)
+            finalCode = await this.generateUniqueTeamCodeTx(tx, prefix)
+          }
+
+          const updatedRegistration = await tx.registration.update({
+            where: { teamId: data.teamId },
+            data: {
+              status: PaymentStatus.APPROVED,
+              approvedBy: data.adminId,
+            },
+          })
+
+          const updatedTeam = await tx.team.update({
+            where: { id: data.teamId },
+            data: {
+              currentStageId: firstStage.id,
+              ...(finalCode ? { code: finalCode } : {}),
+            },
+            include: {
+              members: true,
+              mentor: true,
+              currentStage: true,
+              registration: {
+                include: {
+                  batch: true,
+                  competition: {
+                    include: {
+                      stages: {
+                        orderBy: { order: "asc" },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          })
+
+          return {
+            registration: updatedRegistration,
+            team: updatedTeam,
+          }
+        })
+
+        return {
+          data: result,
+          message: "Registration approved successfully",
+        }
+      } catch (error) {
+        if (this.isUniqueCodeError(error) && attempt < maxRetries) {
+          continue
+        }
+
+        if (this.isUniqueCodeError(error)) {
+          throw new AppError("Gagal generate kode tim unik. Coba approve lagi.", 409)
+        }
+
+        throw error
+      }
+    }
+
+    throw new AppError("Gagal approve registration", 500)
+  }
+
+  async rejectRegistration(data: RegistrationAction) {
+    if (data.action !== "REJECTED") {
+      throw new AppError("Invalid registration action")
+    }
+
+    const registration = await this.repo.findRegistrationByTeamid(data.teamId)
+    if (!registration) throw new AppError("Registration not found", 404)
+
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedRegistration = await tx.registration.update({
+        where: { teamId: data.teamId },
+        data: {
+          status: PaymentStatus.REJECTED,
+          approvedBy: data.adminId,
+        },
+      })
+
+      const updatedTeam = await tx.team.update({
+        where: { id: data.teamId },
+        data: {
+          currentStageId: null,
+        },
+        include: {
+          members: true,
+          mentor: true,
+          currentStage: true,
+          registration: {
+            include: {
+              batch: true,
+              competition: {
+                include: {
+                  stages: {
+                    orderBy: { order: "asc" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+
+      return {
+        registration: updatedRegistration,
+        team: updatedTeam,
+      }
+    })
+
+    return { data: result, message: "Registration rejected successfully" }
+  }
+
+  async getAllCompetitionsWithBatches() {
+    const competitions = await this.repo.findAllWithBatches()
+    return {
+      data: competitions.map((c) => ({
+        ...c,
+        batches: c.batches.map((b) => ({ ...b, price: Number(b.price) })),
+      })),
+    }
+  }
+
+  async updateBatch(id: string, data: { name?: string; startDate?: Date; endDate?: Date; price?: number; module_bacth?: string }) {
+    const batch = await this.repo.findBatchById(id)
+    if (!batch) throw new AppError("Batch not found", 404)
+    const updated = await this.repo.updateBatch(id, {
+      ...(data.name && { name: data.name }),
+      ...(data.startDate && { startDate: data.startDate }),
+      ...(data.endDate && { endDate: data.endDate }),
+      ...(data.price !== undefined && { price: data.price }),
+      ...(data.module_bacth !== undefined && { module_bacth: data.module_bacth }),
+    })
+    return { data: { ...updated, price: Number(updated.price) }, message: "Batch updated" }
+  }
+
+  async createBatch(competitionId: string, data: { name: string; startDate: Date; endDate: Date; price: number; module_bacth: string }) {
+    const created = await this.repo.createBatch({
+      name: data.name,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      price: data.price,
+      module_bacth: data.module_bacth,
+      competition: { connect: { id: competitionId } },
+    })
+    return { data: { ...created, price: Number(created.price) }, message: "Batch created" }
+  }
+
+  async deleteBatch(id: string) {
+    const batch = await this.repo.findBatchById(id)
+    if (!batch) throw new AppError("Batch not found", 404)
+    await this.repo.deleteBatch(id)
+    return { data: null, message: "Batch deleted" }
+  }
 }
 </file>
 

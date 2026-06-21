@@ -53,7 +53,7 @@ export function LKTISection({
     return (
       <div className="animated-border flex flex-col items-center gap-3 rounded-2xl p-6 text-center">
         <CreditCard size={32} className="text-muted-foreground/50" />
-        <p className="text-base font-semibold">Pendaftaran Belum Tersedia</p>
+        <p className="text-base font-semibold">Pendaftaran belum tersedia</p>
         <p className="max-w-sm text-sm text-muted-foreground">
           Maaf, pendaftaran untuk tahap ini belum dibuka. Pantau terus informasi dari panitia.
         </p>
