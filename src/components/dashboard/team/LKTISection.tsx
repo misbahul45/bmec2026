@@ -53,12 +53,20 @@ export function LKTISection({
     return (
       <div className="animated-border flex flex-col items-center gap-3 rounded-2xl p-6 text-center">
         <CreditCard size={32} className="text-muted-foreground/50" />
-        <p className="text-base font-semibold">Pendaftaran belum tersedia</p>
-        <p className="max-w-sm text-sm text-muted-foreground">
-          Maaf, pendaftaran untuk tahap ini belum dibuka. Pantau terus informasi dari panitia.
-        </p>
+
+        <div className="space-y-1">
+          <p className="text-base font-semibold">
+            Menunggu Hasil Seleksi Abstract
+          </p>
+
+          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+            Terima kasih sudah mengirimkan abstract. Saat ini panitia sedang melakukan proses review.
+            Jika abstract dinyatakan lolos, kamu akan dapat melanjutkan ke tahap upload full paper dan pembayaran.
+          </p>
+        </div>
+
         <Badge variant="outline" className="mt-1">
-          Segera Hadir
+          Abstract Dalam Review
         </Badge>
       </div>
     )
