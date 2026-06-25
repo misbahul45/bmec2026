@@ -233,6 +233,7 @@ function TeamDashboard({ teamId }: { teamId: string }) {
             registrationStatus={registrationStatus}
             teamId={teamId}
             stageId={team.currentStageId ?? null}
+            batch={batch}
             existingSubmission={
               team.submissions?.find(
                 (s: any) => s.stageId === team.currentStageId,

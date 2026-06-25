@@ -143,7 +143,6 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
         }
 
         toast.dismiss(toastId)
-
         return res
       } catch (err) {
         toast.dismiss(toastId)
@@ -215,7 +214,6 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
   const activeBatch =
     competition?.batches?.[0]
 
-    console.log(competition)
 
   const onSubmit = (
     data: CreateCompetitionRegistrationData

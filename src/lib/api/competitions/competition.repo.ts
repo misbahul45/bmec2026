@@ -73,6 +73,9 @@ export default class CompetitionRepo {
         })
     }
 
+
+
+
     findRegistrationByTeamid(teamId:string){
         return prisma.registration.findUnique({
             where:{
@@ -80,6 +83,25 @@ export default class CompetitionRepo {
             }
         })
     }
+
+    findActiveBatchByCompetitionId(competitionId: string) {
+        const now = new Date()
+
+        return prisma.batch.findFirst({
+            where: {
+            competitionId,
+            startDate: {
+                lte: now,
+            },
+            endDate: {
+                gte: now,
+            },
+            },
+            orderBy: {
+            startDate: "asc",
+            },
+        })
+        }
 
     approveRegistrationTransaction(params: {
         teamId: string

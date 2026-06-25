@@ -13,11 +13,32 @@ type Props = {
   registrationStatus?: PaymentStatus | null
   teamId: string
   stageId?: string | null
+  batch?: {
+    id: string
+    name: string
+    startDate: Date
+    endDate: Date
+  } | null
   existingSubmission?: { fileUrl?: string | null } | null
   queryKey: unknown[]
 }
 
-export function InfografisSection({ registrationStatus, teamId, stageId, existingSubmission, queryKey }: Props) {
+export function InfografisSection({ registrationStatus, teamId, stageId, existingSubmission, queryKey, batch }: Props) {
+ if (!batch) {
+  return (
+    <div className="animated-border rounded-2xl p-6 text-center space-y-2">
+      <h3 className="font-semibold">
+        Batch pendaftaran tidak aktif
+      </h3>
+
+      <p className="text-sm text-muted-foreground">
+        Upload infografis belum dapat dilakukan karena batch pendaftaran
+        belum dibuka atau sudah ditutup.
+      </p>
+    </div>
+  )
+}
+
   const notApproved = registrationStatus !== 'APPROVED'
 
   if (!stageId) {

@@ -104,6 +104,13 @@ export default class CompetitionService {
       );
     }
 
+    const activeBatch= this.repo.findActiveBatchByCompetitionId(data.competitionId)
+    if (!activeBatch) {
+      throw new AppError(
+        "Pendaftaran untuk kompetisi ini belum dibuka atau sudah ditutup",
+        400
+      )
+    }
     const created =
       await this.repo.createRegistration(
         data

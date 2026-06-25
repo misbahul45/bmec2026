@@ -56,8 +56,6 @@ const RegisterForm = () => {
           inst.includes('kampus')
         )
       })())
-
-  // Dynamic label helpers
   const emailLabel = isUniversityContext
     ? 'Email Ketua Tim'
     : 'Email Tim (Ketua Tim)'
