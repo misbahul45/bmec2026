@@ -1,6 +1,6 @@
 import { Image } from '@unpic/react'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-import { NAV_ITEMS } from '~/contants'
+import { ADMIN_NAV_ITEMS, NAV_ITEMS } from '~/contants'
 import { Link, useLocation, useRouteContext, useRouter } from '@tanstack/react-router'
 import gsap from 'gsap'
 import { cn, toggleHome } from '~/lib/utils'
@@ -623,7 +623,7 @@ const Header = () => {
 
       <MobileMenu
         isOpen={isOpen}
-        navItems={NAV_ITEMS}
+        navItems={isLoggedIn?user.role==='ADMIN'?ADMIN_NAV_ITEMS:NAV_ITEMS:NAV_ITEMS}
         activeSection={activeSection}
         isLogin={isLoggedIn}
         user={user}

@@ -8,6 +8,15 @@ export const NAV_ITEMS = [
   { title: 'FAQ', href: '#faq' },
 ]
 
+export const ADMIN_NAV_ITEMS = [
+  { title: 'Home', href: '/dashboard/admin' },
+  { title: 'Teams', href: '/dashboard/admin/teams' },
+  { title: 'Exams', href: '/dashboard/admin/exams' },
+  { title: 'Submissions', href: '/dashboard/admin/submissions' },
+  { title: 'Scoreboard', href: '/dashboard/admin/scoreboard' },
+  { title: 'Batch', href: '/dashboard/admin/competitions' },
+]
+
 export const ABOUT_IMAGES =  [
     {
       src: "https://xltn7i57i8.ufs.sh/f/KPvneZksE9vwwust5PbXK06jdSMipmk3tVOgQzBx9yP2TuEh",
