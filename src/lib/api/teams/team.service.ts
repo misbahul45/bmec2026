@@ -77,17 +77,6 @@ export default class TeamService {
 
     const tempCode = `pending-${Date.now()}`
 
-    const activeBatch = await this.repo.findActiveBatchByCompetitionType(
-      payload.competitionType
-    )
-
-    if (!activeBatch) {
-      throw new AppError(
-        `${payload.competitionType} belum memiliki batch pendaftaran yang aktif`,
-        400
-      )
-    }
-
     const team = await this.repo.create({
       schoolAddress: payload.address,
       schoolName: payload.institution,
