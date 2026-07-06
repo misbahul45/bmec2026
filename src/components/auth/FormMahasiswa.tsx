@@ -25,6 +25,34 @@ type Props = {
 }
 
 const FormMahasiswa: React.FC<Props> = ({ type: _ }) => {
+  const ABSTRACT_CLOSED = true
+
+  if (ABSTRACT_CLOSED) {
+    return (
+      <Card className="rounded-md shadow-xl">
+        <CardContent className="flex min-h-[300px] items-center justify-center">
+          <div className="space-y-3 text-center">
+            <h2 className="text-xl font-semibold">
+              Pengumpulan Abstrak Ditutup
+            </h2>
+
+            <p className="text-sm text-muted-foreground">
+              Mohon maaf, periode pengumpulan abstrak telah ditutup.
+              Terima kasih atas partisipasi Anda.
+            </p>
+
+            <Button
+              variant="outline"
+              onClick={() => navigate({ to: "/dashboard/team" })}
+            >
+              Kembali ke Dashboard
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   const { teamId } = useParams({ strict: false })
   const navigate = useNavigate()
 
