@@ -274,8 +274,8 @@ function FullPaperUpload({
           size={16}
           className="text-green-500"
         />
-        <span className="text-sm font-medium text-green-600">
-          Abstrak Disetujui — Lanjutkan ke tahap berikutnya
+        <span className="text-md font-medium text-green-600">
+          Selamat! Abstrak Anda Lolos – Lanjutkan ke tahap berikutnya
         </span>
       </div>
 
