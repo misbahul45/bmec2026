@@ -17,6 +17,7 @@
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@fontsource-variable/libre-baskerville": "^5.2.1",
     "@fontsource-variable/montserrat": "^5.2.8",
+    "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.2",
     "@phosphor-icons/react": "^2.1.10",
     "@prisma/adapter-pg": "^7.7.0",

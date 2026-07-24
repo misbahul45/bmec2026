@@ -5,6 +5,7 @@ import CompetitionDetailSection from '~/components/LandingPage/CompetitionDetail
 import FaqSection from '~/components/LandingPage/FaqSection'
 import GalerySection from '~/components/LandingPage/GalerySection'
 import HeroSecttion from '~/components/LandingPage/HeroSecttion'
+import MediaPartnerSection from '~/components/LandingPage/MediaPartnerSection'
 import TimelineSection from '~/components/LandingPage/TimelineSection'
 import WhySection from '~/components/LandingPage/WhySection'
 import { seo } from '~/lib/utils/seo'
@@ -74,6 +75,7 @@ function Home() {
       <TimelineSection />
       <CompetitionDetailSection />
       <GalerySection />
+      <MediaPartnerSection />
       <FaqSection />
       <CTASection />
     </div>
