@@ -108,13 +108,9 @@ const MediaPartnerSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="overflow-hidden bg-white py-16 md:py-24"
+      className="overflow-hidden py-16 md:py-24"
     >
       <div className="mx-auto mb-10 max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-        <span className="mb-3 inline-block rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700">
-          Our Collaboration
-        </span>
-
         <h2 className="media-partner-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
           Media Partners
         </h2>
