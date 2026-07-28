@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
 } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import {
@@ -39,6 +38,12 @@ import {
   Trash2,
 } from 'lucide-react'
 import { Badge } from '~/components/ui/badge'
+import { ExamRichText } from '~/components/exam/ExamRichText'
+import {
+  examOptionLabelClassName,
+  examOptionSurfaceClassName,
+  examQuestionSurfaceClassName,
+} from '~/components/exam/exam-content.styles'
 
 interface Question {
   id: string
@@ -73,15 +78,12 @@ interface Props {
 const difficultyLabel = {
   EASY: {
     label: 'Mudah',
-    score: '+2 / -1 / 0',
   },
   MEDIUM: {
     label: 'Sedang',
-    score: '+4 / -2 / 0',
   },
   HARD: {
     label: 'Sulit',
-    score: '+6 / -3 / 0',
   },
 }
 
@@ -202,34 +204,17 @@ const QuestionCard = ({
     <div className='w-full'>
       <Card className="rounded-lg border">
         <CardHeader className="flex flex-row items-start justify-between gap-2">
-          <div className="flex-1">
-            <CardTitle className="flex items-start gap-2">
-              <span className="font-bold shrink-0">
-                {
-                  data.order
-                }
-                .
-              </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold">Soal {number}</p>
 
-              <div
-                className="prose max-w-none flex-1 [&>p:first-child]:mt-0 [&>p:first-child]:inline"
-                dangerouslySetInnerHTML={{
-                  __html:
-                    data.question,
-                }}
-              />
-            </CardTitle>
-
-            <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <div className="mt-2 flex flex-wrap gap-2 text-xs">
                 <Badge variant={data.difficulty==='HARD'?'destructive':data.difficulty=='MEDIUM'?'secondary':'default'}>
                   {
                     difficultyInfo.label
                   }
                 </Badge>
                 <Badge variant={'outline'}>
-                  {
-                    difficultyInfo.score
-                  }
+                  {data.correctScore > 0 ? '+' : ''}{data.correctScore} / {data.wrongScore} / {data.emptyScore}
                 </Badge>
             </div>
           </div>
@@ -297,7 +282,11 @@ const QuestionCard = ({
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-3">
+          <div className={examQuestionSurfaceClassName}>
+            <ExamRichText content={data.question} />
+          </div>
+
           {options.map(
             (opt) => (
               <div
@@ -305,28 +294,25 @@ const QuestionCard = ({
                   opt.key
                 }
                 className={cn(
-                  'p-2 rounded-md border',
+                  examOptionSurfaceClassName,
+                  'border-border bg-background',
                   opt.key ===
                     data.correctAnswer &&
-                    'bg-green-100 border-green-400 text-green-700'
+                    'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
                 )}
               >
-                <div className="flex items-start gap-2">
-                  <span className="font-semibold shrink-0">
-                    {
-                      opt.key
-                    }
-                    .
-                  </span>
+                <span
+                  className={cn(
+                    examOptionLabelClassName,
+                    opt.key === data.correctAnswer
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-muted text-muted-foreground',
+                  )}
+                >
+                  {opt.key}
+                </span>
 
-                  <div
-                    className="prose max-w-none flex-1 [&>p:first-child]:mt-0 [&>p:first-child]:mb-0"
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        opt.value,
-                    }}
-                  />
-                </div>
+                <ExamRichText content={opt.value} className="min-w-0 flex-1 pt-0.5" />
               </div>
             )
           )}

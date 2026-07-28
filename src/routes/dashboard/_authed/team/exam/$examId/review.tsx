@@ -17,7 +17,7 @@ import { Route as RootRoute } from '~/routes/__root'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
 import { Badge } from '~/components/ui/badge'
-import { TipTapRenderer } from '~/components/exam/TipTapRenderer'
+import { ExamRichText } from '~/components/exam/ExamRichText'
 
 export const Route = createFileRoute(
   '/dashboard/_authed/team/exam/$examId/review',
@@ -243,7 +243,7 @@ function ReviewPage({ examId }: { examId: string }) {
               </div>
 
               <div className="prose prose-sm max-w-none dark:prose-invert">
-                <TipTapRenderer content={question.question} />
+                <ExamRichText content={question.question} />
               </div>
 
               <div className="grid grid-cols-1 gap-2 pt-2">
@@ -290,7 +290,7 @@ function ReviewPage({ examId }: { examId: string }) {
                           {opt.label}
                         </div>
                         <div className="prose prose-sm max-w-none dark:prose-invert">
-                          <TipTapRenderer content={opt.text} />
+                          <ExamRichText content={opt.text} />
                         </div>
                       </div>
                       {badge}

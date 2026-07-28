@@ -1,6 +1,7 @@
 import { Badge } from '~/components/ui/badge'
-import { TipTapRenderer } from './TipTapRenderer'
+import { ExamRichText } from './ExamRichText'
 import { ExamOptionList } from './ExamOptionList'
+import { examQuestionSurfaceClassName } from './exam-content.styles'
 import { AnswerStatus } from '~/hooks/exam/useExamAnswers'
 import { ExamQuestion } from '~/types/exam.type'
 
@@ -68,8 +69,8 @@ export function ExamQuestionView({
         )}
       </div>
 
-      <div className="rounded-xl border bg-muted/20 p-4">
-        <TipTapRenderer content={question.question} />
+      <div className={examQuestionSurfaceClassName}>
+        <ExamRichText content={question.question} />
       </div>
 
       <ExamOptionList
