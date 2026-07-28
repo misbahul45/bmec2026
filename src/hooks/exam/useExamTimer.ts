@@ -6,33 +6,42 @@ interface UseExamTimerOptions {
 }
 
 export function useExamTimer({ effectiveDeadline, onExpire }: UseExamTimerOptions) {
-  const [remainingSeconds, setRemainingSeconds] = useState(() =>
-    Math.max(0, Math.floor((effectiveDeadline.getTime() - Date.now()) / 1000)),
-  )
+  const deadlineMs = effectiveDeadline.getTime()
+  const getRemainingSeconds = () =>
+    Math.max(0, Math.ceil((deadlineMs - Date.now()) / 1000))
+
+  const [remainingSeconds, setRemainingSeconds] = useState(getRemainingSeconds)
   const expiredRef = useRef(false)
   const onExpireRef = useRef(onExpire)
   onExpireRef.current = onExpire
 
   useEffect(() => {
-    if (remainingSeconds <= 0 && !expiredRef.current) {
-      expiredRef.current = true
-      onExpireRef.current()
-      return
+    expiredRef.current = false
+
+    const syncWithDeadline = () => {
+      const next = Math.max(0, Math.ceil((deadlineMs - Date.now()) / 1000))
+      setRemainingSeconds(next)
+
+      if (next === 0 && !expiredRef.current) {
+        expiredRef.current = true
+        onExpireRef.current()
+      }
     }
 
-    const interval = setInterval(() => {
-      setRemainingSeconds((prev) => {
-        const next = Math.max(0, prev - 1)
-        if (next === 0 && !expiredRef.current) {
-          expiredRef.current = true
-          setTimeout(() => onExpireRef.current(), 0)
-        }
-        return next
-      })
-    }, 1000)
+    syncWithDeadline()
+    const interval = window.setInterval(syncWithDeadline, 1000)
+    const timeout = window.setTimeout(syncWithDeadline, Math.max(0, deadlineMs - Date.now()))
 
-    return () => clearInterval(interval)
-  }, [])
+    window.addEventListener('focus', syncWithDeadline)
+    document.addEventListener('visibilitychange', syncWithDeadline)
+
+    return () => {
+      window.clearInterval(interval)
+      window.clearTimeout(timeout)
+      window.removeEventListener('focus', syncWithDeadline)
+      document.removeEventListener('visibilitychange', syncWithDeadline)
+    }
+  }, [deadlineMs])
 
   return { remainingSeconds }
 }

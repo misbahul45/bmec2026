@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useExamAnswers } from '~/hooks/exam/useExamAnswers'
 import { useExamNavigation } from '~/hooks/exam/useExamNavigation'
@@ -12,13 +12,13 @@ import { ExamActionBar } from './ExamActionBar'
 import { ExamSubmitDialog } from './ExamSubmitDialog'
 import { ExamDeviceLockScreen } from './ExamDeviceLockScreen'
 import { ExamBlockedScreen } from './ExamBlockedScreen'
+import { ExamMobileToolbar } from './ExamMobileToolbar'
 import { saveAnswer } from '~/server/exam-attempt'
 import { ExamQuestion } from '~/types/exam.type'
 import { ExamType } from '@prisma/client'
 
 interface ExamAttemptData {
   id: string
-  startTime: string | Date
   deviceId: string | null
   answers: { questionId: string; answer: string }[]
 }
@@ -38,17 +38,19 @@ interface ExamShellProps {
   questions: ExamQuestion[]
   teamId: string
   examId:string
+  effectiveDeadline: Date
 }
 
-export function ExamShell({ attempt, exam, questions, teamId, examId }: ExamShellProps) {
+export function ExamShell({
+  attempt,
+  exam,
+  questions,
+  teamId,
+  examId,
+  effectiveDeadline,
+}: ExamShellProps) {
   const deviceState = useDeviceVerification(attempt.id)
-
-  const effectiveDeadline = (() => {
-    const start = new Date(attempt.startTime)
-    const deadlineFromStart = new Date(start.getTime() + exam.duration * 60 * 1000)
-    const examEnd = new Date(exam.endDate)
-    return deadlineFromStart < examEnd ? deadlineFromStart : examEnd
-  })()
+  const [isSaving, setIsSaving] = useState(false)
 
   const questionIds = questions.map((q) => q.id)
 
@@ -57,11 +59,9 @@ export function ExamShell({ attempt, exam, questions, teamId, examId }: ExamShel
     selectedAnswer,
     setSelectedAnswer,
     markAsSaved,
-    rollbackAnswer,
     markAsDoubt,
     getStatus,
     getSummary,
-    flushAndClear,
   } = useExamAnswers({
     attemptId: attempt.id,
     questionIds,
@@ -72,9 +72,13 @@ export function ExamShell({ attempt, exam, questions, teamId, examId }: ExamShel
     useExamNavigation(questions)
 
   const { isSubmitting, submitManual, submitAuto, showConfirmDialog, setShowConfirmDialog } =
-    useExamSubmit({ attemptId: attempt.id, teamId, examType:exam.type, examId })
+    useExamSubmit({ attemptId: attempt.id, examType:exam.type, examId })
 
-  useExamAntiCheat({ enabled:exam.type ==='OLYMPIAD',attemptId: attempt.id, isFinished: false })
+  useExamAntiCheat({
+    enabled: exam.type === 'OLYMPIAD',
+    attemptId: attempt.id,
+    isFinished: isSubmitting,
+  })
 
   useEffect(() => {
     if (!currentQuestion) return
@@ -82,37 +86,85 @@ export function ExamShell({ attempt, exam, questions, teamId, examId }: ExamShel
     setSelectedAnswer(existing?.answer ?? null)
   }, [currentIndex, currentQuestion?.id, answers, setSelectedAnswer])
 
-  const handleDoubt = useCallback(() => {
-    if (!currentQuestion) return
-    const answerToSave = selectedAnswer ?? ''
-    markAsDoubt(currentQuestion.id, answerToSave)
-    goToNext()
-  }, [currentQuestion, selectedAnswer, markAsDoubt, goToNext])
+  const persistAnswer = useCallback(async (questionId: string, answer: string) => {
+    const response = await saveAnswer({
+      data: {
+        attemptId: attempt.id,
+        questionId,
+        answer,
+        teamId,
+      },
+    })
+
+    const result = response.data as { skipped?: boolean; reason?: string } | undefined
+    if (result?.skipped) {
+      throw new Error(result.reason ?? 'ANSWER_NOT_SAVED')
+    }
+  }, [attempt.id, teamId])
+
+  const handleDoubt = useCallback(async () => {
+    if (!currentQuestion || !selectedAnswer || isSaving || isSubmitting) return
+
+    setIsSaving(true)
+    try {
+      await persistAnswer(currentQuestion.id, selectedAnswer)
+      markAsDoubt(currentQuestion.id, selectedAnswer)
+      goToNext()
+    } catch (error) {
+      if (error instanceof Error && error.message === 'TIME_EXPIRED') {
+        void submitAuto()
+      } else {
+        toast.error('Gagal menyimpan jawaban ragu-ragu. Coba lagi.')
+      }
+    } finally {
+      setIsSaving(false)
+    }
+  }, [currentQuestion, selectedAnswer, isSaving, isSubmitting, persistAnswer, markAsDoubt, goToNext, submitAuto])
 
   const handleSave = useCallback(async () => {
-    if (!currentQuestion) return
-    const answerToSave = selectedAnswer ?? ''
-    const previous = answers[currentQuestion.id]
-    markAsSaved(currentQuestion.id, answerToSave)
+    if (!currentQuestion || !selectedAnswer || isSaving || isSubmitting) return
+
+    setIsSaving(true)
     try {
-      await saveAnswer({
-        data: {
-          attemptId: attempt.id,
-          questionId: currentQuestion.id,
-          answer: answerToSave,
-          teamId,
-        },
-      })
-    } catch {
-      rollbackAnswer(currentQuestion.id, previous)
-      toast.error('Gagal menyimpan jawaban. Coba lagi.')
+      await persistAnswer(currentQuestion.id, selectedAnswer)
+      markAsSaved(currentQuestion.id, selectedAnswer)
+      if (!isLast) goToNext()
+    } catch (error) {
+      if (error instanceof Error && error.message === 'TIME_EXPIRED') {
+        void submitAuto()
+      } else {
+        toast.error('Gagal menyimpan jawaban. Coba lagi.')
+      }
+    } finally {
+      setIsSaving(false)
+    }
+  }, [currentQuestion, selectedAnswer, isSaving, isSubmitting, persistAnswer, markAsSaved, isLast, goToNext, submitAuto])
+
+  const hasUnsavedSelection = useCallback(() => {
+    if (!currentQuestion) return false
+    return selectedAnswer !== (answers[currentQuestion.id]?.answer ?? null)
+  }, [answers, currentQuestion, selectedAnswer])
+
+  const handleNavigate = useCallback((index: number) => {
+    if (isSaving || isSubmitting) return
+    if (hasUnsavedSelection()) {
+      toast.warning('Simpan jawaban sebelum berpindah soal.')
       return
     }
-    if (!isLast) goToNext()
-  }, [currentQuestion, selectedAnswer, answers, attempt.id, teamId, markAsSaved, rollbackAnswer, isLast, goToNext])
+    goToIndex(index)
+  }, [goToIndex, hasUnsavedSelection, isSaving, isSubmitting])
+
+  const handlePrev = useCallback(() => {
+    if (isSaving || isSubmitting) return
+    if (hasUnsavedSelection()) {
+      toast.warning('Simpan jawaban sebelum berpindah soal.')
+      return
+    }
+    goToPrev()
+  }, [goToPrev, hasUnsavedSelection, isSaving, isSubmitting])
 
   const handleExpire = useCallback(() => {
-    submitAuto()
+    void submitAuto()
   }, [submitAuto])
 
   if (deviceState === 'device_locked') return <ExamDeviceLockScreen />
@@ -130,7 +182,7 @@ export function ExamShell({ attempt, exam, questions, teamId, examId }: ExamShel
   const answered = summary.saved + summary.doubt
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex h-dvh flex-col overflow-hidden">
       <ExamHeader
         examTitle={exam.title}
         stageName={exam.stage?.name ?? ''}
@@ -140,6 +192,17 @@ export function ExamShell({ attempt, exam, questions, teamId, examId }: ExamShel
         onExpire={handleExpire}
       />
 
+      <ExamMobileToolbar
+        total={questions.length}
+        currentIndex={currentIndex}
+        questionIds={questionIds}
+        getStatus={getStatus}
+        summary={summary}
+        onNavigate={handleNavigate}
+        onSubmit={() => setShowConfirmDialog(true)}
+        disabled={isSaving || isSubmitting}
+      />
+
       <div className="flex flex-1 overflow-hidden">
         <ExamSidebar
           total={questions.length}
@@ -147,8 +210,9 @@ export function ExamShell({ attempt, exam, questions, teamId, examId }: ExamShel
           questionIds={questionIds}
           getStatus={getStatus}
           summary={summary}
-          onNavigate={goToIndex}
+          onNavigate={handleNavigate}
           onSubmit={() => setShowConfirmDialog(true)}
+          disabled={isSaving || isSubmitting}
         />
 
         <div className="flex flex-col flex-1 overflow-hidden">
@@ -159,15 +223,17 @@ export function ExamShell({ attempt, exam, questions, teamId, examId }: ExamShel
             status={getStatus(currentQuestion.id)}
             selectedAnswer={selectedAnswer}
             onSelect={setSelectedAnswer}
+            disabled={isSaving || isSubmitting}
           />
 
           <ExamActionBar
             isFirst={isFirst}
             isLast={isLast}
             selectedAnswer={selectedAnswer}
-            onPrev={goToPrev}
+            onPrev={handlePrev}
             onDoubt={handleDoubt}
             onSave={handleSave}
+            isBusy={isSaving || isSubmitting}
           />
         </div>
       </div>

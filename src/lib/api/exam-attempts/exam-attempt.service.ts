@@ -1,5 +1,4 @@
 import { ExamEventType, Prisma } from '@prisma/client'
-import { prisma } from '~/lib/utils/prisma'
 import { AppError } from '~/lib/utils/app-error'
 import ExamAttemptRepo from './exam-attempt.repo'
 
@@ -33,66 +32,33 @@ export default class ExamAttemptService {
       throw new AppError('Ujian tidak dalam periode aktif', 400)
     }
 
-    const existing = await this.repo.findAttempt(input.teamId, input.examId)
+    const attempt = await this.repo.upsertAttempt({
+      ...input,
+      deviceId: '',
+      startTime: now,
+    })
 
-    if (existing) {
-      if (existing.finished) throw new AppError('Ujian sudah selesai dikerjakan', 400)
+    if (attempt.finished) throw new AppError('Ujian sudah selesai dikerjakan', 400)
 
-      if (input.deviceId && existing.deviceId && existing.deviceId !== input.deviceId) {
-        await prisma.$transaction((tx) =>
-          this.repo.logEventAndUpdateAttempt(
-            tx,
-            existing.id,
-            ExamEventType.MULTIPLE_LOGIN,
-            {
-              blockedDeviceId: input.deviceId,
-              originalDeviceId: existing.deviceId,
-              ipAddress: input.ipAddress,
-              userAgent: input.userAgent,
-              timestamp: now.toISOString(),
-            },
-            SUSPICIOUS_WEIGHTS.MULTIPLE_LOGIN,
-          ),
-        )
-        throw new AppError('Ujian sedang dikerjakan dari perangkat lain', 403)
-      }
-
-      return { data: existing, alreadyStarted: true }
+    if (input.deviceId && attempt.deviceId && attempt.deviceId !== input.deviceId) {
+      await this.repo.logEventAndUpdateAttempt(
+        attempt.id,
+        ExamEventType.MULTIPLE_LOGIN,
+        {
+          blockedDeviceId: input.deviceId,
+          originalDeviceId: attempt.deviceId,
+          ipAddress: input.ipAddress,
+          userAgent: input.userAgent,
+          timestamp: now.toISOString(),
+        },
+        SUSPICIOUS_WEIGHTS.MULTIPLE_LOGIN,
+      )
+      throw new AppError('Ujian sedang dikerjakan dari perangkat lain', 403)
     }
 
-    try {
-      const attempt = await this.repo.createAttempt({
-        ...input,
-        deviceId: '',
-      })
-      return { data: attempt, alreadyStarted: false }
-    } catch (err: any) {
-      if (err?.code === 'P2002') {
-        const retry = await this.repo.findAttempt(input.teamId, input.examId)
-        if (!retry) throw new AppError('Gagal memulai ujian', 500)
-
-        if (input.deviceId && retry.deviceId && retry.deviceId !== input.deviceId) {
-          await prisma.$transaction((tx) =>
-            this.repo.logEventAndUpdateAttempt(
-              tx,
-              retry.id,
-              ExamEventType.MULTIPLE_LOGIN,
-              {
-                blockedDeviceId: input.deviceId,
-                originalDeviceId: retry.deviceId,
-                ipAddress: input.ipAddress,
-                userAgent: input.userAgent,
-                timestamp: new Date().toISOString(),
-              },
-              SUSPICIOUS_WEIGHTS.MULTIPLE_LOGIN,
-            ),
-          )
-          throw new AppError('Ujian sedang dikerjakan dari perangkat lain', 403)
-        }
-
-        return { data: retry, alreadyStarted: true }
-      }
-      throw err
+    return {
+      data: attempt,
+      alreadyStarted: attempt.startTime.getTime() !== now.getTime(),
     }
   }
 
@@ -101,10 +67,14 @@ export default class ExamAttemptService {
     deviceId: string
     ipAddress: string
     userAgent: string
+    teamId: string
   }) {
     const attempt = await this.repo.findAttemptById(input.attemptId)
 
     if (!attempt) return { allowed: false as const, reason: 'NOT_FOUND' as const }
+    if (attempt.teamId !== input.teamId) {
+      throw new AppError('Akses ujian ditolak', 403)
+    }
     if (attempt.finished) return { allowed: false as const, reason: 'FINISHED' as const }
 
     if (!attempt.deviceId) {
@@ -113,20 +83,17 @@ export default class ExamAttemptService {
     }
 
     if (attempt.deviceId !== input.deviceId) {
-      await prisma.$transaction((tx) =>
-        this.repo.logEventAndUpdateAttempt(
-          tx,
-          attempt.id,
-          ExamEventType.MULTIPLE_LOGIN,
-          {
-            blockedDeviceId: input.deviceId,
-            originalDeviceId: attempt.deviceId,
-            ipAddress: input.ipAddress,
-            userAgent: input.userAgent,
-            timestamp: new Date().toISOString(),
-          },
-          SUSPICIOUS_WEIGHTS.MULTIPLE_LOGIN,
-        ),
+      await this.repo.logEventAndUpdateAttempt(
+        attempt.id,
+        ExamEventType.MULTIPLE_LOGIN,
+        {
+          blockedDeviceId: input.deviceId,
+          originalDeviceId: attempt.deviceId,
+          ipAddress: input.ipAddress,
+          userAgent: input.userAgent,
+          timestamp: new Date().toISOString(),
+        },
+        SUSPICIOUS_WEIGHTS.MULTIPLE_LOGIN,
       )
       return { allowed: false as const, reason: 'DEVICE_LOCKED' as const }
     }
@@ -196,16 +163,30 @@ export default class ExamAttemptService {
     answer: string
     teamId: string
   }) {
-    const attempt = await this.repo.findAttemptById(input.attemptId)
+    const [attempt, question] = await Promise.all([
+      this.repo.findAttemptForAnswer(input.attemptId),
+      this.repo.findQuestion(input.questionId),
+    ])
+
     if (!attempt) throw new AppError('Sesi ujian tidak ditemukan', 404)
+    if (attempt.teamId !== input.teamId) throw new AppError('Akses ujian ditolak', 403)
     if (attempt.finished) return { skipped: true, reason: 'EXAM_FINISHED' as const }
 
-    const timeOk = await this.guardExamTime(input.attemptId, attempt.examId, attempt.startTime)
-    if (!timeOk) return { skipped: true, reason: 'TIME_EXPIRED' as const }
-
-    const question = await this.repo.findQuestion(input.questionId)
     if (!question) throw new AppError('Soal tidak ditemukan', 404)
     if (question.examId !== attempt.examId) throw new AppError('Soal tidak termasuk dalam ujian ini', 400)
+
+    const deadlineFromStart = new Date(
+      attempt.startTime.getTime() + attempt.exam.duration * 60 * 1000,
+    )
+    const effectiveDeadline =
+      deadlineFromStart < attempt.exam.endDate
+        ? deadlineFromStart
+        : attempt.exam.endDate
+
+    if (new Date() > effectiveDeadline) {
+      await this.finishExam(attempt.id, attempt.teamId)
+      return { skipped: true, reason: 'TIME_EXPIRED' as const }
+    }
 
     const isEmpty = !input.answer || input.answer.trim() === ''
     const isCorrect = isEmpty ? false : question.correctAnswer === input.answer
@@ -223,90 +204,46 @@ export default class ExamAttemptService {
 
 
   async finishExam(
-    attemptId: string
+    attemptId: string,
+    expectedTeamId?: string,
   ) {
-    return prisma.$transaction(
-      async (tx) => {
-        const attempt =
-          await this.repo.findAttemptForFinish(
-            tx,
-            attemptId
-          )
+    const attempt = await this.repo.findAttemptForFinish(attemptId)
 
-        if (!attempt) {
-          throw new AppError(
-            'Sesi ujian tidak ditemukan',
-            404
-          )
-        }
+    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan', 404)
+    if (expectedTeamId && attempt.teamId !== expectedTeamId) {
+      throw new AppError('Akses ujian ditolak', 403)
+    }
+    if (attempt.finished) return { alreadyFinished: true, totalScore: null }
 
-        if (attempt.finished) {
-          return {
-            alreadyFinished: true,
-            totalScore: null,
-          }
-        }
+    const totalScore = attempt.answers.reduce((sum, answer) => {
+      const question = answer.question
+      const isEmpty = !answer.answer || answer.answer.trim() === ''
 
-        const totalScore =
-          attempt.answers.reduce(
-            (
-              sum,
-              answer
-            ) => {
-              const question =
-                answer.question
+      if (isEmpty) return sum + question.emptyScore
+      if (answer.isCorrect) return sum + question.correctScore
+      return sum + question.wrongScore
+    }, 0)
 
-              const isEmpty =
-                !answer.answer ||
-                answer.answer.trim() === ''
+    const updated = await this.repo.finishAttempt(attemptId, totalScore)
 
-              if (isEmpty) {
-                return (
-                  sum +
-                  question.emptyScore
-                )
-              }
+    if (updated.count === 0) {
+      return { alreadyFinished: true, totalScore: null }
+    }
 
-              if (
-                answer.isCorrect
-              ) {
-                return (
-                  sum +
-                  question.correctScore
-                )
-              }
-
-              return (
-                sum +
-                question.wrongScore
-              )
-            },
-            0
-          )
-
-        await this.repo.finishAttempt(
-          tx,
-          attemptId,
-          totalScore
-        )
-
-        return {
-          alreadyFinished: false,
-          totalScore,
-        }
-      },
-      {
-        maxWait: 5000,
-        timeout: 15000,
-      }
-    )
+    return { alreadyFinished: false, totalScore }
   }
 
 
-  async getResult(attemptId: string) {
+  async getResult(attemptId: string, expectedTeamId?: string) {
     const attempt = await this.repo.findAttemptResult(attemptId)
     if (!attempt) throw new AppError('Sesi ujian tidak ditemukan', 404)
+    if (expectedTeamId && attempt.teamId !== expectedTeamId) {
+      throw new AppError('Akses ujian ditolak', 403)
+    }
     if (!attempt.finished) throw new AppError('Ujian belum selesai', 400)
+    if (attempt.exam.type === 'OLYMPIAD') {
+      throw new AppError('Hasil detail olimpiade tidak tersedia untuk peserta', 403)
+    }
     return { data: attempt }
   }
 
@@ -323,35 +260,22 @@ export default class ExamAttemptService {
     attemptId: string
     type: ExamEventType
     metadata?: Record<string, unknown>
+    teamId: string
   }) {
     const attempt = await this.repo.findAttemptById(input.attemptId)
     if (!attempt || attempt.finished) return
+    if (attempt.teamId !== input.teamId) {
+      throw new AppError('Akses ujian ditolak', 403)
+    }
 
     const weight = SUSPICIOUS_WEIGHTS[input.type] ?? 0
 
-    await prisma.$transaction((tx) =>
-      this.repo.logEventAndUpdateAttempt(
-        tx,
-        input.attemptId,
-        input.type,
-        (input.metadata ?? {}) as Prisma.InputJsonValue,
-        weight,
-      ),
+    await this.repo.logEventAndUpdateAttempt(
+      input.attemptId,
+      input.type,
+      (input.metadata ?? {}) as Prisma.InputJsonValue,
+      weight,
     )
   }
 
-  private async guardExamTime(attemptId: string, examId: string, startTime: Date): Promise<boolean> {
-    const exam = await this.repo.findExamWindow(examId)
-    if (!exam) return false
-
-    const deadlineFromStart = new Date(startTime.getTime() + exam.duration * 60 * 1000)
-    const effectiveDeadline = deadlineFromStart < exam.endDate ? deadlineFromStart : exam.endDate
-
-    if (new Date() > effectiveDeadline) {
-      await this.finishExam(attemptId)
-      return false
-    }
-
-    return true
-  }
 }

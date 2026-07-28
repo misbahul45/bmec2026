@@ -54,7 +54,7 @@ export function ExamSubmitDialog({
               )}
               {summary.unanswered > 0 && (
                 <p className="text-xs text-muted-foreground bg-muted rounded-lg px-3 py-2 border">
-                  {summary.unanswered} soal belum dijawab dan tidak akan mendapat nilai.
+                  {summary.unanswered} soal masih kosong dan akan dikumpulkan tanpa jawaban.
                 </p>
               )}
             </div>

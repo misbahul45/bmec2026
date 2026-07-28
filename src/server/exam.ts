@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Uuid } from "~/schemas/general.schema";
 import { examQuestionSchema } from "~/schemas/exam";
 import { ExamWithStage } from "~/types/exam.type";
+import { requireTeamSession } from "~/lib/utils/server-auth";
 
 const examService = new ExamService();
 
@@ -68,6 +69,7 @@ export const getExamsByCompetitionType = createServerFn({ method: 'GET' })
   .inputValidator(z.object({ type: z.string(), teamId: z.string() }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireTeamSession(data.teamId)
       const result = await examService.findByCompetitionType(data.type, data.teamId)
       return successResponse<any>(result.data, result.message)
     })

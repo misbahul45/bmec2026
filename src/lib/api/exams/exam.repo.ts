@@ -51,6 +51,10 @@ export default class ExamRepo {
         stage: true,
         attempts: {
           where: { teamId },
+          select: {
+            finished: true,
+            startTime: true,
+          },
         },
       },
       orderBy: { startDate: 'asc' },

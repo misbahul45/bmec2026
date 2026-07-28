@@ -14,12 +14,9 @@ import { ExamShell } from '~/components/exam/ExamShell'
 
 import { examSessionQueryOptions } from '~/lib/api/exam-attempts/exam-attempt.query-options'
 
-import { startExam } from '~/server/exam-attempt'
+import { startExamSession } from '~/server/exam-attempt'
 
-import {
-  ExamType,
-  QuestionDifficulty,
-} from '@prisma/client'
+import { ExamType } from '@prisma/client'
 
 import {
   AlertTriangle,
@@ -36,7 +33,7 @@ export const Route = createFileRoute(
       throw redirect({ to: '/auth/login' })
     }
 
-    await startExam({
+    const session = await startExamSession({
       data: {
         teamId,
         examId: params.examId,
@@ -46,8 +43,9 @@ export const Route = createFileRoute(
       },
     })
 
-    await context.queryClient.ensureQueryData(
-      examSessionQueryOptions(teamId, params.examId),
+    context.queryClient.setQueryData(
+      examSessionQueryOptions(teamId, params.examId).queryKey,
+      session,
     )
   },
 
@@ -145,11 +143,6 @@ function ExamPage({
         optionD: string
         optionE: string
 
-        difficulty: QuestionDifficulty
-
-        correctScore: number
-        wrongScore: number
-        emptyScore: number
       }[]
 
       type: ExamType
@@ -158,16 +151,7 @@ function ExamPage({
 
   const attempt = {
     id: session.attemptId,
-
-    startTime: new Date(
-      new Date().getTime() -
-        (session.exam.duration * 60 -
-          session.remainingSeconds) *
-          1000,
-    ),
-
     deviceId: null as string | null,
-
     answers: session.answers,
   }
 
@@ -178,6 +162,7 @@ function ExamPage({
       questions={session.exam.questions}
       teamId={teamId}
       examId={examId}
+      effectiveDeadline={new Date(session.effectiveDeadline)}
     />
   )
 }

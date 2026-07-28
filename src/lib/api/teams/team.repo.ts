@@ -4,6 +4,32 @@ import { CompetitionType, Prisma } from "@prisma/client"
 
 export default class TeamRepo {
 
+  findAuthState(id: string) {
+    return prisma.team.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        competitionType: true,
+        documentUrl: true,
+        twibbonUrl: true,
+        mentor: {
+          select: { id: true },
+        },
+        registration: {
+          select: { id: true },
+        },
+        _count: {
+          select: { members: true },
+        },
+        submissions: {
+          where: { abstractUrl: { not: null } },
+          select: { abstractUrl: true },
+          take: 1,
+        },
+      },
+    })
+  }
+
   findByEmail(email: string) {
     return prisma.team.findUnique({
       where: { email },

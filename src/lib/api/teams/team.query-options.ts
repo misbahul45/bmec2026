@@ -13,6 +13,7 @@ export const teamDashboardQueryOptions = (teamId: string) =>
   queryOptions({
     queryKey: ['teams', teamId, 'dashboard'],
     queryFn: () => getTeamDashboard({ data: teamId }),
+    staleTime: 60_000,
   })
 
 export const teamsQueryOptions = (query: QueryTeam) => {

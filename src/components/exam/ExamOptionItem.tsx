@@ -5,13 +5,18 @@ interface ExamOptionItemProps {
   content: string
   isSelected: boolean
   onClick: () => void
+  disabled?: boolean
 }
 
-export function ExamOptionItem({ label, content, isSelected, onClick }: ExamOptionItemProps) {
+export function ExamOptionItem({ label, content, isSelected, onClick, disabled = false }: ExamOptionItemProps) {
   return (
-    <div
+    <button
+      type="button"
+      role="radio"
+      aria-checked={isSelected}
+      disabled={disabled}
       onClick={onClick}
-      className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors select-none
+      className={`flex w-full items-start gap-3 p-4 rounded-xl border text-left cursor-pointer transition-colors select-none disabled:cursor-not-allowed disabled:opacity-60
         ${isSelected
           ? 'border-primary bg-primary/10'
           : 'border-border bg-background hover:border-primary/40 hover:bg-primary/5'
@@ -26,6 +31,6 @@ export function ExamOptionItem({ label, content, isSelected, onClick }: ExamOpti
       <div className="flex-1 min-w-0 pt-0.5">
         <TipTapRenderer content={content} />
       </div>
-    </div>
+    </button>
   )
 }

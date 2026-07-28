@@ -4,6 +4,7 @@ import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { examsByCompetitionTypeQueryOptions } from '~/lib/api/exams/exam.query-options'
 import { PaymentStatus } from '@prisma/client'
+import { useEffect, useState } from 'react'
 
 type Props = {
   registrationStatus?: PaymentStatus | null
@@ -43,13 +44,30 @@ export function OlimpiadeSection({ registrationStatus, teamId }: Props) {
     )
   }
 
+  if (registrationStatus !== 'APPROVED') {
+    return (
+      <div className="rounded-2xl bg-background shadow border p-6 flex flex-col items-center gap-3 text-center">
+        <Lock size={32} className="text-destructive/70" />
+        <p className="font-semibold text-base">Registrasi Tidak Aktif</p>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          Ujian hanya tersedia untuk tim dengan registrasi yang telah disetujui.
+        </p>
+      </div>
+    )
+  }
+
   return <ExamList teamId={teamId} />
 }
 
 function ExamList({ teamId }: { teamId: string }) {
   const { data: res } = useSuspenseQuery(examsByCompetitionTypeQueryOptions('OLIMPIADE', teamId))
   const exams: any[] = res.data ?? []
-  const now = new Date()
+  const [now, setNow] = useState(() => new Date())
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(new Date()), 30_000)
+    return () => window.clearInterval(interval)
+  }, [])
 
   if (exams.length === 0) {
     return (
@@ -73,7 +91,9 @@ function ExamList({ teamId }: { teamId: string }) {
           const isEnded = now > end
           const isUpcoming = now < start
           
-          const isFinished = exam.attempts?.[0]?.finished
+          const attempt = exam.attempts?.[0]
+          const isFinished = attempt?.finished
+          const isStarted = Boolean(attempt && !attempt.finished)
 
           return (
             <div key={exam.id} className="rounded-2xl bg-background shadow border p-5 space-y-3">
@@ -122,7 +142,7 @@ function ExamList({ teamId }: { teamId: string }) {
                 <Button size="sm" className="w-full rounded-xl" asChild>
                   <a href={`/dashboard/team/exam/${exam.id}`}>
                     <BookOpen size={13} className="mr-1.5" />
-                    Mulai Kerjakan
+                    {isStarted ? 'Lanjutkan Ujian' : 'Mulai Kerjakan'}
                   </a>
                 </Button>
               ) : isUpcoming ? (

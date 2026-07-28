@@ -40,10 +40,10 @@ export function ExamTimer({ effectiveDeadline, onExpire }: ExamTimerProps) {
         {isExpired ? 'Waktu Habis' : formatTime(remainingSeconds)}
       </span>
       {isCritical && !isExpired && (
-        <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Hampir Habis</Badge>
+        <Badge variant="destructive" className="hidden md:inline-flex text-[10px] px-1.5 py-0">Hampir Habis</Badge>
       )}
       {isWarning && (
-        <Badge className="text-[10px] px-1.5 py-0 bg-amber-500 text-white">Segera Habis</Badge>
+        <Badge className="hidden md:inline-flex text-[10px] px-1.5 py-0 bg-amber-500 text-white">Segera Habis</Badge>
       )}
     </div>
   )

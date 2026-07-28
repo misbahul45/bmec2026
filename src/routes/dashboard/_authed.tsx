@@ -1,5 +1,4 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { fetchUser } from '~/server/auth'
 
 export const Route = createFileRoute('/dashboard/_authed')({
   beforeLoad: async ({ context, location }) => {
@@ -20,17 +19,9 @@ export const Route = createFileRoute('/dashboard/_authed')({
     }
 
     if (location.pathname.startsWith('/dashboard/team')) {
-      const userLogin = await fetchUser()
-
-      if (!userLogin) {
+      if (context.user.redirect !== '/dashboard/team') {
         throw redirect({
-          to: '/auth/login',
-        })
-      }
-
-      if (userLogin.redirect !== '/dashboard/team') {
-        throw redirect({
-          href: userLogin.redirect,
+          href: context.user.redirect,
         })
       }
     }

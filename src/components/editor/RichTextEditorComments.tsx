@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react"
+import 'quill/dist/quill.core.css'
 import "quill/dist/quill.snow.css"
 import { uploadToImageKit } from "~/lib/api/uploads/service"
 

@@ -2,13 +2,6 @@ import { ExamEventType, Prisma } from '@prisma/client'
 import { prisma } from '~/lib/utils/prisma'
 
 export default class ExamAttemptRepo {
-  findAttempt(teamId: string, examId: string) {
-    return prisma.examAttempt.findUnique({
-      where: { teamId_examId: { teamId, examId } },
-      select: { id: true, finished: true, deviceId: true, startTime: true, examId: true },
-    })
-  }
-
   findAttemptById(id: string) {
     return prisma.examAttempt.findUnique({
       where: { id },
@@ -16,21 +9,29 @@ export default class ExamAttemptRepo {
     })
   }
 
-  createAttempt(data: {
+  upsertAttempt(data: {
     teamId: string
     examId: string
     deviceId: string
     ipAddress: string
     userAgent: string
+    startTime: Date
   }) {
-    return prisma.examAttempt.create({
-      data: {
+    return prisma.examAttempt.upsert({
+      where: {
+        teamId_examId: {
+          teamId: data.teamId,
+          examId: data.examId,
+        },
+      },
+      update: {},
+      create: {
         teamId: data.teamId,
         examId: data.examId,
         deviceId: data.deviceId || null,
         ipAddress: data.ipAddress || null,
         userAgent: data.userAgent || null,
-        startTime: new Date(),
+        startTime: data.startTime,
       },
       select: { id: true, startTime: true, finished: true, teamId: true, examId: true, deviceId: true },
     })
@@ -52,21 +53,38 @@ export default class ExamAttemptRepo {
         startTime: true,
         finished: true,
         answers: {
-          select: { questionId: true, answer: true, isCorrect: true, answeredAt: true },
+          select: { questionId: true, answer: true },
         },
       },
     })
   }
 
-  findAttemptForFinish(
-    tx: Prisma.TransactionClient,
-    attemptId: string
-  ) {
-    return tx.examAttempt.findUnique({
+  findAttemptForAnswer(id: string) {
+    return prisma.examAttempt.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        finished: true,
+        startTime: true,
+        examId: true,
+        teamId: true,
+        exam: {
+          select: {
+            endDate: true,
+            duration: true,
+          },
+        },
+      },
+    })
+  }
+
+  findAttemptForFinish(attemptId: string) {
+    return prisma.examAttempt.findUnique({
       where: {
         id: attemptId,
       },
       select: {
+        teamId: true,
         finished: true,
         examId: true,
         answers: {
@@ -86,9 +104,9 @@ export default class ExamAttemptRepo {
     })
   }
 
-  finishAttempt(tx: Prisma.TransactionClient, attemptId: string, totalScore: number) {
-    return tx.examAttempt.update({
-      where: { id: attemptId },
+  finishAttempt(attemptId: string, totalScore: number) {
+    return prisma.examAttempt.updateMany({
+      where: { id: attemptId, finished: false },
       data: { finished: true, endTime: new Date(), totalScore },
     })
   }
@@ -141,6 +159,11 @@ export default class ExamAttemptRepo {
         endDate: true,
         duration: true,
         type: true,
+        stage: {
+          select: {
+            name: true,
+          },
+        },
         questions: {
           select: {
             id: true,
@@ -150,11 +173,11 @@ export default class ExamAttemptRepo {
             optionC: true,
             optionD: true,
             optionE: true,
-            correctScore:true,
-            wrongScore:true,
-            emptyScore:true,    
           },
-          orderBy: { createdAt: 'asc' },
+          orderBy: [
+            { order: 'asc' },
+            { createdAt: 'asc' },
+          ],
         },
       },
     })
@@ -200,6 +223,7 @@ export default class ExamAttemptRepo {
       },
       select: {
         id: true,
+        teamId: true,
         totalScore: true,
         finished: true,
         startTime: true,
@@ -210,6 +234,7 @@ export default class ExamAttemptRepo {
 
         exam: {
           select: {
+            type: true,
             _count: {
               select: { questions: true },
             },
@@ -241,20 +266,23 @@ export default class ExamAttemptRepo {
     })
   }
   logEventAndUpdateAttempt(
-    tx: Prisma.TransactionClient,
     attemptId: string,
     type: ExamEventType,
     metadata: Prisma.InputJsonValue,
     weight: number,
   ) {
+    const createEvent = prisma.examEventLog.create({
+      data: { attemptId, type, metadata },
+    })
+
+    if (weight <= 0) return createEvent
+
     return Promise.all([
-      tx.examEventLog.create({
-        data: { attemptId, type, metadata },
-      }),
-      tx.examAttempt.update({
-        where: { id: attemptId },
+      createEvent,
+      prisma.examAttempt.updateMany({
+        where: { id: attemptId, finished: false },
         data: {
-          cheatCount: { increment: weight > 0 ? 1 : 0 },
+          cheatCount: { increment: 1 },
           suspiciousScore: { increment: weight },
           ...(weight >= 25 ? { flagged: true } : {}),
         },

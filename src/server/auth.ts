@@ -7,11 +7,9 @@ import TeamRepo from "~/lib/api/teams/team.repo"
 import AdminRepo from "~/lib/api/admins/admin.repo"
 import * as bcrypt from "bcrypt"
 import { useAppSession } from "~/lib/utils/session"
-import CompetitionRepo from "~/lib/api/competitions/competition.repo"
 
 const teamRepo = new TeamRepo()
 const adminRepo = new AdminRepo()
-const competitionRepo = new CompetitionRepo()
 
 
 export const loginFn = createServerFn({ method: "POST" })
@@ -82,24 +80,28 @@ export const fetchUser = createServerFn({ method: "GET" })
 
     if (session.data.role === "ADMIN") {
       return {
-        ...session.data,
+        userId: session.data.userId,
+        email: session.data.email,
+        role: 'ADMIN' as const,
         redirect: "/dashboard/admin",
       }
     }
 
-    const team = await teamRepo.findById(session.data.userId)
+    if (session.data.role !== 'TEAM') return null
+
+    const team = await teamRepo.findAuthState(session.data.userId)
 
     if (!team) return null
 
-    const mentor = await teamRepo.findMentorByTeamId(team.id)
-    const registration = await competitionRepo.findRegistrationByTeamid(team.id)
-    const abstractTeam = (await teamRepo.findSubmissionsByTeamId(team.id))[0]?.abstractUrl
+    const mentor = team.mentor
+    const registration = team.registration
+    const abstractTeam = team.submissions[0]?.abstractUrl
 
     let redirect: string
 
     if (!mentor) {
       redirect = `/auth/register/${team.id}/`
-    } else if (!team.members || team.members.length === 0) {
+    } else if (team._count.members === 0) {
       redirect = `/auth/register/${team.id}/?tab=members`
     } else if (team.competitionType === 'LKTI') {
       if (!abstractTeam) {
@@ -116,7 +118,9 @@ export const fetchUser = createServerFn({ method: "GET" })
     }
 
     return {
-      ...session.data,
+      userId: session.data.userId,
+      email: session.data.email,
+      role: 'TEAM' as const,
       redirect,
     }
   })

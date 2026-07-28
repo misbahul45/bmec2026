@@ -6,6 +6,7 @@ interface ExamNavigatorGridProps {
   getStatus: (questionId: string) => AnswerStatus
   questionIds: string[]
   onNavigate: (index: number) => void
+  disabled?: boolean
 }
 
 const statusStyles: Record<AnswerStatus | 'active', string> = {
@@ -21,6 +22,7 @@ export function ExamNavigatorGrid({
   getStatus,
   questionIds,
   onNavigate,
+  disabled = false,
 }: ExamNavigatorGridProps) {
   return (
     <div className="grid grid-cols-5 gap-1.5">
@@ -30,8 +32,12 @@ export function ExamNavigatorGrid({
         return (
           <button
             key={i}
+            type="button"
             onClick={() => onNavigate(i)}
-            className={`h-8 w-8 rounded-lg border text-xs font-medium transition-colors ${statusStyles[status]}`}
+            disabled={disabled}
+            aria-current={isActive ? 'step' : undefined}
+            aria-label={`Soal ${i + 1}, ${isActive ? 'aktif' : status === 'saved' ? 'sudah dijawab' : status === 'doubt' ? 'ragu-ragu' : 'belum dijawab'}`}
+            className={`h-9 w-9 rounded-lg border text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${statusStyles[status]}`}
           >
             {i + 1}
           </button>

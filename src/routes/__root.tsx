@@ -8,25 +8,23 @@ import {
   redirect,
 } from '@tanstack/react-router'
 import { QueryClient } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import * as React from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
-import Footer from '~/components/layout/Footer'
-import Header from '~/components/layout/Header'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/lib/utils/seo'
 import { Toaster } from "~/components/ui/sonner"
 import { fetchUser } from '~/server/auth'
 import { allowedRegisterPaths } from '~/contants'
-import { SessionData } from '~/lib/utils/session'
+import { AuthenticatedUser } from '~/lib/utils/session'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
-import "quill/dist/quill.core.css";
+
+const Header = React.lazy(() => import('~/components/layout/Header'))
+const Footer = React.lazy(() => import('~/components/layout/Footer'))
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient,
-  user: SessionData | null
+  user: AuthenticatedUser | null
 }>()({
   beforeLoad: async ({ location }) => {
     const user = await fetchUser()
@@ -87,12 +85,6 @@ export const Route = createRootRouteWithContext<{
       { rel: 'manifest', href: '/site.webmanifest' },
       { rel: 'icon', href: '/favicon.ico' },
     ],
-    scripts: [
-      {
-        src: '/customScript.js',
-        type: 'text/javascript',
-      },
-    ],
   }),
 
   errorComponent: (props) => (
@@ -119,7 +111,6 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const location = useLocation()
-  const isAuthPage = location.pathname.startsWith('/auth')
   const isExamPage = location.pathname.includes('/exam/')
 
   return (
@@ -128,11 +119,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="bg-background">
-        {!isExamPage && <Header />}
+        {!isExamPage && (
+          <React.Suspense fallback={null}>
+            <Header />
+          </React.Suspense>
+        )}
 
         {children}
 
-        {!isExamPage && <Footer />}
+        {!isExamPage && (
+          <React.Suspense fallback={null}>
+            <Footer />
+          </React.Suspense>
+        )}
         <Toaster
           position="top-right"
           richColors

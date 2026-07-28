@@ -8,6 +8,12 @@ export type SessionData = {
   role?: SessionRole;
 }
 
+export type AuthenticatedUser = SessionData & {
+  userId: string
+  role: SessionRole
+  redirect: string
+}
+
 export function useAppSession() {
   return useSession<SessionData>({
     name: "app-session",

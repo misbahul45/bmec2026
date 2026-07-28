@@ -47,12 +47,14 @@ export function useExamAntiCheat({
     ) => {
       if (isFinishedRef.current) return
 
-      logExamEvent({
+      void logExamEvent({
         data: {
           attemptId,
           type,
           metadata,
         },
+      }).catch(() => {
+        // Logging anti-cheat tidak boleh menghambat interaksi utama ujian.
       })
 
       switch (type) {
@@ -123,14 +125,17 @@ export function useExamAntiCheat({
     }
 
     const handleBlur = () => {
+      if (document.hidden) return
       debouncedBlur()
     }
 
-    const handleCopy = () => {
+    const handleCopy = (event: ClipboardEvent) => {
+      event.preventDefault()
       log(ExamEventType.COPY)
     }
 
-    const handlePaste = () => {
+    const handlePaste = (event: ClipboardEvent) => {
+      event.preventDefault()
       log(ExamEventType.PASTE)
     }
 

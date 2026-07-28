@@ -11,12 +11,23 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
+  build: {
+    target: 'es2022',
+    sourcemap: false,
+    cssCodeSplit: true,
+  },
   plugins: [
     tailwindcss(),
     tanstackStart({
       srcDirectory: 'src',
     }),
     viteReact(),
-    nitro(),
+    nitro({
+      preset: process.env.VERCEL ? 'vercel' : 'node-server',
+      compatibilityDate: '2025-07-15',
+      minify: true,
+      sourcemap: false,
+      compressPublicAssets: true,
+    }),
   ],
 })

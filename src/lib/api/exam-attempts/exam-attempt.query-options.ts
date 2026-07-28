@@ -5,7 +5,7 @@ export const examSessionQueryOptions = (teamId: string, examId: string) =>
   queryOptions({
     queryKey: ['exam-session', teamId, examId],
     queryFn: () => getExamSession({ data: { teamId, examId } }),
-    staleTime: 0,
+    staleTime: Number.POSITIVE_INFINITY,
     retry: false,
   })
 

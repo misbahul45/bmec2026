@@ -23,4 +23,5 @@ export const examsByCompetitionTypeQueryOptions = (competitionType: string, team
   queryOptions({
     queryKey: ["exams", "competition", competitionType, teamId],
     queryFn: () => getExamsByCompetitionType({ data: { type: competitionType, teamId } }),
+    staleTime: 30_000,
   })

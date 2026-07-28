@@ -25,7 +25,7 @@ export function ExamHeader({
     <header className="sticky top-0 z-30 h-14 bg-background border-b flex items-center px-4 gap-3">
       <div className="flex items-center gap-2 min-w-0 flex-1">
         <span className="font-semibold text-sm truncate">{examTitle}</span>
-        <Badge variant="outline" className="text-[10px] shrink-0">{stageName}</Badge>
+        {stageName && <Badge variant="outline" className="hidden sm:inline-flex text-[10px] shrink-0">{stageName}</Badge>}
       </div>
 
       <div className="hidden sm:flex items-center gap-2 shrink-0">

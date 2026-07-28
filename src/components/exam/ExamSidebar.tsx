@@ -12,6 +12,7 @@ interface ExamSidebarProps {
   summary: { saved: number; doubt: number; unanswered: number }
   onNavigate: (index: number) => void
   onSubmit: () => void
+  disabled?: boolean
 }
 
 export function ExamSidebar({
@@ -22,6 +23,7 @@ export function ExamSidebar({
   summary,
   onNavigate,
   onSubmit,
+  disabled = false,
 }: ExamSidebarProps) {
   return (
     <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r bg-muted/20 h-full overflow-y-auto">
@@ -37,6 +39,7 @@ export function ExamSidebar({
           questionIds={questionIds}
           getStatus={getStatus}
           onNavigate={onNavigate}
+          disabled={disabled}
         />
 
         <Separator />
@@ -63,6 +66,7 @@ export function ExamSidebar({
           size="sm"
           className="w-full rounded-xl text-xs border-destructive/50 text-destructive hover:bg-destructive/5"
           onClick={onSubmit}
+          disabled={disabled}
         >
           Submit Ujian
         </Button>
