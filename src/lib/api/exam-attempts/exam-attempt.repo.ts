@@ -89,10 +89,16 @@ export default class ExamAttemptRepo {
         examId: true,
         answers: {
           select: {
+            questionId: true,
             answer: true,
             isCorrect: true,
-            question: {
+          },
+        },
+        exam: {
+          select: {
+            questions: {
               select: {
+                id: true,
                 correctScore: true,
                 wrongScore: true,
                 emptyScore: true,
@@ -186,10 +192,22 @@ export default class ExamAttemptRepo {
   findReviewAttempt(teamId: string, examId: string) {
     return prisma.examAttempt.findUnique({
       where: { teamId_examId: { teamId, examId } },
-      include: {
-        answers: true,
+      select: {
+        id: true,
+        totalScore: true,
+        finished: true,
+        answers: {
+          select: {
+            questionId: true,
+            answer: true,
+            isCorrect: true,
+          },
+        },
         exam: {
-          include: {
+          select: {
+            id: true,
+            title: true,
+            type: true,
             questions: {
               select: {
                 id: true,

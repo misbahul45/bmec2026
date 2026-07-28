@@ -5,7 +5,13 @@ import {
   redirect,
   Link,
 } from '@tanstack/react-router'
-import { CheckCircle2, XCircle, MinusCircle, ArrowLeft } from 'lucide-react'
+import {
+  CheckCircle2,
+  XCircle,
+  MinusCircle,
+  ArrowLeft,
+  Trophy,
+} from 'lucide-react'
 import { examReviewQueryOptions } from '~/lib/api/exam-attempts/exam-attempt.query-options'
 import { Route as RootRoute } from '~/routes/__root'
 import { Button } from '~/components/ui/button'
@@ -93,9 +99,76 @@ function ReviewPage({ examId }: { examId: string }) {
   const wrong = userAnswers.filter(
     (a: any) => a.answer && a.answer.trim() !== '' && !a.isCorrect,
   ).length
+  const unanswered = questions.length - correct - wrong
+  const answersByQuestion = new Map(
+    userAnswers.map((answer: any) => [answer.questionId, answer]),
+  )
+  const totalScore = questions.reduce((sum: number, question: any) => {
+    const answer = answersByQuestion.get(question.id) as
+      | { answer?: string; isCorrect?: boolean }
+      | undefined
+    const isEmpty = !answer?.answer || answer.answer.trim() === ''
+
+    if (isEmpty) return sum + question.emptyScore
+    if (answer.isCorrect) return sum + question.correctScore
+    return sum + question.wrongScore
+  }, 0)
+  const maximumScore = questions.reduce(
+    (sum: number, question: any) => sum + question.correctScore,
+    0,
+  )
 
   return (
     <div className="space-y-8">
+      <section
+        aria-labelledby="exam-result-title"
+        className="overflow-hidden rounded-2xl border bg-card shadow-sm"
+      >
+        <div className="flex flex-col gap-5 bg-primary/5 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="flex items-center gap-4">
+            <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
+              <Trophy aria-hidden="true" size={24} />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Hasil Tryout</p>
+              <h2 id="exam-result-title" className="text-lg font-semibold">
+                {exam.title}
+              </h2>
+            </div>
+          </div>
+
+          <div className="rounded-xl border bg-background px-5 py-3 text-left sm:min-w-40 sm:text-right">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Nilai
+            </p>
+            <p className="mt-1 text-3xl font-bold tabular-nums text-primary">
+              {totalScore}
+              <span className="ml-1 text-sm font-medium text-muted-foreground">
+                / {maximumScore}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 divide-x border-t">
+          <ResultStat
+            label="Benar"
+            value={correct}
+            className="text-emerald-600"
+          />
+          <ResultStat
+            label="Salah"
+            value={wrong}
+            className="text-destructive"
+          />
+          <ResultStat
+            label="Kosong"
+            value={unanswered}
+            className="text-muted-foreground"
+          />
+        </div>
+      </section>
+
       <div className="space-y-6">
         {questions.map((question: any, index: number) => {
           const userAnswerObj = userAnswers.find(
@@ -229,6 +302,25 @@ function ReviewPage({ examId }: { examId: string }) {
           )
         })}
       </div>
+    </div>
+  )
+}
+
+function ResultStat({
+  label,
+  value,
+  className,
+}: {
+  label: string
+  value: number
+  className: string
+}) {
+  return (
+    <div className="p-4 text-center">
+      <p className={`text-xl font-bold tabular-nums sm:text-2xl ${className}`}>
+        {value}
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">{label}</p>
     </div>
   )
 }

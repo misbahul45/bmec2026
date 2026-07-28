@@ -215,9 +215,12 @@ export default class ExamAttemptService {
     }
     if (attempt.finished) return { alreadyFinished: true, totalScore: null }
 
-    const totalScore = attempt.answers.reduce((sum, answer) => {
-      const question = answer.question
-      const isEmpty = !answer.answer || answer.answer.trim() === ''
+    const answersByQuestion = new Map(
+      attempt.answers.map((answer) => [answer.questionId, answer]),
+    )
+    const totalScore = attempt.exam.questions.reduce((sum, question) => {
+      const answer = answersByQuestion.get(question.id)
+      const isEmpty = !answer?.answer || answer.answer.trim() === ''
 
       if (isEmpty) return sum + question.emptyScore
       if (answer.isCorrect) return sum + question.correctScore
