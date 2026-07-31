@@ -49,28 +49,50 @@ export function LKTISection({
   existingSubmission,
   queryKey,
 }: Props) {
-  if (!batchId) {
-    return (
-      <div className="animated-border flex flex-col items-center gap-3 rounded-2xl p-6 text-center">
-        <CreditCard size={32} className="text-muted-foreground/50" />
+ if (!batchId) {
+  return (
+    <div className="animated-border flex flex-col items-center gap-4 rounded-2xl p-6 text-center">
+      <CreditCard
+        size={32}
+        className="text-muted-foreground/50"
+        aria-hidden="true"
+      />
 
-        <div className="space-y-1">
-          <p className="text-base font-semibold">
-            Menunggu Hasil Seleksi Abstract
-          </p>
+      <div className="space-y-2">
+        <p className="text-base font-semibold">
+          Menunggu Hasil Seleksi Abstract
+        </p>
 
-          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-            Terima kasih sudah mengirimkan abstract. Saat ini panitia sedang melakukan proses review.
-            Jika abstract dinyatakan lolos, kamu akan dapat melanjutkan ke tahap upload full paper dan pembayaran.
-          </p>
-        </div>
-
-        <Badge variant="outline" className="mt-1">
-          Abstract Dalam Review
-        </Badge>
+        <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+          Abstract tim kamu sudah berhasil dikirim dan saat ini sedang dalam
+          proses pemeriksaan oleh panitia.
+        </p>
       </div>
-    )
-  }
+
+      <div className="w-full max-w-md rounded-xl border bg-muted/30 p-4 text-left">
+        <p className="mb-2 text-sm font-medium">Informasi selanjutnya:</p>
+
+        <ul className="space-y-2 text-sm leading-relaxed text-muted-foreground">
+          <li>
+            • Kamu belum perlu melakukan pembayaran atau mengunggah full paper.
+          </li>
+          <li>
+            • Jika abstract dinyatakan lolos, tahap upload full paper dan
+            pembayaran akan otomatis tersedia di dashboard.
+          </li>
+          <li>
+            • Silakan periksa dashboard secara berkala untuk melihat pembaruan
+            hasil seleksi.
+          </li>
+        </ul>
+      </div>
+
+      <Badge variant="outline" className="mt-1">
+        Abstract Sedang Dalam Review
+      </Badge>
+    </div>
+  )
+}
 
   if (!abstractStatus) {
     return (
