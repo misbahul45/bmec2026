@@ -59,6 +59,33 @@ export default class ExamAttemptRepo {
     })
   }
 
+  findAttemptWithSession(teamId: string, examId: string) {
+    return prisma.examAttempt.findUnique({
+      where: { teamId_examId: { teamId, examId } },
+      select: {
+        id: true,
+        startTime: true,
+        finished: true,
+        answers: {
+          select: { questionId: true, answer: true },
+        },
+      },
+    }).then((attempt) => {
+      if (!attempt) return attempt
+      return prisma.examSessionTeam.findUnique({
+        where: { teamId_examId: { teamId, examId } },
+        select: {
+          session: {
+            select: { id: true, name: true, startTime: true, endTime: true },
+          },
+        },
+      }).then((assignment) => ({
+        ...attempt,
+        session: assignment?.session ?? null,
+      }))
+    })
+  }
+
   findAttemptForAnswer(id: string) {
     return prisma.examAttempt.findUnique({
       where: { id },
@@ -72,6 +99,7 @@ export default class ExamAttemptRepo {
           select: {
             endDate: true,
             duration: true,
+            type: true,
           },
         },
       },
@@ -99,6 +127,7 @@ export default class ExamAttemptRepo {
             questions: {
               select: {
                 id: true,
+                correctAnswer: true,
                 correctScore: true,
                 wrongScore: true,
                 emptyScore: true,

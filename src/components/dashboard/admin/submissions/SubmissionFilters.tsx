@@ -12,6 +12,7 @@ const STATUS_OPTIONS = [
 
 const COMPETITION_OPTIONS = [
   { label: 'Semua Lomba', value: 'ALL' },
+  { label: 'Olimpiade', value: 'OLIMPIADE' },
   { label: 'LKTI', value: 'LKTI' },
   { label: 'Infografis', value: 'INFOGRAFIS' },
 ]

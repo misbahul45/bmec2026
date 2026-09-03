@@ -50,10 +50,12 @@ export default class DashboardRepo {
   }
 
   getExamAttemptsByDate() {
-    return prisma.examAttempt.findMany({
-      select: { createdAt: true },
-      orderBy: { createdAt: 'asc' },
-    })
+    return prisma.$queryRaw<{ date: string; count: bigint }[]>`
+      SELECT DATE("createdAt") AS date, COUNT(*) AS count
+      FROM "ExamAttempt"
+      GROUP BY DATE("createdAt")
+      ORDER BY date ASC
+    `
   }
 
   getCheatStats() {

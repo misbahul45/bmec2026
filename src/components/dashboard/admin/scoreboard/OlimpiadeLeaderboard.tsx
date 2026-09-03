@@ -157,7 +157,8 @@ function ExamLeaderboardTable({ examId, examTitle }: { examId: string; examTitle
 
 export function OlimpiadeLeaderboard() {
   const { data: res } = useSuspenseQuery(examsQueryOptions())
-  const exams: any[] = Array.isArray(res) ? res : (res?.data ?? [])
+  const allExams: any[] = Array.isArray(res) ? res : (res?.data ?? [])
+  const exams = allExams.filter((e) => e.type === 'OLYMPIAD')
   const [selectedExamId, setSelectedExamId] = useState<string>(exams[0]?.id ?? '')
 
   if (exams.length === 0) {

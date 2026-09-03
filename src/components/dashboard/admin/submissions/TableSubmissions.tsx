@@ -29,12 +29,11 @@ interface Submission {
 interface Props {
   submissions: Submission[]
   meta: MetaData
-  adminId: string
   queryKey: unknown[]
   onPageChange: (page: number) => void
 }
 
-export function TableSubmissions({ submissions, meta, adminId, queryKey, onPageChange }: Props) {
+export function TableSubmissions({ submissions, meta, queryKey, onPageChange }: Props) {
   return (
     <div className="space-y-4">
       <div className="border rounded-xl overflow-hidden">
@@ -162,7 +161,6 @@ export function TableSubmissions({ submissions, meta, adminId, queryKey, onPageC
                 <TableCell className="text-center">
                   <SubmissionActions
                     submissionId={sub.id}
-                    adminId={adminId}
                     status={sub.status}
                     score={sub.score}
                     feedback={sub.feedback}

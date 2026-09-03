@@ -15,7 +15,7 @@ export const Route = createFileRoute('/dashboard/_authed/admin/submissions/')({
   component: RouteComponent,
 })
 
-function SubmissionsContent({ filters, page, adminId }: { filters: typeof DEFAULT_FILTERS; page: number; adminId: string }) {
+function SubmissionsContent({ filters, page, onPageChange }: { filters: typeof DEFAULT_FILTERS; page: number; onPageChange: (page: number) => void }) {
   const query = {
     search: filters.search || undefined,
     status: filters.status as any,
@@ -32,17 +32,13 @@ function SubmissionsContent({ filters, page, adminId }: { filters: typeof DEFAUL
     <TableSubmissions
       submissions={submissions}
       meta={meta}
-      adminId={adminId}
       queryKey={['submissions', query]}
-      onPageChange={() => {}}
+      onPageChange={onPageChange}
     />
   )
 }
 
 function RouteComponent() {
-  const context = Route.useRouteContext()
-  const adminId = (context as any)?.user?.userId ?? ''
-
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [applied, setApplied] = useState(DEFAULT_FILTERS)
   const [page, setPage] = useState(1)
@@ -57,6 +53,13 @@ function RouteComponent() {
     setApplied(DEFAULT_FILTERS)
     setPage(1)
   }
+
+  const handleLimitChange = (newFilters: typeof DEFAULT_FILTERS) => {
+    setFilters(newFilters)
+    setApplied(newFilters)
+    setPage(1)
+  }
+
   return (
     <div className="space-y-6 w-full pt-20 min-h-screen pb-6 max-w-6xl mx-auto px-8">
       <div>
@@ -66,13 +69,20 @@ function RouteComponent() {
 
       <SubmissionFilters
         filters={filters}
-        onChange={setFilters}
+        onChange={(f) => {
+          const isLimitChange = f.limit !== filters.limit
+          if (isLimitChange) {
+            handleLimitChange(f)
+          } else {
+            setFilters(f)
+          }
+        }}
         onSearch={handleSearch}
         onReset={handleReset}
       />
 
       <Suspense fallback={<div className="text-xs text-muted-foreground py-10 text-center">Memuat data...</div>}>
-        <SubmissionsContent filters={applied} page={page} adminId={adminId} />
+        <SubmissionsContent filters={applied} page={page} onPageChange={setPage} />
       </Suspense>
     </div>
   )

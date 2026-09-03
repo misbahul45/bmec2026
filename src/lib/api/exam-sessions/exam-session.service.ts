@@ -28,6 +28,13 @@ export default class ExamSessionService {
       throw new AppError('Sesi hanya tersedia untuk ujian Olimpiade', 400)
     }
 
+    if (data.startTime < exam.startDate) {
+      throw new AppError('Jam mulai sesi tidak boleh sebelum ujian dimulai', 400)
+    }
+    if (data.endTime > exam.endDate) {
+      throw new AppError('Jam selesai sesi tidak boleh setelah ujian berakhir', 400)
+    }
+
     try {
       const session = await this.repo.createSession({
         examId: data.examId,
@@ -55,6 +62,13 @@ export default class ExamSessionService {
     const endTime = data.endTime ?? session.endTime
     if (endTime <= startTime) {
       throw new AppError('Jam selesai harus setelah jam mulai', 400)
+    }
+
+    if (startTime < session.exam.startDate) {
+      throw new AppError('Jam mulai sesi tidak boleh sebelum ujian dimulai', 400)
+    }
+    if (endTime > session.exam.endDate) {
+      throw new AppError('Jam selesai sesi tidak boleh setelah ujian berakhir', 400)
     }
 
     try {

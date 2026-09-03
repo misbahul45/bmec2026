@@ -12,10 +12,9 @@ import { Download, Pencil } from 'lucide-react'
 
 interface Props {
   competitionType: 'LKTI' | 'INFOGRAFIS'
-  adminId: string
 }
 
-export function SubmissionLeaderboard({ competitionType, adminId }: Props) {
+export function SubmissionLeaderboard({ competitionType }: Props) {
   const { data: res } = useSuspenseQuery(submissionLeaderboardQueryOptions(competitionType))
   const submissions: any[] = res?.data ?? []
   const [editTarget, setEditTarget] = useState<any | null>(null)
@@ -118,7 +117,6 @@ export function SubmissionLeaderboard({ competitionType, adminId }: Props) {
           {editTarget && (
             <FormEditScore
               submissionId={editTarget.id}
-              adminId={adminId}
               defaultScore={editTarget.score}
               defaultFeedback={editTarget.feedback}
               queryKey={['submission-leaderboard', competitionType]}

@@ -89,15 +89,15 @@ export default class SubmissionRepo {
   upsert(data: { teamId: string; stageId: string; title?: string; turnitinUrl?: string; orsinalitasUrl?: string, abstractUrl?:string, fileUrl?:string }) {
     return prisma.submission.upsert({
       where: { teamId_stageId: { teamId: data.teamId, stageId: data.stageId } },
-      update: { title: data.title, status:'PENDING' , turnitinUrl: data.turnitinUrl, orsinalitasUrl: data.orsinalitasUrl, abstractUrl:data.abstractUrl },
+      update: { title: data.title, turnitinUrl: data.turnitinUrl, orsinalitasUrl: data.orsinalitasUrl, abstractUrl: data.abstractUrl, fileUrl: data.fileUrl },
       create: {
         ...data,
-        status:!data.turnitinUrl?'APPROVED':'PENDING'
+        status: 'PENDING',
       },
     })
   }
 
-  updateFileUrl(teamId: string, stageId: string, data: { fileUrl?: string; turnitinUrl?: string; orsinalitasUrl?: string }) {
+  updateFileUrl(teamId: string, stageId: string, data: { fileUrl?: string; turnitinUrl?: string; orsinalitasUrl?: string; abstractUrl?: string }) {
     return prisma.submission.update({
       where: { teamId_stageId: { teamId, stageId } },
       data,
@@ -119,6 +119,54 @@ export default class SubmissionRepo {
 
   findRegistrationByTeamId(teamId: string) {
     return prisma.registration.findUnique({ where: { teamId } })
+  }
+
+  upsertTransaction(
+    submissionData: { teamId: string; stageId: string; title?: string; turnitinUrl?: string; orsinalitasUrl?: string; abstractUrl?: string; fileUrl?: string },
+    teamId: string,
+    paymentProof: string,
+    hasExistingRegistration: boolean,
+  ) {
+    return prisma.$transaction(async (tx) => {
+      const submission = await tx.submission.upsert({
+        where: { teamId_stageId: { teamId: submissionData.teamId, stageId: submissionData.stageId } },
+        update: { title: submissionData.title, turnitinUrl: submissionData.turnitinUrl, orsinalitasUrl: submissionData.orsinalitasUrl, abstractUrl: submissionData.abstractUrl, fileUrl: submissionData.fileUrl },
+        create: { ...submissionData, status: 'PENDING' },
+      })
+
+      if (hasExistingRegistration) {
+        await tx.registration.update({
+          where: { teamId },
+          data: { paymentProof },
+        })
+      }
+
+      return submission
+    })
+  }
+
+  upsertWithRegistrationTransaction(
+    submissionData: { teamId: string; stageId: string; title?: string; turnitinUrl?: string; orsinalitasUrl?: string; abstractUrl?: string; fileUrl?: string },
+    registrationData: { teamId: string; competitionId: string; batchId: string; paymentProof: string },
+  ) {
+    return prisma.$transaction(async (tx) => {
+      const submission = await tx.submission.upsert({
+        where: { teamId_stageId: { teamId: submissionData.teamId, stageId: submissionData.stageId } },
+        update: { title: submissionData.title, turnitinUrl: submissionData.turnitinUrl, orsinalitasUrl: submissionData.orsinalitasUrl, abstractUrl: submissionData.abstractUrl, fileUrl: submissionData.fileUrl },
+        create: { ...submissionData, status: 'PENDING' },
+      })
+
+      await tx.registration.create({
+        data: {
+          teamId: registrationData.teamId,
+          competitionId: registrationData.competitionId,
+          batchId: registrationData.batchId,
+          paymentProof: registrationData.paymentProof,
+        },
+      })
+
+      return submission
+    })
   }
 
   createRegistration(data: { teamId: string; competitionId: string; batchId: string; paymentProof: string }) {

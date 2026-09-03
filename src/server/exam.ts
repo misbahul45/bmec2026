@@ -7,12 +7,13 @@ import { z } from "zod";
 import { Uuid } from "~/schemas/general.schema";
 import { examQuestionSchema } from "~/schemas/exam";
 import { ExamWithStage } from "~/types/exam.type";
-import { requireTeamSession } from "~/lib/utils/server-auth";
+import { requireTeamSession, requireAdminSession } from "~/lib/utils/server-auth";
 
 const examService = new ExamService();
 
 export const getExams = createServerFn({ method: "GET" }).handler(
   withErrorHandling(async (): Promise<ApiSuccess<Exam[]>> => {
+    await requireAdminSession()
     const result = await examService.findAll();
     return successResponse<Exam[]>(result.data, result.message);
   })
@@ -22,6 +23,7 @@ export const getExam = createServerFn({ method: "GET" })
   .inputValidator(Uuid)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<ExamWithStage>> => {
+      await requireAdminSession()
       const result = await examService.findOneById(data);
       return successResponse<ExamWithStage>(result.data, result.message);
     })
@@ -32,6 +34,7 @@ export const getExamQuestion = createServerFn({ method: "GET" })
   .inputValidator(Uuid)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<ExamQuestion[]>> => {
+      await requireAdminSession()
       const result = await examService.getExamQuestionByExamId(data)
       return successResponse<ExamQuestion[]>(result.data!, result.message)
     })
@@ -42,6 +45,7 @@ export const createExamQuestion = createServerFn({ method:'POST' })
 .inputValidator(examQuestionSchema)
 .handler(
   withErrorHandling(async ({ data }): Promise<ApiSuccess<ExamQuestion>> => {
+    await requireAdminSession()
     const result = await examService.createExamQuestion(data)
     return successResponse<ExamQuestion>(result.data!, result.message)
   })
@@ -51,6 +55,7 @@ export const updateExamQuestion = createServerFn({ method: 'POST' })
   .inputValidator(examQuestionSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<ExamQuestion>> => {
+      await requireAdminSession()
       const result = await examService.updateExamQuestion(data)
       return successResponse<ExamQuestion>(result.data!, result.message)
     })
@@ -60,6 +65,7 @@ export const deleteExamQuestion = createServerFn({ method: 'POST' })
   .inputValidator(Uuid)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<null>> => {
+      await requireAdminSession()
       const result = await examService.deleteExamQuestion(data)
       return successResponse<null>(result.data, result.message)
     })

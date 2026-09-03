@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg";
+import { requireEnv } from "./env";
 
-const connectionString = process.env.DATABASE_URL!
+const connectionString = requireEnv("DATABASE_URL")
 const configuredPoolMax = Number.parseInt(process.env.DATABASE_POOL_MAX ?? '5', 10)
 const poolMax = Number.isFinite(configuredPoolMax)
   ? Math.min(10, Math.max(2, configuredPoolMax))

@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { withErrorHandling } from '~/lib/utils/server-wrapper'
 import { successResponse, ApiSuccess } from '~/lib/utils/api-response'
+import { requireAdminSession, requireTeamSession } from '~/lib/utils/server-auth'
 import SubmissionService from '~/lib/api/submissions/submission.service'
 import { z } from 'zod'
 
@@ -17,14 +18,12 @@ const submissionQuerySchema = z.object({
 
 const reviewSchema = z.object({
   id: z.string().uuid(),
-  adminId: z.string().uuid(),
 })
 
 const updateScoreSchema = z.object({
   id: z.string().uuid(),
   score: z.number().min(0),
   feedback: z.string().nullable().optional(),
-  adminId: z.string().uuid(),
 })
 
 const leaderboardSchema = z.object({
@@ -36,6 +35,7 @@ export const getSubmissions = createServerFn({ method: 'GET' })
   .inputValidator(submissionQuerySchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireAdminSession()
       const result = await submissionService.findAll(data)
       return successResponse(result.data, result.message)
     })
@@ -45,7 +45,8 @@ export const approveSubmission = createServerFn({ method: 'POST' })
   .inputValidator(reviewSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
-      const result = await submissionService.approve(data.id, data.adminId)
+      const adminId = await requireAdminSession()
+      const result = await submissionService.approve(data.id, adminId)
       return successResponse(result.data, result.message)
     })
   )
@@ -54,7 +55,8 @@ export const rejectSubmission = createServerFn({ method: 'POST' })
   .inputValidator(reviewSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
-      const result = await submissionService.reject(data.id, data.adminId)
+      const adminId = await requireAdminSession()
+      const result = await submissionService.reject(data.id, adminId)
       return successResponse(result.data, result.message)
     })
   )
@@ -63,7 +65,8 @@ export const updateSubmissionScore = createServerFn({ method: 'POST' })
   .inputValidator(updateScoreSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
-      const result = await submissionService.updateScore(data.id, data.score, data.feedback ?? null, data.adminId)
+      const adminId = await requireAdminSession()
+      const result = await submissionService.updateScore(data.id, data.score, data.feedback ?? null, adminId)
       return successResponse(result.data, result.message)
     })
   )
@@ -72,6 +75,7 @@ export const getSubmissionLeaderboard = createServerFn({ method: 'GET' })
   .inputValidator(leaderboardSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireAdminSession()
       const result = await submissionService.getLeaderboard(data.competitionType, data.stageType)
       return successResponse(result.data, result.message)
     })
@@ -89,6 +93,7 @@ export const upsertSubmission = createServerFn({ method: 'POST' })
   }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireTeamSession(data.teamId)
       const result = await submissionService.upsertSubmission(data)
       return successResponse(result.data, result.message)
     })
@@ -101,9 +106,11 @@ export const updateSubmissionFiles = createServerFn({ method: 'POST' })
     fileUrl: z.string().url().optional(),
     turnitinUrl: z.string().url().optional(),
     orsinalitasUrl: z.string().url().optional(),
+    abstractUrl: z.string().url().optional(),
   }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireTeamSession(data.teamId)
       const { teamId, stageId, ...files } = data
       const result = await submissionService.updateSubmissionFiles(teamId, stageId, files)
       return successResponse(result.data, result.message)
@@ -120,6 +127,7 @@ export const submitWithPayment = createServerFn({ method: 'POST' })
   }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireTeamSession(data.teamId)
       const result = await submissionService.submitWithPayment(data)
       return successResponse(result.data, result.message)
     })

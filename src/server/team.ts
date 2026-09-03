@@ -9,6 +9,7 @@ import { Uuid } from "~/schemas/general.schema"
 import { queryTeam, updateTeamSchema } from "~/schemas/team.schema"
 import { loginFn } from "./auth"
 import { createMentorSchema } from "~/schemas/team.mentor.schema"
+import { requireTeamSession, requireAdminSession } from "~/lib/utils/server-auth"
 
 const teamService = new TeamService()
 
@@ -16,6 +17,7 @@ export const getTeams = createServerFn({ method: "GET" })
   .inputValidator(queryTeam)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireAdminSession()
       const result = await teamService.findAll(data)
       return successResponse<any>(result.data, result.message)
     })
@@ -25,6 +27,7 @@ export const getTeam = createServerFn({ method: "GET" })
   .inputValidator(Uuid)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireTeamSession(data)
       const result = await teamService.findOne(data)
       return successResponse<any>(result.data, result.message)
     })
@@ -49,6 +52,7 @@ export const createMentor = createServerFn({ method: "POST" })
   .inputValidator(createMentorSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireTeamSession(data.teamId)
       const result = await teamService.createMentor(data)
       return successResponse<any>(result.data, result.message)
     })
@@ -63,6 +67,7 @@ export const updateMentor = createServerFn({ method: "POST" })
   }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireTeamSession(data.teamId)
       const { teamId, ...body } = data
       const result = await teamService.updateMentor(teamId, body)
       return successResponse<any>(result.data, result.message)
@@ -76,6 +81,7 @@ export const updateTeam = createServerFn({ method: "POST" })
   }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireTeamSession(data.id)
       const { id, body } = data as { id: string; body: typeof updateTeamSchema._type }
       const result = await teamService.update(id, body)
       return successResponse<any>(result.data, result.message)
@@ -86,6 +92,7 @@ export const deleteTeam = createServerFn({ method: "POST" })
   .inputValidator(Uuid)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<null>> => {
+      await requireAdminSession()
       const result = await teamService.delete(data)
       return successResponse<null>(result.data, result.message)
     })
@@ -95,6 +102,9 @@ export const createTeamMember = createServerFn({ method:'POST' })
   .inputValidator(createMembersSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      const teamId = data.members[0]?.teamId
+      if (!teamId) throw new Error("Team ID is required")
+      await requireTeamSession(teamId)
       const result = await teamService.createMember(data)
       return successResponse<any>(result.data, result.message)
     })
@@ -104,6 +114,7 @@ export const updateTeamStage = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ teamId: z.string().uuid(), stageId: z.string().uuid() }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireAdminSession()
       const result = await teamService.updateStage(data.teamId, data.stageId)
       return successResponse<any>(result.data, result.message)
     })
@@ -113,6 +124,7 @@ export const getStagesForTeam = createServerFn({ method: 'GET' })
   .inputValidator(Uuid)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireTeamSession(data)
       const result = await teamService.getStagesForTeam(data)
       return successResponse<any>(result.data, result.message)
     })
@@ -122,6 +134,7 @@ export const getTeamDashboard = createServerFn({ method: 'GET' })
   .inputValidator(Uuid)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireTeamSession(data)
       const result = await teamService.getDashboard(data)
       return successResponse<any>(result.data, result.message)
     })

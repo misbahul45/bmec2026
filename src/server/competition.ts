@@ -7,6 +7,7 @@ import { registrationCompetitionSchema } from "~/schemas/competition.schema";
 import { CompetitionTypeSchema } from "~/schemas/general.schema";
 import { CompetitionWithActiveBatch } from "~/types/competition.type";
 import { z } from "zod";
+import { requireTeamSession, requireAdminSession } from "~/lib/utils/server-auth";
 
 const competitionService = new CompetitionService()
 
@@ -23,6 +24,7 @@ export const registrationCompetition = createServerFn({ method: 'POST' })
   .inputValidator(registrationCompetitionSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<Registration>> => {
+      await requireTeamSession(data.teamId)
       const result = await competitionService.registrationCompetition(data)
       return successResponse<Registration>(result.data, result.message)
     })
@@ -58,6 +60,7 @@ export const updateBatch = createServerFn({ method: 'POST' })
   .inputValidator(batchUpdateSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireAdminSession()
       const { id, startDate, endDate, ...rest } = data
       const result = await competitionService.updateBatch(id, {
         ...rest,
@@ -72,6 +75,7 @@ export const createBatch = createServerFn({ method: 'POST' })
   .inputValidator(batchCreateSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireAdminSession()
       const result = await competitionService.createBatch(data.competitionId, {
         name: data.name,
         startDate: new Date(data.startDate),
@@ -87,6 +91,7 @@ export const deleteBatch = createServerFn({ method: 'POST' })
   .inputValidator(z.string().uuid())
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<null>> => {
+      await requireAdminSession()
       const result = await competitionService.deleteBatch(data)
       return successResponse(result.data, result.message)
     })

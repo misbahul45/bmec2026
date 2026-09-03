@@ -17,14 +17,13 @@ type FormData = z.infer<typeof schema>
 
 interface Props {
   submissionId: string
-  adminId: string
   defaultScore?: number | null
   defaultFeedback?: string | null
   queryKey: unknown[]
   onSuccess?: () => void
 }
 
-export function FormEditScore({ submissionId, adminId, defaultScore, defaultFeedback, queryKey, onSuccess }: Props) {
+export function FormEditScore({ submissionId, defaultScore, defaultFeedback, queryKey, onSuccess }: Props) {
   const qc = useQueryClient()
 
   const form = useForm<FormData>({
@@ -34,7 +33,7 @@ export function FormEditScore({ submissionId, adminId, defaultScore, defaultFeed
 
   const mutation = useMutation({
     mutationFn: (d: FormData) =>
-      updateSubmissionScore({ data: { id: submissionId, score: d.score, feedback: d.feedback ?? null, adminId } }),
+      updateSubmissionScore({ data: { id: submissionId, score: d.score, feedback: d.feedback ?? null } }),
     onSuccess: () => {
       toast.success('Nilai berhasil disimpan')
       qc.invalidateQueries({ queryKey })

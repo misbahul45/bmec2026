@@ -28,8 +28,6 @@ export const Route = createFileRoute('/dashboard/_authed/admin/scoreboard/')({
 })
 
 function RouteComponent() {
-  const context = Route.useRouteContext()
-  const adminId = (context as any)?.user?.userId ?? ''
   const [activeTab, setActiveTab] = useState<TabKey>('OLIMPIADE')
 
   return (
@@ -58,8 +56,8 @@ function RouteComponent() {
 
       <Suspense fallback={<div className="text-xs text-muted-foreground py-10 text-center">Memuat data...</div>}>
         {activeTab === 'OLIMPIADE' && <OlimpiadeLeaderboard />}
-        {activeTab === 'LKTI' && <SubmissionLeaderboard competitionType="LKTI" adminId={adminId} />}
-        {activeTab === 'INFOGRAFIS' && <SubmissionLeaderboard competitionType="INFOGRAFIS" adminId={adminId} />}
+        {activeTab === 'LKTI' && <SubmissionLeaderboard competitionType="LKTI" />}
+        {activeTab === 'INFOGRAFIS' && <SubmissionLeaderboard competitionType="INFOGRAFIS" />}
       </Suspense>
     </div>
   )

@@ -24,6 +24,8 @@ export default class ExamSessionRepo {
       select: {
         id: true,
         type: true,
+        startDate: true,
+        endDate: true,
         stage: { select: { competition: { select: { name: true } } } },
       },
     })
@@ -40,6 +42,8 @@ export default class ExamSessionRepo {
         exam: {
           select: {
             id: true,
+            startDate: true,
+            endDate: true,
             stage: { select: { competition: { select: { name: true } } } },
           },
         },

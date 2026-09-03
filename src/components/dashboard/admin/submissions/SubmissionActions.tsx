@@ -10,19 +10,18 @@ import { CheckCircle, XCircle, ClipboardEdit } from 'lucide-react'
 
 interface Props {
   submissionId: string
-  adminId: string
   status: string
   score: number | null
   feedback: string | null
   queryKey: unknown[]
 }
 
-export function SubmissionActions({ submissionId, adminId, status, score, feedback, queryKey }: Props) {
+export function SubmissionActions({ submissionId, status, score, feedback, queryKey }: Props) {
   const qc = useQueryClient()
   const [scoreOpen, setScoreOpen] = useState(false)
 
   const approveMutation = useMutation({
-    mutationFn: () => approveSubmission({ data: { id: submissionId, adminId } }),
+    mutationFn: () => approveSubmission({ data: { id: submissionId } }),
     onSuccess: () => {
       toast.success('Submission approved')
       qc.invalidateQueries({ queryKey })
@@ -31,7 +30,7 @@ export function SubmissionActions({ submissionId, adminId, status, score, feedba
   })
 
   const rejectMutation = useMutation({
-    mutationFn: () => rejectSubmission({ data: { id: submissionId, adminId } }),
+    mutationFn: () => rejectSubmission({ data: { id: submissionId } }),
     onSuccess: () => {
       toast.success('Submission rejected')
       qc.invalidateQueries({ queryKey })
@@ -94,7 +93,6 @@ export function SubmissionActions({ submissionId, adminId, status, score, feedba
             </DialogHeader>
             <FormEditScore
               submissionId={submissionId}
-              adminId={adminId}
               defaultScore={score}
               defaultFeedback={feedback}
               queryKey={queryKey}

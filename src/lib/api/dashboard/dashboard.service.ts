@@ -29,8 +29,8 @@ export default class DashboardService {
 
     const dateCountMap: Record<string, number> = {}
     for (const a of attemptDates) {
-      const d = new Date(a.createdAt).toISOString().slice(0, 10)
-      dateCountMap[d] = (dateCountMap[d] ?? 0) + 1
+      const d = new Date(a.date).toISOString().slice(0, 10)
+      dateCountMap[d] = (dateCountMap[d] ?? 0) + Number(a.count)
     }
 
     const [mostActiveTeamGroup, mostPopularCompGroup, mostActiveStageGroup] = await Promise.all([

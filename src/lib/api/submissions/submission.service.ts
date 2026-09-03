@@ -76,7 +76,7 @@ export default class SubmissionService {
     return { data: result, message: 'Submission saved' }
   }
 
-  async updateSubmissionFiles(teamId: string, stageId: string, data: { fileUrl?: string; turnitinUrl?: string; orsinalitasUrl?: string }) {
+  async updateSubmissionFiles(teamId: string, stageId: string, data: { fileUrl?: string; turnitinUrl?: string; orsinalitasUrl?: string; abstractUrl?: string }) {
     const existing = await this.repo.findByTeamAndStage(teamId, stageId)
     if (!existing) throw new AppError('Submission not found', 404)
     const result = await this.repo.updateFileUrl(teamId, stageId, data)
@@ -89,10 +89,7 @@ export default class SubmissionService {
     const existing = await this.repo.findRegistrationByTeamId(data.teamId)
 
     if (existing) {
-      const [submission] = await Promise.all([
-        this.repo.upsert(submissionData),
-        this.repo.updatePaymentProof(data.teamId, paymentProof),
-      ])
+      const submission = await this.repo.upsertTransaction(submissionData, data.teamId, paymentProof, true)
       return { data: submission, message: 'Submission and payment saved' }
     }
 
@@ -102,15 +99,15 @@ export default class SubmissionService {
     const batch = competition.batches?.[0]
     if (!batch) throw new AppError('Tidak ada batch LKTI aktif saat ini', 400)
 
-    const [submission] = await Promise.all([
-      this.repo.upsert(submissionData),
-      this.repo.createRegistration({
+    const submission = await this.repo.upsertWithRegistrationTransaction(
+      submissionData,
+      {
         teamId: data.teamId,
         competitionId: competition.id,
         batchId: batch.id,
         paymentProof,
-      }),
-    ])
+      },
+    )
 
     return { data: submission, message: 'Submission, registration, and payment saved' }
   }

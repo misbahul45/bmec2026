@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { withErrorHandling } from '~/lib/utils/server-wrapper'
 import { successResponse, ApiSuccess } from '~/lib/utils/api-response'
+import { requireAdminSession } from '~/lib/utils/server-auth'
 import AttemptService from '~/lib/api/exam-attempts/attempt.service'
 import { z } from 'zod'
 
@@ -21,6 +22,7 @@ export const getExamAttempts = createServerFn({ method: 'GET' })
   .inputValidator(attemptQuerySchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireAdminSession()
       const result = await attemptService.findByExam(data)
       return successResponse(result.data, result.message)
     })
@@ -30,6 +32,7 @@ export const getAttemptDetail = createServerFn({ method: 'GET' })
   .inputValidator(z.object({ attemptId: z.string().uuid() }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireAdminSession()
       const result = await attemptService.findDetail(data.attemptId)
       return successResponse(result.data, result.message)
     })
@@ -39,6 +42,7 @@ export const getExamLeaderboard = createServerFn({ method: 'GET' })
   .inputValidator(z.object({ examId: z.string().uuid() }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireAdminSession()
       const result = await attemptService.getLeaderboard(data.examId)
       return successResponse(result.data, result.message)
     })

@@ -4,6 +4,7 @@ import { prisma } from "~/lib/utils/prisma"
 import { authMiddleware } from "~/middleware/auth.middleware"
 import { fileSchema } from "~/schemas/general.schema"
 import { z } from "zod"
+import { requireEnv } from "~/lib/utils/env"
 
 export const imagekitAuth = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
@@ -12,7 +13,7 @@ export const imagekitAuth = createServerFn({ method: "GET" })
     const expire = Math.floor(Date.now() / 1000) + 2400
 
     const signature = crypto
-      .createHmac("sha1", process.env.IMAGEKIT_PRIVATE_KEY!)
+      .createHmac("sha1", requireEnv("IMAGEKIT_PRIVATE_KEY"))
       .update(token + expire)
       .digest("hex")
 
@@ -20,7 +21,7 @@ export const imagekitAuth = createServerFn({ method: "GET" })
       token,
       expire,
       signature,
-      publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+      publicKey: requireEnv("IMAGEKIT_PUBLIC_KEY"),
     }
   })
 
@@ -51,7 +52,7 @@ export const deleteUpload = createServerFn({ method: "POST" })
     await fetch(`https://api.imagekit.io/v1/files/${file.fileId}`, {
       method: "DELETE",
       headers: {
-        Authorization: `Basic ${Buffer.from(process.env.IMAGEKIT_PRIVATE_KEY! + ":").toString("base64")}`,
+        Authorization: `Basic ${Buffer.from(requireEnv("IMAGEKIT_PRIVATE_KEY") + ":").toString("base64")}`,
       },
     })
 

@@ -68,7 +68,6 @@ export default class ExamAttemptService {
 
     const attempt = await this.repo.upsertAttempt({
       ...input,
-      deviceId: '',
       startTime: now,
     })
 
@@ -136,7 +135,7 @@ export default class ExamAttemptService {
   }
 
   async resumeExam(teamId: string, examId: string) {
-    const attempt = await this.repo.findAttemptWithAnswers(teamId, examId)
+    const attempt = await this.repo.findAttemptWithSession(teamId, examId)
     if (!attempt) throw new AppError('Sesi ujian tidak ditemukan', 404)
     if (attempt.finished) throw new AppError('Ujian sudah selesai dikerjakan', 400)
 
@@ -144,7 +143,16 @@ export default class ExamAttemptService {
     if (!exam) throw new AppError('Ujian tidak ditemukan', 404)
 
     const deadlineFromStart = new Date(attempt.startTime.getTime() + exam.duration * 60 * 1000)
-    const effectiveDeadline = deadlineFromStart < exam.endDate ? deadlineFromStart : exam.endDate
+    let effectiveDeadline = deadlineFromStart < exam.endDate ? deadlineFromStart : exam.endDate
+
+    // For OLYMPIAD with sessions, session endTime is a hard stop for new answers
+    if (exam.type === 'OLYMPIAD' && attempt.session) {
+      const sessionEnd = new Date(attempt.session.endTime)
+      if (sessionEnd < effectiveDeadline) {
+        effectiveDeadline = sessionEnd
+      }
+    }
+
     const remainingMs = effectiveDeadline.getTime() - Date.now()
 
     if (remainingMs <= 0) {
@@ -163,7 +171,7 @@ export default class ExamAttemptService {
 
   async getExamSession(teamId: string, examId: string) {
     const [attempt, exam] = await Promise.all([
-      this.repo.findAttemptWithAnswers(teamId, examId),
+      this.repo.findAttemptWithSession(teamId, examId),
       this.repo.findExamWithQuestions(examId),
     ])
 
@@ -172,7 +180,16 @@ export default class ExamAttemptService {
     if (attempt.finished) throw new AppError('Ujian sudah selesai dikerjakan', 400)
 
     const deadlineFromStart = new Date(attempt.startTime.getTime() + exam.duration * 60 * 1000)
-    const effectiveDeadline = deadlineFromStart < exam.endDate ? deadlineFromStart : exam.endDate
+    let effectiveDeadline = deadlineFromStart < exam.endDate ? deadlineFromStart : exam.endDate
+
+    // For OLYMPIAD with sessions, session endTime is a hard stop for new answers
+    if (exam.type === 'OLYMPIAD' && attempt.session) {
+      const sessionEnd = new Date(attempt.session.endTime)
+      if (sessionEnd < effectiveDeadline) {
+        effectiveDeadline = sessionEnd
+      }
+    }
+
     const remainingMs = effectiveDeadline.getTime() - Date.now()
 
     if (remainingMs <= 0) {
@@ -212,10 +229,21 @@ export default class ExamAttemptService {
     const deadlineFromStart = new Date(
       attempt.startTime.getTime() + attempt.exam.duration * 60 * 1000,
     )
-    const effectiveDeadline =
+    let effectiveDeadline =
       deadlineFromStart < attempt.exam.endDate
         ? deadlineFromStart
         : attempt.exam.endDate
+
+    // For OLYMPIAD with sessions, session endTime is a hard stop
+    if (attempt.exam.type === 'OLYMPIAD') {
+      const assignment = await this.repo.findAssignment(input.teamId, attempt.examId)
+      if (assignment) {
+        const sessionEnd = new Date(assignment.session.endTime)
+        if (sessionEnd < effectiveDeadline) {
+          effectiveDeadline = sessionEnd
+        }
+      }
+    }
 
     if (new Date() > effectiveDeadline) {
       await this.finishExam(attempt.id, attempt.teamId)
@@ -257,7 +285,8 @@ export default class ExamAttemptService {
       const isEmpty = !answer?.answer || answer.answer.trim() === ''
 
       if (isEmpty) return sum + question.emptyScore
-      if (answer.isCorrect) return sum + question.correctScore
+      const isCorrect = question.correctAnswer === answer.answer
+      if (isCorrect) return sum + question.correctScore
       return sum + question.wrongScore
     }, 0)
 
