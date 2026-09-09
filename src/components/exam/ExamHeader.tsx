@@ -22,17 +22,17 @@ export function ExamHeader({
   const percent = total > 0 ? Math.round((answered / total) * 100) : 0
 
   return (
-    <header className="sticky top-0 z-30 h-14 bg-background border-b flex items-center px-4 gap-3">
+    <header className="sticky top-0 z-30 h-14 bg-background border-b flex items-center px-4 gap-3 pt-[env(safe-area-inset-top)]">
       <div className="flex items-center gap-2 min-w-0 flex-1">
         <span className="font-semibold text-sm truncate">{examTitle}</span>
         {stageName && <Badge variant="outline" className="hidden sm:inline-flex text-[10px] shrink-0">{stageName}</Badge>}
       </div>
 
-      <div className="hidden sm:flex items-center gap-2 shrink-0">
-        <span className="text-xs text-muted-foreground whitespace-nowrap">
-          {answered} / {total} dijawab
+      <div className="flex items-center gap-2 shrink-0">
+        <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
+          {answered}/{total}
         </span>
-        <Progress value={percent} className="w-24 h-1.5" />
+        <Progress value={percent} className="hidden sm:block w-24 h-1.5" />
       </div>
 
       <ExamTimer effectiveDeadline={effectiveDeadline} onExpire={onExpire} />

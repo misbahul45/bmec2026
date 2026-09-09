@@ -23,7 +23,7 @@ export function ExamActionBar({
   const hasAnswer = selectedAnswer !== null
 
   return (
-    <div className="sticky bottom-0 bg-background border-t px-3 sm:px-6 py-3 grid grid-cols-3 items-center gap-2 sm:gap-3">
+    <div className="sticky bottom-0 bg-background border-t px-3 sm:px-6 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] grid grid-cols-3 items-center gap-2 sm:gap-3">
       <Button
         variant="ghost"
         size="sm"
