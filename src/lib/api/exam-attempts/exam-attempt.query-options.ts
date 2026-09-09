@@ -1,5 +1,13 @@
 import { queryOptions } from '@tanstack/react-query'
-import { getExamSession, getExamResult, getExamReview } from '~/server/exam-attempt'
+import { getExamSession, getExamResult, getExamReview, getExamPreview } from '~/server/exam-attempt'
+
+export const examPreviewQueryOptions = (teamId: string, examId: string) =>
+  queryOptions({
+    queryKey: ['exam-preview', teamId, examId],
+    queryFn: () => getExamPreview({ data: { teamId, examId } }),
+    staleTime: Number.POSITIVE_INFINITY,
+    retry: false,
+  })
 
 export const examSessionQueryOptions = (teamId: string, examId: string) =>
   queryOptions({

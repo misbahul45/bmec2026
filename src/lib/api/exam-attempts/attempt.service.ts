@@ -41,7 +41,7 @@ export default class AttemptService {
 
   async findDetail(id: string) {
     const attempt = await this.repo.findById(id)
-    if (!attempt) throw new AppError('Attempt not found', 404)
+    if (!attempt) throw new AppError('Attempt ujian tidak ditemukan. Pastikan ID attempt benar.', 404, 'ATTEMPT_NOT_FOUND')
     return { data: attempt, message: 'Attempt detail fetched' }
   }
 

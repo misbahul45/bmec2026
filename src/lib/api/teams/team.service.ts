@@ -23,7 +23,7 @@ export default class TeamService {
 
   async createMentor(payload: CreateMentorInput) {
     const team = await this.repo.findById(payload.teamId)
-    if (!team) throw new AppError('Tim tidak ditemukan', 404)
+    if (!team) throw new AppError('Tim tidak ditemukan. Pastikan ID tim benar.', 404, 'TEAM_NOT_FOUND')
 
     const mentor = await this.repo.createMentor({
       teamId: payload.teamId,
@@ -64,14 +64,14 @@ export default class TeamService {
 
   async create(payload: RegisterFormData): Promise<ServiceResponse<any>> {
     if (!payload.competitionType) {
-      throw new AppError("Maff tentukan lomba yang ingin diikuti", 400)
+      throw new AppError("Maaf, tentukan lomba yang ingin diikuti sebelum mendaftar.", 400, "COMPETITION_TYPE_REQUIRED")
     }
 
     const existing = await this.repo.findByEmail(payload.email)
-    if (existing) throw new AppError("Email sudah terdaftar", 400)
+    if (existing) throw new AppError("Email sudah terdaftar. Silakan gunakan email lain atau login dengan email tersebut.", 409, "EMAIL_ALREADY_EXISTS")
 
     const uniqueName = await this.repo.findByName(payload.teamName)
-    if (uniqueName) throw new AppError("Nama team sudah digunakan", 400)
+    if (uniqueName) throw new AppError("Nama tim sudah digunakan. Silakan pilih nama tim lain.", 409, "TEAM_NAME_EXISTS")
 
     const hashedPassword = await bcrypt.hash(payload.password, 10)
 
@@ -167,7 +167,7 @@ export default class TeamService {
     const team = await this.repo.findById(id)
 
     if (!team) {
-      throw new AppError('Tim tidak ditemukan', 404)
+      throw new AppError('Tim tidak ditemukan. Pastikan ID tim benar.', 404, 'TEAM_NOT_FOUND')
     }
 
     return {
@@ -181,7 +181,7 @@ export default class TeamService {
     const team = await this.repo.findById(id)
 
     if (!team) {
-      throw new AppError('Tim tidak ditemukan', 404)
+      throw new AppError('Tim tidak ditemukan. Pastikan ID tim benar.', 404, 'TEAM_NOT_FOUND')
     }
 
     await this.repo.delete(id)
@@ -199,7 +199,7 @@ export default class TeamService {
     const team = await this.repo.findById(id)
 
     if (!team) {
-      throw new AppError('Tim tidak ditemukan', 404)
+      throw new AppError('Tim tidak ditemukan. Pastikan ID tim benar.', 404, 'TEAM_NOT_FOUND')
     }
 
     if(payload.password){
@@ -227,13 +227,13 @@ export default class TeamService {
     const teamId = payload.members[0]?.teamId;
 
     if (!teamId) {
-      throw new AppError('Id required', 400);
+      throw new AppError('ID tim wajib diisi untuk menambahkan anggota.', 400, 'TEAM_ID_REQUIRED');
     }
 
     const existingTeam = await this.repo.findById(teamId);
 
     if (!existingTeam) {
-      throw new AppError('Tim tidak ditemukan', 404);
+      throw new AppError('Tim tidak ditemukan. Pastikan ID tim benar.', 404, 'TEAM_NOT_FOUND');
     }
 
     const emails = payload.members.map((m) => m.email)
@@ -242,10 +242,11 @@ export default class TeamService {
 
     if (existingEmails.length > 0) {
       throw new AppError(
-        `Email sudah digunakan: ${existingEmails
+        `Email sudah digunakan oleh anggota lain: ${existingEmails
           .map((e) => e.email)
-          .join(", ")}`,
-        400
+          .join(", ")}. Gunakan email yang berbeda.`,
+        409,
+        'MEMBER_EMAIL_EXISTS'
       )
     }
 
@@ -259,10 +260,10 @@ export default class TeamService {
 
   async updateStage(teamId: string, stageId: string): Promise<ServiceResponse<any>> {
     const team = await this.repo.findById(teamId)
-    if (!team) throw new AppError('Tim tidak ditemukan', 404)
+    if (!team) throw new AppError('Tim tidak ditemukan. Pastikan ID tim benar.', 404, 'TEAM_NOT_FOUND')
 
     const stage = await prisma.stage.findUnique({ where: { id: stageId } })
-    if (!stage) throw new AppError('Stage tidak ditemukan', 404)
+    if (!stage) throw new AppError('Stage tidak ditemukan. Pastikan ID stage benar.', 404, 'STAGE_NOT_FOUND')
 
     const updated = await this.repo.updateStage(teamId, stageId)
     return { data: this.sanitizeTeam(updated), message: 'Stage berhasil diperbarui' }
@@ -270,7 +271,7 @@ export default class TeamService {
 
   async getStagesForTeam(teamId: string): Promise<ServiceResponse<any>> {
     const team = await this.repo.findById(teamId)
-    if (!team) throw new AppError('Tim tidak ditemukan', 404)
+    if (!team) throw new AppError('Tim tidak ditemukan. Pastikan ID tim benar.', 404, 'TEAM_NOT_FOUND')
 
     const competition = await prisma.competition.findFirst({
       where: { name: team.competitionType as any },
@@ -284,7 +285,7 @@ export default class TeamService {
 
   async updateMentor(teamId: string, payload: { name?: string; email?: string; phone?: string }) {
     const existing = await this.repo.findMentorByTeamId(teamId)
-    if (!existing) throw new AppError('Pembimbing tidak ditemukan', 404)
+    if (!existing) throw new AppError('Pembimbing tidak ditemukan untuk tim ini. Tambahkan pembimbing terlebih dahulu.', 404, 'MENTOR_NOT_FOUND')
 
     const updated = await this.repo.updateMentor(teamId, payload)
     return {
@@ -297,7 +298,7 @@ export default class TeamService {
     const team = await this.repo.findDashboard(teamId)
 
     if (!team) {
-      throw new AppError("Tim tidak ditemukan", 404)
+      throw new AppError("Tim tidak ditemukan. Pastikan ID tim benar.", 404, "TEAM_NOT_FOUND")
     }
 
     const { password, ...rest } = team as any

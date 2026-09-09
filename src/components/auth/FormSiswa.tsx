@@ -79,13 +79,13 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
         if (type === 'INFOGRAFIS') {
           if (!file) {
             throw new Error(
-              'Pilih file infografis terlebih dahulu'
+              'Pilih file infografis terlebih dahulu sebelum mengirim.'
             )
           }
 
           if (file.size > 10 * 1024 * 1024) {
             throw new Error(
-              'Ukuran file infografis maksimal 10MB'
+              'Ukuran file infografis melebihi batas maksimal 10MB. Kompres atau pilih file yang lebih kecil.'
             )
           }
 
@@ -95,7 +95,7 @@ const FormSiswa: React.FC<Props> = ({ type }) => {
               10 * 1024 * 1024
           ) {
             throw new Error(
-              'Ukuran surat orisinalitas maksimal 10MB'
+              'Ukuran surat orisinalitas melebihi batas maksimal 10MB. Kompres atau pilih file yang lebih kecil.'
             )
           }
 

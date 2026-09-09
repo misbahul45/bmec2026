@@ -6,7 +6,7 @@ export const adminMiddleware = createMiddleware({ type: "function" })
   .middleware([authMiddleware])
   .server(async ({ next, context }) => {
     if (context.session.role !== "ADMIN") {
-      throw new ForbiddenError("Admin only")
+      throw new ForbiddenError("Akses ditolak: halaman ini hanya untuk admin.")
     }
 
     return next()

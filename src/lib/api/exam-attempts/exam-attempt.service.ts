@@ -25,7 +25,7 @@ export default class ExamAttemptService {
     userAgent: string
   }) {
     const exam = await this.repo.findExamWindow(input.examId)
-    if (!exam) throw new AppError('Ujian tidak ditemukan', 404)
+    if (!exam) throw new AppError('Ujian tidak ditemukan. Pastikan ID ujian benar.', 404, 'EXAM_NOT_FOUND')
 
     const now = new Date()
 
@@ -35,7 +35,7 @@ export default class ExamAttemptService {
       if (sessionCount === 0) {
         // Fallback: exam olimpiade belum punya sesi → window exam (D4)
         if (now < exam.startDate || now > exam.endDate) {
-          throw new AppError('Ujian tidak dalam periode aktif', 400)
+          throw new AppError('Ujian tidak dalam periode aktif. Periksa jadwal ujian pada dashboard.', 400, 'EXAM_NOT_IN_WINDOW')
         }
       } else {
         // Ada sesi: attempt baru hanya boleh dibuat dalam window sesi tim (D3).
@@ -52,18 +52,18 @@ export default class ExamAttemptService {
           )
 
           if (!assignment) {
-            throw new AppError('Tim belum di-assign ke sesi ujian', 400)
+            throw new AppError('Tim belum di-assign ke sesi ujian. Hubungi admin untuk penugasan sesi.', 400, 'NOT_ASSIGNED_TO_SESSION')
           }
           if (now < assignment.session.startTime) {
-            throw new AppError('Sesi ujian belum dimulai', 400)
+            throw new AppError('Sesi ujian belum dimulai. Mohon tunggu hingga sesi dimulai.', 400, 'SESSION_NOT_STARTED')
           }
           if (now > assignment.session.endTime) {
-            throw new AppError('Sesi ujian telah berakhir', 400)
+            throw new AppError('Sesi ujian telah berakhir. Anda tidak dapat memulai ujian lagi.', 400, 'SESSION_ENDED')
           }
         }
       }
     } else if (now < exam.startDate || now > exam.endDate) {
-      throw new AppError('Ujian tidak dalam periode aktif', 400)
+      throw new AppError('Ujian tidak dalam periode aktif. Periksa jadwal ujian pada dashboard.', 400, 'EXAM_NOT_IN_WINDOW')
     }
 
     const attempt = await this.repo.upsertAttempt({
@@ -71,7 +71,7 @@ export default class ExamAttemptService {
       startTime: now,
     })
 
-    if (attempt.finished) throw new AppError('Ujian sudah selesai dikerjakan', 400)
+    if (attempt.finished) throw new AppError('Ujian sudah selesai dikerjakan. Anda tidak dapat memulai lagi.', 400, 'EXAM_ALREADY_FINISHED')
 
     if (input.deviceId && attempt.deviceId && attempt.deviceId !== input.deviceId) {
       await this.repo.logEventAndUpdateAttempt(
@@ -86,12 +86,59 @@ export default class ExamAttemptService {
         },
         SUSPICIOUS_WEIGHTS.MULTIPLE_LOGIN,
       )
-      throw new AppError('Ujian sedang dikerjakan dari perangkat lain', 403)
+      throw new AppError('Ujian sedang dikerjakan dari perangkat lain. Jika ini bukan Anda, hubungi admin.', 403, 'MULTIPLE_DEVICE_DETECTED')
     }
 
     return {
       data: attempt,
       alreadyStarted: attempt.startTime.getTime() !== now.getTime(),
+    }
+  }
+
+  async getExamPreview(teamId: string, examId: string) {
+    const exam = await this.repo.findExamPreview(examId)
+    if (!exam) {
+      throw new AppError('Ujian tidak ditemukan. Pastikan ID ujian benar.', 404, 'EXAM_NOT_FOUND')
+    }
+
+    const existingAttempt = await this.repo.findAttemptLite(teamId, examId)
+    if (existingAttempt?.finished) {
+      throw new AppError('Ujian sudah selesai dikerjakan. Anda tidak dapat memulai lagi.', 400, 'EXAM_ALREADY_FINISHED')
+    }
+
+    const now = new Date()
+
+    if (exam.type === 'OLYMPIAD') {
+      const sessionCount = await this.repo.countSessionsByExamId(examId)
+
+      if (sessionCount === 0) {
+        if (now < exam.startDate || now > exam.endDate) {
+          throw new AppError('Ujian tidak dalam periode aktif. Periksa jadwal ujian pada dashboard.', 400, 'EXAM_NOT_IN_WINDOW')
+        }
+      } else if (!existingAttempt) {
+        const assignment = await this.repo.findAssignment(teamId, examId)
+        if (!assignment) {
+          throw new AppError('Tim belum di-assign ke sesi ujian. Hubungi admin untuk penugasan sesi.', 400, 'NOT_ASSIGNED_TO_SESSION')
+        }
+        if (now < assignment.session.startTime) {
+          throw new AppError('Sesi ujian belum dimulai. Mohon tunggu hingga sesi dimulai.', 400, 'SESSION_NOT_STARTED')
+        }
+        if (now > assignment.session.endTime) {
+          throw new AppError('Sesi ujian telah berakhir. Anda tidak dapat memulai ujian lagi.', 400, 'SESSION_ENDED')
+        }
+      }
+    } else if (now < exam.startDate || now > exam.endDate) {
+      throw new AppError('Ujian tidak dalam periode aktif. Periksa jadwal ujian pada dashboard.', 400, 'EXAM_NOT_IN_WINDOW')
+    }
+
+    return {
+      data: {
+        examId: exam.id,
+        examTitle: exam.title,
+        stageName: exam.stage?.name ?? null,
+        duration: exam.duration,
+        totalQuestions: exam._count.questions,
+      },
     }
   }
 
@@ -106,7 +153,7 @@ export default class ExamAttemptService {
 
     if (!attempt) return { allowed: false as const, reason: 'NOT_FOUND' as const }
     if (attempt.teamId !== input.teamId) {
-      throw new AppError('Akses ujian ditolak', 403)
+      throw new AppError('Akses ditolak: Anda tidak memiliki izin untuk memverifikasi perangkat pada sesi ujian ini.', 403, 'ATTEMPT_ACCESS_DENIED')
     }
     if (attempt.finished) return { allowed: false as const, reason: 'FINISHED' as const }
 
@@ -136,11 +183,11 @@ export default class ExamAttemptService {
 
   async resumeExam(teamId: string, examId: string) {
     const attempt = await this.repo.findAttemptWithSession(teamId, examId)
-    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan', 404)
-    if (attempt.finished) throw new AppError('Ujian sudah selesai dikerjakan', 400)
+    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan. Mulai ujian terlebih dahulu.', 404, 'ATTEMPT_NOT_FOUND')
+    if (attempt.finished) throw new AppError('Ujian sudah selesai dikerjakan. Anda tidak dapat melanjutkan.', 400, 'EXAM_ALREADY_FINISHED')
 
     const exam = await this.repo.findExamWindow(examId)
-    if (!exam) throw new AppError('Ujian tidak ditemukan', 404)
+    if (!exam) throw new AppError('Ujian tidak ditemukan. Pastikan ID ujian benar.', 404, 'EXAM_NOT_FOUND')
 
     const deadlineFromStart = new Date(attempt.startTime.getTime() + exam.duration * 60 * 1000)
     let effectiveDeadline = deadlineFromStart < exam.endDate ? deadlineFromStart : exam.endDate
@@ -157,7 +204,7 @@ export default class ExamAttemptService {
 
     if (remainingMs <= 0) {
       await this.finishExam(attempt.id)
-      throw new AppError('Waktu ujian telah habis', 400)
+      throw new AppError('Waktu ujian telah habis. Ujian otomatis diselesaikan.', 400, 'TIME_EXPIRED')
     }
 
     return {
@@ -175,9 +222,9 @@ export default class ExamAttemptService {
       this.repo.findExamWithQuestions(examId),
     ])
 
-    if (!exam) throw new AppError('Ujian tidak ditemukan', 404)
-    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan. Mulai ujian terlebih dahulu', 404)
-    if (attempt.finished) throw new AppError('Ujian sudah selesai dikerjakan', 400)
+    if (!exam) throw new AppError('Ujian tidak ditemukan. Pastikan ID ujian benar.', 404, 'EXAM_NOT_FOUND')
+    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan. Mulai ujian terlebih dahulu sebelum mengakses halaman ini.', 404, 'ATTEMPT_NOT_FOUND')
+    if (attempt.finished) throw new AppError('Ujian sudah selesai dikerjakan. Anda tidak dapat melanjutkan.', 400, 'EXAM_ALREADY_FINISHED')
 
     const deadlineFromStart = new Date(attempt.startTime.getTime() + exam.duration * 60 * 1000)
     let effectiveDeadline = deadlineFromStart < exam.endDate ? deadlineFromStart : exam.endDate
@@ -194,7 +241,7 @@ export default class ExamAttemptService {
 
     if (remainingMs <= 0) {
       await this.finishExam(attempt.id)
-      throw new AppError('Waktu ujian telah habis', 400)
+      throw new AppError('Waktu ujian telah habis. Ujian otomatis diselesaikan.', 400, 'TIME_EXPIRED')
     }
 
     return {
@@ -219,12 +266,12 @@ export default class ExamAttemptService {
       this.repo.findQuestion(input.questionId),
     ])
 
-    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan', 404)
-    if (attempt.teamId !== input.teamId) throw new AppError('Akses ujian ditolak', 403)
+    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan. Mulai ujian terlebih dahulu.', 404, 'ATTEMPT_NOT_FOUND')
+    if (attempt.teamId !== input.teamId) throw new AppError('Akses ditolak: Anda tidak memiliki izin untuk sesi ujian ini.', 403, 'ATTEMPT_ACCESS_DENIED')
     if (attempt.finished) return { skipped: true, reason: 'EXAM_FINISHED' as const }
 
-    if (!question) throw new AppError('Soal tidak ditemukan', 404)
-    if (question.examId !== attempt.examId) throw new AppError('Soal tidak termasuk dalam ujian ini', 400)
+    if (!question) throw new AppError('Soal tidak ditemukan. Pastikan ID soal benar.', 404, 'QUESTION_NOT_FOUND')
+    if (question.examId !== attempt.examId) throw new AppError('Soal tidak termasuk dalam ujian ini. Periksa kembali ID soal dan ujian.', 400, 'QUESTION_NOT_IN_EXAM')
 
     const deadlineFromStart = new Date(
       attempt.startTime.getTime() + attempt.exam.duration * 60 * 1000,
@@ -271,9 +318,9 @@ export default class ExamAttemptService {
   ) {
     const attempt = await this.repo.findAttemptForFinish(attemptId)
 
-    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan', 404)
+    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan. Pastikan ID attempt benar.', 404, 'ATTEMPT_NOT_FOUND')
     if (expectedTeamId && attempt.teamId !== expectedTeamId) {
-      throw new AppError('Akses ujian ditolak', 403)
+      throw new AppError('Akses ditolak: Anda tidak memiliki izin untuk menyelesaikan ujian ini.', 403, 'ATTEMPT_ACCESS_DENIED')
     }
     if (attempt.finished) return { alreadyFinished: true, totalScore: null }
 
@@ -302,22 +349,22 @@ export default class ExamAttemptService {
 
   async getResult(attemptId: string, expectedTeamId?: string) {
     const attempt = await this.repo.findAttemptResult(attemptId)
-    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan', 404)
+    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan. Pastikan ID attempt benar.', 404, 'ATTEMPT_NOT_FOUND')
     if (expectedTeamId && attempt.teamId !== expectedTeamId) {
-      throw new AppError('Akses ujian ditolak', 403)
+      throw new AppError('Akses ditolak: Anda tidak memiliki izin untuk melihat hasil ujian ini.', 403, 'ATTEMPT_ACCESS_DENIED')
     }
-    if (!attempt.finished) throw new AppError('Ujian belum selesai', 400)
+    if (!attempt.finished) throw new AppError('Ujian belum selesai. Hasil hanya tersedia setelah ujian diselesaikan.', 400, 'EXAM_NOT_FINISHED')
     if (attempt.exam.type === 'OLYMPIAD') {
-      throw new AppError('Hasil detail olimpiade tidak tersedia untuk peserta', 403)
+      throw new AppError('Hasil detail olimpiade tidak tersedia untuk peserta. Hubungi admin untuk informasi skor.', 403, 'OLYMPIAD_RESULT_RESTRICTED')
     }
     return { data: attempt }
   }
 
   async getExamReview(examId: string, teamId: string) {
     const attempt = await this.repo.findReviewAttempt(teamId, examId)
-    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan', 404)
-    if (!attempt.finished) throw new AppError('Ujian belum selesai dikerjakan', 400)
-    if (attempt.exam.type !== 'TRYOUT') throw new AppError('Pembahasan hanya tersedia untuk Tryout', 403)
+    if (!attempt) throw new AppError('Sesi ujian tidak ditemukan. Pastikan ID attempt benar.', 404, 'ATTEMPT_NOT_FOUND')
+    if (!attempt.finished) throw new AppError('Ujian belum selesai dikerjakan. Pembahasan hanya tersedia setelah ujian selesai.', 400, 'EXAM_NOT_FINISHED')
+    if (attempt.exam.type !== 'TRYOUT') throw new AppError('Pembahasan hanya tersedia untuk ujian tipe Tryout, bukan Olimpiade.', 403, 'REVIEW_TRYOUT_ONLY')
 
     return { data: attempt, message: 'Berhasil memuat pembahasan' }
   }
@@ -331,7 +378,7 @@ export default class ExamAttemptService {
     const attempt = await this.repo.findAttemptById(input.attemptId)
     if (!attempt || attempt.finished) return
     if (attempt.teamId !== input.teamId) {
-      throw new AppError('Akses ujian ditolak', 403)
+      throw new AppError('Akses ditolak: Anda tidak memiliki izin untuk mencatat event pada sesi ujian ini.', 403, 'ATTEMPT_ACCESS_DENIED')
     }
 
     const weight = SUSPICIOUS_WEIGHTS[input.type] ?? 0

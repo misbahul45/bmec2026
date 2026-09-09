@@ -79,15 +79,15 @@ const FormMahasiswa: React.FC<Props> = ({ type: _ }) => {
   const mutation = useMutation({
     mutationFn: async (data: CreateAbstractSubmissionData) => {
       if (data.abstractFile.size > MAX_SIZE) {
-        throw new AppError("File abstrak maksimal 10MB")
+        throw new AppError("Ukuran file abstrak melebihi batas maksimal 10MB. Kompres atau pilih file yang lebih kecil.", 400, "FILE_TOO_LARGE")
       }
 
       if (data.turnitinFile && data.turnitinFile.size > MAX_SIZE) {
-        throw new AppError("File turnitin maksimal 10MB")
+        throw new AppError("Ukuran file turnitin melebihi batas maksimal 10MB. Kompres atau pilih file yang lebih kecil.", 400, "FILE_TOO_LARGE")
       }
 
       if (data.orsinalitasFile && data.orsinalitasFile.size > MAX_SIZE) {
-        throw new AppError("File orisinalitas maksimal 10MB")
+        throw new AppError("Ukuran file orisinalitas melebihi batas maksimal 10MB. Kompres atau pilih file yang lebih kecil.", 400, "FILE_TOO_LARGE")
       }
 
       const toastId = toast.loading("Mengunggah abstrak...")
@@ -104,11 +104,11 @@ const FormMahasiswa: React.FC<Props> = ({ type: _ }) => {
         ])
 
         if (!abstractUrl) {
-          throw new AppError("Gagal mengunggah file abstrak")
+          throw new AppError("Gagal mengunggah file abstrak. Periksa koneksi internet Anda dan coba lagi.", 500, "UPLOAD_FAILED")
         }
 
         if (!stageId) {
-          throw new AppError("Stage tidak ditemukan")
+          throw new AppError("Stage kompetisi tidak ditemukan. Hubungi admin untuk konfigurasi stage.", 404, "STAGE_NOT_FOUND")
         }
 
         await upsertSubmission({

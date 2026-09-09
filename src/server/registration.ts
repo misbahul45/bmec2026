@@ -14,7 +14,7 @@ export const approveRegistration = createServerFn({ method: "POST" })
   .handler(
     withErrorHandling(async ({ data, context }): Promise<ApiSuccess<any>> => {
       if (context.session.role !== "ADMIN" || !context.session.userId) {
-        throw AppError.forbidden("Admin only");
+        throw AppError.forbidden("Akses ditolak: aksi ini hanya untuk admin.");
       }
 
       const result =
@@ -36,7 +36,7 @@ export const rejectRegistration = createServerFn({ method: "POST" })
   .handler(
     withErrorHandling(async ({ data, context }): Promise<ApiSuccess<any>> => {
       if (context.session.role !== "ADMIN" || !context.session.userId) {
-        throw AppError.forbidden("Admin only");
+        throw AppError.forbidden("Akses ditolak: aksi ini hanya untuk admin.");
       }
 
       const result =

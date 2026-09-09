@@ -45,23 +45,23 @@ export default class SubmissionService {
 
   async approve(id: string, adminId: string) {
     const sub = await this.repo.findById(id)
-    if (!sub) throw new AppError('Submission not found', 404)
-    if (sub.status !== SubmissionStatus.PENDING) throw new AppError('Already reviewed', 400)
+    if (!sub) throw new AppError('Submission tidak ditemukan. Pastikan ID submission benar.', 404, 'SUBMISSION_NOT_FOUND')
+    if (sub.status !== SubmissionStatus.PENDING) throw new AppError('Submission sudah pernah direview dan tidak dapat diubah lagi.', 400, 'ALREADY_REVIEWED')
     const updated = await this.repo.approve(id, adminId)
     return { data: updated, message: 'Approved' }
   }
 
   async reject(id: string, adminId: string) {
     const sub = await this.repo.findById(id)
-    if (!sub) throw new AppError('Submission not found', 404)
-    if (sub.status !== SubmissionStatus.PENDING) throw new AppError('Already reviewed', 400)
+    if (!sub) throw new AppError('Submission tidak ditemukan. Pastikan ID submission benar.', 404, 'SUBMISSION_NOT_FOUND')
+    if (sub.status !== SubmissionStatus.PENDING) throw new AppError('Submission sudah pernah direview dan tidak dapat diubah lagi.', 400, 'ALREADY_REVIEWED')
     const updated = await this.repo.reject(id, adminId)
     return { data: updated, message: 'Rejected' }
   }
 
   async updateScore(id: string, score: number, feedback: string | null, adminId: string) {
     const sub = await this.repo.findById(id)
-    if (!sub) throw new AppError('Submission not found', 404)
+    if (!sub) throw new AppError('Submission tidak ditemukan. Pastikan ID submission benar.', 404, 'SUBMISSION_NOT_FOUND')
     const updated = await this.repo.updateScore(id, score, feedback, adminId)
     return { data: updated, message: 'Score updated' }
   }
@@ -78,7 +78,7 @@ export default class SubmissionService {
 
   async updateSubmissionFiles(teamId: string, stageId: string, data: { fileUrl?: string; turnitinUrl?: string; orsinalitasUrl?: string; abstractUrl?: string }) {
     const existing = await this.repo.findByTeamAndStage(teamId, stageId)
-    if (!existing) throw new AppError('Submission not found', 404)
+    if (!existing) throw new AppError('Submission tidak ditemukan untuk tim dan stage ini. Buat submission terlebih dahulu.', 404, 'SUBMISSION_NOT_FOUND')
     const result = await this.repo.updateFileUrl(teamId, stageId, data)
     return { data: result, message: 'Submission updated' }
   }
@@ -94,10 +94,10 @@ export default class SubmissionService {
     }
 
     const competition = await this.repo.findActiveLKTIBatch()
-    if (!competition) throw new AppError('Kompetisi LKTI tidak ditemukan', 404)
+    if (!competition) throw new AppError('Kompetisi LKTI tidak ditemukan. Hubungi admin untuk konfigurasi kompetisi.', 404, 'COMPETITION_NOT_FOUND')
 
     const batch = competition.batches?.[0]
-    if (!batch) throw new AppError('Tidak ada batch LKTI aktif saat ini', 400)
+    if (!batch) throw new AppError('Tidak ada batch LKTI aktif saat ini. Tunggu hingga pendaftaran batch dibuka.', 400, 'NO_ACTIVE_BATCH')
 
     const submission = await this.repo.upsertWithRegistrationTransaction(
       submissionData,

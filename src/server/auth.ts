@@ -22,14 +22,14 @@ export const loginFn = createServerFn({ method: "POST" })
       ])
 
       if (!team && !admin) {
-        throw new AppError("Account not found")
+        throw new AppError("Akun tidak ditemukan. Periksa kembali email Anda atau daftar terlebih dahulu.", 404, "ACCOUNT_NOT_FOUND")
       }
 
       const user = admin ?? team
       const role = admin ? "ADMIN" : "TEAM"
 
       if (!user) {
-        throw new AppError("Account not found")
+        throw new AppError("Akun tidak ditemukan. Periksa kembali email Anda atau daftar terlebih dahulu.", 404, "ACCOUNT_NOT_FOUND")
       }
 
       const isValidPassword = await bcrypt.compare(
@@ -38,7 +38,7 @@ export const loginFn = createServerFn({ method: "POST" })
       )
 
       if (!isValidPassword) {
-        throw new AppError("Incorrect password")
+        throw new AppError("Kata sandi salah. Periksa kembali kata sandi Anda.", 401, "INVALID_PASSWORD")
       }
 
       const session = await useAppSession()

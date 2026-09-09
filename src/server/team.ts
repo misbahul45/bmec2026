@@ -103,7 +103,7 @@ export const createTeamMember = createServerFn({ method:'POST' })
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
       const teamId = data.members[0]?.teamId
-      if (!teamId) throw new Error("Team ID is required")
+      if (!teamId) throw new Error("ID tim wajib diisi untuk menambahkan anggota tim.")
       await requireTeamSession(teamId)
       const result = await teamService.createMember(data)
       return successResponse<any>(result.data, result.message)

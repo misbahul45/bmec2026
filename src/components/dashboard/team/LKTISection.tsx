@@ -209,19 +209,19 @@ function FullPaperUpload({
   const mutation = useMutation({
     mutationFn: async () => {
       if (!paperFile) {
-        throw new Error("Upload full paper terlebih dahulu")
+        throw new Error("Upload full paper terlebih dahulu sebelum mengirim.")
       }
 
       if (!paymentFile) {
-        throw new Error("Upload bukti pembayaran terlebih dahulu")
+        throw new Error("Upload bukti pembayaran terlebih dahulu sebelum mengirim.")
       }
 
       if (paperFile.size > MAX) {
-        throw new Error("Ukuran full paper maksimal 10MB")
+        throw new Error("Ukuran full paper melebihi batas maksimal 10MB. Kompres atau pilih file yang lebih kecil.")
       }
 
       if (paymentFile.size > MAX) {
-        throw new Error("Ukuran bukti pembayaran maksimal 10MB")
+        throw new Error("Ukuran bukti pembayaran melebihi batas maksimal 10MB. Kompres atau pilih file yang lebih kecil.")
       }
 
       const [fileUrl, paymentProof] = await Promise.all([

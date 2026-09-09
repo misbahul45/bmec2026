@@ -2,19 +2,25 @@ import {
   createFileRoute,
   redirect,
   Link,
+  useRouter,
 } from '@tanstack/react-router'
 
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 
 import { Skeleton } from '~/components/ui/skeleton'
 import { Button } from '~/components/ui/button'
 
 import { ExamShell } from '~/components/exam/ExamShell'
+import { ExamStartDialog } from '~/components/exam/ExamStartDialog'
 
-import { examSessionQueryOptions } from '~/lib/api/exam-attempts/exam-attempt.query-options'
+import {
+  examPreviewQueryOptions,
+} from '~/lib/api/exam-attempts/exam-attempt.query-options'
 
-import { startExamSession } from '~/server/exam-attempt'
+import { getExamPreview, startExamSession } from '~/server/exam-attempt'
+
+import { getOrCreateDeviceId } from '~/lib/exam/device-id'
 
 import { ExamType } from '@prisma/client'
 
@@ -33,19 +39,16 @@ export const Route = createFileRoute(
       throw redirect({ to: '/auth/login' })
     }
 
-    const session = await startExamSession({
+    const preview = await getExamPreview({
       data: {
         teamId,
         examId: params.examId,
-        deviceId: '',
-        ipAddress: '',
-        userAgent: '',
       },
     })
 
     context.queryClient.setQueryData(
-      examSessionQueryOptions(teamId, params.examId).queryKey,
-      session,
+      examPreviewQueryOptions(teamId, params.examId).queryKey,
+      preview,
     )
   },
 
@@ -88,6 +91,39 @@ export const Route = createFileRoute(
   },
 })
 
+interface ExamSessionData {
+  attemptId: string
+  remainingSeconds: number
+  effectiveDeadline: string
+  answers: {
+    questionId: string
+    answer: string
+  }[]
+
+  exam: {
+    id: string
+    title: string
+    endDate: string
+    duration: number
+
+    stage?: {
+      name: string
+    }
+
+    questions: {
+      id: string
+      question: string
+      optionA: string
+      optionB: string
+      optionC: string
+      optionD: string
+      optionE: string
+    }[]
+
+    type: ExamType
+  }
+}
+
 function RouteComponent() {
   const { user } = Route.useRouteContext()
   const { examId } = Route.useParams()
@@ -111,42 +147,71 @@ function ExamPage({
   teamId: string
   examId: string
 }) {
-  const { data: res } = useSuspenseQuery(
-    examSessionQueryOptions(teamId, examId),
+  const router = useRouter()
+  const { data: previewRes } = useSuspenseQuery(
+    examPreviewQueryOptions(teamId, examId),
   )
 
-  const session = res.data as {
-    attemptId: string
-    remainingSeconds: number
-    effectiveDeadline: string
-    answers: {
-      questionId: string
-      answer: string
-    }[]
+  const preview = previewRes.data as {
+    examId: string
+    examTitle: string
+    stageName: string | null
+    duration: number
+    totalQuestions: number
+  }
 
-    exam: {
-      id: string
-      title: string
-      endDate: string
-      duration: number
+  const [session, setSession] = useState<ExamSessionData | null>(null)
+  const [isStarting, setIsStarting] = useState(false)
+  const [startError, setStartError] = useState<string | null>(null)
 
-      stage?: {
-        name: string
-      }
+  const handleStart = async () => {
+    setIsStarting(true)
+    setStartError(null)
+    try {
+      const deviceId = getOrCreateDeviceId()
+      const userAgent =
+        typeof navigator !== 'undefined' ? navigator.userAgent : ''
 
-      questions: {
-        id: string
-        question: string
-        optionA: string
-        optionB: string
-        optionC: string
-        optionD: string
-        optionE: string
+      const sessionRes = await startExamSession({
+        data: {
+          teamId,
+          examId,
+          deviceId,
+          ipAddress: '',
+          userAgent,
+        },
+      })
 
-      }[]
-
-      type: ExamType
+      setSession(sessionRes.data as ExamSessionData)
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Gagal memulai ujian. Silakan coba lagi.'
+      setStartError(message)
+    } finally {
+      setIsStarting(false)
     }
+  }
+
+  const handleCancel = () => {
+    router.navigate({ to: '/dashboard/team' })
+  }
+
+  if (!session) {
+    return (
+      <ExamStartDialog
+        open
+        examTitle={preview.examTitle}
+        stageName={preview.stageName ?? undefined}
+        duration={preview.duration}
+        totalQuestions={preview.totalQuestions}
+        isStarting={isStarting}
+        errorMessage={startError}
+        onStart={handleStart}
+        onCancel={handleCancel}
+      />
+    )
   }
 
   const attempt = {

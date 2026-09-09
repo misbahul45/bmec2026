@@ -51,6 +51,11 @@ const verifyDeviceSchema = z.object({
   userAgent: z.string().default(''),
 })
 
+const examPreviewSchema = z.object({
+  teamId: z.string().uuid(),
+  examId: z.string().uuid(),
+})
+
 const saveAnswerSchema = z.object({
   attemptId: z.string().uuid(),
   questionId: z.string().uuid(),
@@ -121,6 +126,16 @@ export const getExamSession = createServerFn({ method: 'GET' })
       await requireTeamSession(data.teamId)
       const result = await service.getExamSession(data.teamId, data.examId)
       return successResponse(result.data, 'Sesi ujian berhasil dimuat')
+    }),
+  )
+
+export const getExamPreview = createServerFn({ method: 'GET' })
+  .inputValidator(examPreviewSchema)
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireTeamSession(data.teamId)
+      const result = await service.getExamPreview(data.teamId, data.examId)
+      return successResponse(result.data, 'Pratinjau ujian berhasil dimuat')
     }),
   )
 

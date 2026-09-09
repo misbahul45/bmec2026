@@ -184,6 +184,26 @@ export default class ExamAttemptRepo {
     })
   }
 
+  findExamPreview(examId: string) {
+    return prisma.exam.findUnique({
+      where: { id: examId },
+      select: {
+        id: true,
+        title: true,
+        duration: true,
+        startDate: true,
+        endDate: true,
+        type: true,
+        stage: {
+          select: { name: true },
+        },
+        _count: {
+          select: { questions: true },
+        },
+      },
+    })
+  }
+
   findAttemptLite(teamId: string, examId: string) {
     return prisma.examAttempt.findUnique({
       where: { teamId_examId: { teamId, examId } },

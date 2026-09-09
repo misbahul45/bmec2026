@@ -64,7 +64,9 @@ export default class CompetitionService {
 
     if (!existedcompetition) {
       throw new AppError(
-        "Competition not found"
+        "Kompetisi tidak ditemukan. Pastikan nama kompetisi benar.",
+        404,
+        "COMPETITION_NOT_FOUND"
       );
     }
 
@@ -100,15 +102,18 @@ export default class CompetitionService {
 
     if (teamAlreadyRegister?.paymentProof) {
       throw new AppError(
-        "Team already registered"
+        "Tim sudah terdaftar dan telah mengunggah bukti pembayaran. Tidak dapat mendaftar ulang.",
+        409,
+        "ALREADY_REGISTERED"
       );
     }
 
     const activeBatch = await this.repo.findActiveBatchByCompetitionId(data.competitionId)
     if (!activeBatch) {
       throw new AppError(
-        "Pendaftaran untuk kompetisi ini belum dibuka atau sudah ditutup",
-        400
+        "Pendaftaran untuk kompetisi ini belum dibuka atau sudah ditutup. Periksa jadwal batch pendaftaran.",
+        400,
+        "NO_ACTIVE_BATCH"
       )
     }
     const created =
@@ -125,17 +130,17 @@ export default class CompetitionService {
   }
   async approveRegistration(data: RegistrationAction) {
     if (data.action !== "APPROVED") {
-      throw new AppError("Invalid registration action")
+      throw new AppError("Aksi registrasi tidak valid. Gunakan 'APPROVED' untuk menyetujui.", 400, "INVALID_ACTION")
     }
 
     const registration = await this.repo.findRegistrationByTeamid(data.teamId)
-    if (!registration) throw new AppError("Registration not found", 404)
+    if (!registration) throw new AppError("Registrasi tim tidak ditemukan. Pastikan tim sudah mendaftar.", 404, "REGISTRATION_NOT_FOUND")
 
     const firstStage = await this.repo.findFirstStageByCompetition(registration.competitionId)
-    if (!firstStage) throw new AppError("Stage not found", 404)
+    if (!firstStage) throw new AppError("Stage awal kompetisi tidak ditemukan. Hubungi admin untuk konfigurasi stage.", 404, "STAGE_NOT_FOUND")
 
     const team = await this.teamRepo.findById(data.teamId)
-    if (!team) throw new AppError("Team not found", 404)
+    if (!team) throw new AppError("Tim tidak ditemukan. Pastikan ID tim benar.", 404, "TEAM_NOT_FOUND")
 
     const maxRetries = 5
 
@@ -151,7 +156,7 @@ export default class CompetitionService {
             },
           })
 
-          if (!freshTeam) throw new AppError("Team not found", 404)
+          if (!freshTeam) throw new AppError("Tim tidak ditemukan di dalam transaksi. Data mungkin telah berubah.", 404, "TEAM_NOT_FOUND_IN_TX")
 
           let finalCode: string | undefined
 
@@ -209,23 +214,23 @@ export default class CompetitionService {
         }
 
         if (this.isUniqueCodeError(error)) {
-          throw new AppError("Gagal generate kode tim unik. Coba approve lagi.", 409)
+          throw new AppError("Gagal membuat kode tim unik setelah beberapa percobaan. Coba approve lagi atau hubungi admin.", 409, "CODE_GENERATION_FAILED")
         }
 
         throw error
       }
     }
 
-    throw new AppError("Gagal approve registration", 500)
+    throw new AppError("Gagal menyetujui registrasi setelah beberapa percobaan. Coba lagi atau hubungi admin.", 500, "APPROVE_FAILED")
   }
 
   async rejectRegistration(data: RegistrationAction) {
     if (data.action !== "REJECTED") {
-      throw new AppError("Invalid registration action")
+      throw new AppError("Aksi registrasi tidak valid. Gunakan 'REJECTED' untuk menolak.", 400, "INVALID_ACTION")
     }
 
     const registration = await this.repo.findRegistrationByTeamid(data.teamId)
-    if (!registration) throw new AppError("Registration not found", 404)
+    if (!registration) throw new AppError("Registrasi tim tidak ditemukan. Pastikan tim sudah mendaftar.", 404, "REGISTRATION_NOT_FOUND")
 
     const result = await prisma.$transaction(async (tx) => {
       const updatedRegistration = await tx.registration.update({
@@ -281,7 +286,7 @@ export default class CompetitionService {
 
   async updateBatch(id: string, data: { name?: string; startDate?: Date; endDate?: Date; price?: number; module_bacth?: string }) {
     const batch = await this.repo.findBatchById(id)
-    if (!batch) throw new AppError("Batch not found", 404)
+    if (!batch) throw new AppError("Batch pendaftaran tidak ditemukan. Pastikan ID batch benar.", 404, "BATCH_NOT_FOUND")
     const updated = await this.repo.updateBatch(id, {
       ...(data.name && { name: data.name }),
       ...(data.startDate && { startDate: data.startDate }),
@@ -306,7 +311,7 @@ export default class CompetitionService {
 
   async deleteBatch(id: string) {
     const batch = await this.repo.findBatchById(id)
-    if (!batch) throw new AppError("Batch not found", 404)
+    if (!batch) throw new AppError("Batch pendaftaran tidak ditemukan. Pastikan ID batch benar.", 404, "BATCH_NOT_FOUND")
     await this.repo.deleteBatch(id)
     return { data: null, message: "Batch deleted" }
   }

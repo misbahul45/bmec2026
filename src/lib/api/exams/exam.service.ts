@@ -17,13 +17,13 @@ export default class ExamService {
 
   async findOneById(id: string) {
     if (!id) {
-      throw new AppError("Exam id is required");
+      throw new AppError("ID ujian wajib diisi untuk mencari data ujian.", 400, "EXAM_ID_REQUIRED");
     }
 
     const exam = await this.repo.getExamById(id);
 
     if (!exam) {
-      throw new AppError("Exam not found");
+      throw new AppError("Ujian tidak ditemukan. Pastikan ID ujian benar.", 404, "EXAM_NOT_FOUND");
     }
 
     return {
@@ -37,7 +37,7 @@ export default class ExamService {
     const exam = await this.repo.getExamById(examId);
 
     if (!exam) {
-      throw new AppError("Exam not found");
+      throw new AppError("Ujian tidak ditemukan. Pastikan ID ujian benar.", 404, "EXAM_NOT_FOUND");
     }
 
     const examQuestions=await this.repo.getExamQuestionById(examId)
@@ -52,7 +52,7 @@ export default class ExamService {
     const exam = await this.repo.getExamById(data.examId);
 
     if (!exam) {
-      throw new AppError("Exam not found");
+      throw new AppError("Ujian tidak ditemukan. Pastikan ID ujian benar.", 404, "EXAM_NOT_FOUND");
     }
 
     const dataExamQuestion=await this.repo.createExamQuestion(data)
@@ -63,10 +63,10 @@ export default class ExamService {
     }
   }
   async updateExamQuestion(data: ExamQuestionData) {
-    if (!data.id) throw new AppError('Question id is required')
+    if (!data.id) throw new AppError('ID soal wajib diisi untuk memperbarui data soal.', 400, 'QUESTION_ID_REQUIRED')
 
     const question = await prisma.examQuestion.findUnique({ where: { id: data.id } })
-    if (!question) throw new AppError('Question not found')
+    if (!question) throw new AppError('Soal tidak ditemukan. Pastikan ID soal benar.', 404, 'QUESTION_NOT_FOUND')
 
     const updated = await this.repo.updateExamQuestion(data.id, data)
 
@@ -78,7 +78,7 @@ export default class ExamService {
 
   async deleteExamQuestion(id: string) {
     const question = await prisma.examQuestion.findUnique({ where: { id } })
-    if (!question) throw new AppError('Question not found')
+    if (!question) throw new AppError('Soal tidak ditemukan. Pastikan ID soal benar.', 404, 'QUESTION_NOT_FOUND')
 
     await this.repo.deleteExamQuestion(id)
 

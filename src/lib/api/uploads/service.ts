@@ -35,11 +35,11 @@ export const uploadToImageKit = async (file: File) => {
 
 export const uploadPdfToImageKit = async (file: File) => {
   if (!file) {
-    throw new Error("File is required")
+    throw new Error("File wajib diunggah. Pastikan file telah dipilih.")
   }
 
   if (file.type !== "application/pdf") {
-    throw new Error("Only PDF files are allowed")
+    throw new Error("Hanya file PDF yang diizinkan untuk diunggah.")
   }
 
   const auth = await imagekitAuth()
@@ -63,7 +63,7 @@ export const uploadPdfToImageKit = async (file: File) => {
   )
 
   if (!res.ok) {
-    throw new Error("Upload failed")
+    throw new Error("Gagal mengunggah file ke ImageKit. Coba lagi beberapa saat.")
   }
 
   const data = await res.json()

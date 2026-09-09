@@ -9,7 +9,7 @@ export const authMiddleware = createMiddleware({ type: "function" })
     const { userId, role } = session.data
 
     if (!userId || !role) {
-      throw new UnauthorizedError("Login required")
+      throw new UnauthorizedError("Login diperlukan. Silakan login terlebih dahulu.")
     }
 
     return next({
