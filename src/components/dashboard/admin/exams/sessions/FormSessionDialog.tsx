@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useFormState } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -80,12 +80,15 @@ export function FormSessionDialog({
     defaultValues: existing
       ? {
           id: existing.id,
+          examId,
           name: existing.name,
           startTime: toLocalInputValue(existing.startTime),
           endTime: toLocalInputValue(existing.endTime),
         }
-      : { name: '', startTime: '', endTime: '' },
+      : { examId, name: '', startTime: '', endTime: '' },
   })
+
+  const formState = useFormState({ control: form.control })
 
   const mutation = useMutation({
     mutationFn: async (values: any) => {
@@ -221,7 +224,7 @@ export function FormSessionDialog({
             </Button>
             <Button
               type="submit"
-              disabled={mutation.isPending || !form.formState.isValid}
+              disabled={mutation.isPending || !formState.isValid}
             >
               {mutation.isPending ? 'Menyimpan…' : 'Simpan'}
             </Button>
