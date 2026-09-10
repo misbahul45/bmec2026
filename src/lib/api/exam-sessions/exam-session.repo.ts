@@ -9,7 +9,26 @@ export default class ExamSessionRepo {
         assignments: {
           include: {
             team: {
-              select: { id: true, code: true, name: true, schoolName: true },
+              select: {
+                id: true,
+                code: true,
+                name: true,
+                schoolName: true,
+                email: true,
+                phone: true,
+                competitionType: true,
+                members: {
+                  select: { id: true, role: true },
+                },
+                registration: {
+                  select: { status: true },
+                },
+                attempts: {
+                  where: { examId },
+                  select: { id: true, finished: true, totalScore: true },
+                  take: 1,
+                },
+              },
             },
           },
           orderBy: { createdAt: 'asc' },

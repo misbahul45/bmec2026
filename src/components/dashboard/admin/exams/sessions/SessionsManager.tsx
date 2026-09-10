@@ -202,28 +202,88 @@ export function SessionsManager({ examId }: { examId: string }) {
               ) : (
                 <div className="border rounded-xl overflow-hidden">
                   <table className="w-full text-sm">
+                    <thead className="bg-muted/40 text-[10px] uppercase tracking-wide text-muted-foreground">
+                      <tr>
+                        <th className="px-3 py-2 text-left font-medium">Kode</th>
+                        <th className="px-3 py-2 text-left font-medium">Tim</th>
+                        <th className="px-3 py-2 text-left font-medium">Asal</th>
+                        <th className="px-3 py-2 text-center font-medium">Anggota</th>
+                        <th className="px-3 py-2 text-center font-medium">Status</th>
+                        <th className="px-3 py-2 text-center font-medium">Nilai</th>
+                        <th className="px-3 py-2 text-right font-medium">Aksi</th>
+                      </tr>
+                    </thead>
                     <tbody>
-                      {(session.assignments as any[]).map((a) => (
-                        <tr key={a.id} className="border-b last:border-b-0">
-                          <td className="px-3 py-2 font-mono text-xs w-28">{a.team.code}</td>
-                          <td className="px-3 py-2">{a.team.name}</td>
-                          <td className="px-3 py-2 text-xs text-muted-foreground">{a.team.schoolName}</td>
-                          <td className="px-3 py-2 text-right">
-                            <Button
-                              size="icon-sm" variant="ghost"
-                              disabled={removeTeamMutation.isPending}
-                              onClick={() =>
-                                removeTeamMutation.mutate({
-                                  sessionId: session.id,
-                                  teamId: a.team.id,
-                                })
-                              }
-                            >
-                              <Trash2 className="size-3.5 text-destructive" />
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
+                      {(session.assignments as any[]).map((a) => {
+                        const t = a.team
+                        const memberCount = (t.members ?? []).length
+                        const kapten = (t.members ?? []).find((m: any) => m.role === 'KETUA')
+                        const regStatus = t.registration?.status
+                        const attempt = t.attempts?.[0]
+                        const score = attempt?.totalScore
+                        const finished = attempt?.finished
+                        return (
+                          <tr key={a.id} className="border-t hover:bg-muted/20">
+                            <td className="px-3 py-2 font-mono text-xs">{t.code}</td>
+                            <td className="px-3 py-2">
+                              <div className="font-medium text-foreground">{t.name}</div>
+                              {kapten && (
+                                <div className="text-[10px] text-muted-foreground">
+                                  Ketua: {kapten.name ?? '(tanpa nama)'}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-3 py-2 text-xs text-muted-foreground">
+                              <div>{t.schoolName}</div>
+                              <div className="text-[10px]">{t.competitionType}</div>
+                            </td>
+                            <td className="px-3 py-2 text-center text-xs">
+                              <span className="inline-flex items-center rounded-md bg-muted px-1.5 py-0.5 font-mono">
+                                {memberCount}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2 text-center">
+                              {regStatus === 'APPROVED' ? (
+                                <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+                                  Aktif
+                                </Badge>
+                              ) : regStatus === 'PENDING' ? (
+                                <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-600 border-amber-500/30">
+                                  Pending
+                                </Badge>
+                              ) : regStatus === 'REJECTED' ? (
+                                <Badge variant="outline" className="text-[10px] bg-destructive/10 text-destructive border-destructive/30">
+                                  Ditolak
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="text-[10px]">—</Badge>
+                              )}
+                            </td>
+                            <td className="px-3 py-2 text-center text-xs font-mono">
+                              {finished
+                                ? (score != null ? score : '0')
+                                : attempt
+                                ? <span className="text-muted-foreground">berjalan</span>
+                                : <span className="text-muted-foreground">—</span>}
+                            </td>
+                            <td className="px-3 py-2 text-right">
+                              <Button
+                                size="icon-sm" variant="ghost"
+                                disabled={removeTeamMutation.isPending}
+                                onClick={() =>
+                                  removeTeamMutation.mutate({
+                                    sessionId: session.id,
+                                    teamId: a.team.id,
+                                  })
+                                }
+                                title={`Keluarkan ${t.name} dari sesi`}
+                              >
+                                <Trash2 className="size-3.5 text-destructive" />
+                              </Button>
+                            </td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>

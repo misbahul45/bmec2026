@@ -1,10 +1,23 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { BookOpen, Clock, CheckCircle2, Lock, Trophy } from 'lucide-react'
+import { BookOpen, Clock, CheckCircle2, Hourglass, Lock, Trophy } from 'lucide-react'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { examsByCompetitionTypeQueryOptions } from '~/lib/api/exams/exam.query-options'
 import { PaymentStatus } from '@prisma/client'
 import { useEffect, useState } from 'react'
+
+function formatCountdown(target: Date, now: Date) {
+  const ms = target.getTime() - now.getTime()
+  if (ms <= 0) return null
+  const totalMinutes = Math.floor(ms / 60000)
+  const days = Math.floor(totalMinutes / (60 * 24))
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60)
+  const minutes = totalMinutes % 60
+  if (days > 0) return `${days} hari ${hours} jam lagi`
+  if (hours > 0) return `${hours} jam ${minutes} menit lagi`
+  if (minutes > 0) return `${minutes} menit lagi`
+  return 'kurang dari 1 menit lagi'
+}
 
 type Props = {
   registrationStatus?: PaymentStatus | null
@@ -163,7 +176,7 @@ function ExamList({ teamId }: { teamId: string }) {
                 )}
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {sessionInfo ? (
                   <>
                     <Badge variant="outline" className="shrink-0 text-xs">
@@ -173,6 +186,32 @@ function ExamList({ teamId }: { teamId: string }) {
                       <Clock size={12} />
                       <span>Mulai sesimu: {sessionInfo.range}</span>
                     </div>
+                    {mySession && (() => {
+                      const sStart = new Date(mySession.startTime)
+                      const sEnd = new Date(mySession.endTime)
+                      if (isFinished || isEnded) return null
+                      if (now < sStart) {
+                        const cd = formatCountdown(sStart, now)
+                        if (!cd) return null
+                        return (
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600">
+                            <Hourglass size={12} />
+                            Dimulai {cd}
+                          </div>
+                        )
+                      }
+                      if (now <= sEnd) {
+                        const remaining = formatCountdown(sEnd, now)
+                        if (!remaining) return null
+                        return (
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+                            <Clock size={12} />
+                            Sesi berakhir {remaining}
+                          </div>
+                        )
+                      }
+                      return null
+                    })()}
                   </>
                 ) : (
                   <>
@@ -184,6 +223,16 @@ function ExamList({ teamId }: { teamId: string }) {
                       <Clock size={12} />
                       <span>Selesai: {new Date(exam.endDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
+                    {isUpcoming && !hasSessions && (() => {
+                      const cd = formatCountdown(new Date(exam.startDate), now)
+                      if (!cd) return null
+                      return (
+                        <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600">
+                          <Hourglass size={12} />
+                          Dimulai {cd}
+                        </div>
+                      )
+                    })()}
                   </>
                 )}
               </div>

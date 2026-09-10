@@ -26,8 +26,82 @@ import { ExamType } from '@prisma/client'
 
 import {
   AlertTriangle,
+  CalendarClock,
+  Clock,
   Home,
+  Info,
+  RefreshCw,
+  Users,
 } from 'lucide-react'
+
+import { getExamErrorInfo } from '~/lib/exam/exam-error-messages'
+
+function extractErrorInfo(error: unknown): {
+  code: string | undefined
+  message: string
+  meta?: Record<string, unknown>
+} {
+  if (error && typeof error === 'object') {
+    const e = error as Record<string, any>
+    return {
+      code: e.code,
+      message:
+        typeof e.message === 'string'
+          ? e.message
+          : 'Terjadi kesalahan',
+      meta: e.meta && typeof e.meta === 'object' ? e.meta : undefined,
+    }
+  }
+  return { code: undefined, message: 'Terjadi kesalahan' }
+}
+
+function InfoBlock({ meta }: { meta?: Record<string, unknown> }) {
+  if (!meta) return null
+  const sessionName = typeof meta.sessionName === 'string' ? meta.sessionName : null
+  const sessionStart = typeof meta.sessionStart === 'string' ? meta.sessionStart : null
+  const sessionEnd = typeof meta.sessionEnd === 'string' ? meta.sessionEnd : null
+  if (!sessionName && !sessionStart && !sessionEnd) return null
+  return (
+    <div className="rounded-xl border bg-muted/30 p-3 text-xs space-y-1 text-left">
+      {sessionName && (
+        <div className="flex items-center gap-2 font-medium">
+          <Users size={13} />
+          Sesi kamu: <span className="font-mono">{sessionName}</span>
+        </div>
+      )}
+      {sessionStart && (
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Clock size={13} />
+          Mulai:{' '}
+          {new Date(sessionStart).toLocaleString('id-ID', {
+            timeZone: 'Asia/Jakarta',
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}{' '}
+          WIB
+        </div>
+      )}
+      {sessionEnd && (
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Clock size={13} />
+          Selesai:{' '}
+          {new Date(sessionEnd).toLocaleString('id-ID', {
+            timeZone: 'Asia/Jakarta',
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}{' '}
+          WIB
+        </div>
+      )}
+    </div>
+  )
+}
 
 export const Route = createFileRoute(
   '/dashboard/_authed/team/exam/$examId/',
@@ -55,35 +129,55 @@ export const Route = createFileRoute(
   component: RouteComponent,
 
   errorComponent: ({ error }) => {
-    const message =
-      error instanceof Error
-        ? error.message
-        : 'Terjadi kesalahan'
+    const { code, message, meta } = extractErrorInfo(error)
+    const info = getExamErrorInfo(code, meta)
+
+    const toneClass = {
+      info: 'bg-blue-500/10 text-blue-600',
+      warning: 'bg-amber-500/10 text-amber-600',
+      blocked: 'bg-destructive/10 text-destructive',
+    }[info.tone]
+
+    const Icon = info.tone === 'info' ? Info : AlertTriangle
 
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md border rounded-2xl p-8 text-center space-y-5 bg-background">
-          <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
-            <AlertTriangle className="size-8 text-destructive" />
+          <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center ${toneClass}`}>
+            <Icon className="size-8" />
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-xl font-bold">
-              Ujian Tidak Dapat Dibuka
-            </h1>
-
-            <p className="text-sm text-muted-foreground">
-              {message}
-            </p>
+            <h1 className="text-xl font-bold">{info.title}</h1>
+            <p className="text-sm text-muted-foreground">{info.description}</p>
+            {message && message !== info.description && (
+              <p className="text-[11px] text-muted-foreground/80 italic mt-2">
+                Detail: {message}
+              </p>
+            )}
           </div>
 
+          <InfoBlock meta={meta} />
+
           <div className="flex flex-col gap-3">
-            <Button asChild>
-              <Link to="/dashboard/team">
-                <Home className="size-4 mr-2" />
-                Kembali ke Dashboard
-              </Link>
-            </Button>
+            {info.action?.label === 'Refresh Halaman' ? (
+              <Button onClick={() => window.location.reload()}>
+                <RefreshCw className="size-4 mr-2" />
+                {info.action.label}
+              </Button>
+            ) : info.action?.to ? (
+              <Button asChild>
+                <Link to={info.action.to}>
+                  <Home className="size-4 mr-2" />
+                  {info.action.label}
+                </Link>
+              </Button>
+            ) : null}
+            {code && (
+              <p className="text-[10px] text-muted-foreground/60 font-mono">
+                Kode: {code}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -184,11 +278,12 @@ function ExamPage({
 
       setSession(sessionRes.data as ExamSessionData)
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Gagal memulai ujian. Silakan coba lagi.'
-      setStartError(message)
+      const { code, message, meta } = extractErrorInfo(error)
+      const info = getExamErrorInfo(code, meta)
+      const fullMessage = info.title === 'Ujian Tidak Dapat Dibuka'
+        ? message
+        : `${info.title}. ${info.description}`
+      setStartError(fullMessage)
     } finally {
       setIsStarting(false)
     }
