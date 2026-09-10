@@ -1,7 +1,7 @@
 import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { CalendarClock, Trash2, UserPlus } from 'lucide-react'
+import { CalendarClock, Trash2, UserPlus, AlertTriangle } from 'lucide-react'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
@@ -13,16 +13,19 @@ import {
   removeTeamFromSession,
 } from '~/server/exam-session'
 import { examSessionsQueryOptions } from '~/lib/api/exam-sessions/exam-session.query-options'
+import { examQueryOptions } from '~/lib/api/exams/exam.query-options'
 import { FormSessionDialog } from './FormSessionDialog'
 
 export function SessionsManager({ examId }: { examId: string }) {
   const { data: res } = useSuspenseQuery(examSessionsQueryOptions(examId))
+  const { data: examRes } = useSuspenseQuery(examQueryOptions(examId))
   const sessions: any[] = (res as any)?.data ?? []
+  const exam: any = (examRes as any)?.data
+  const isOlympiad = exam?.type === 'OLYMPIAD'
   const queryClient = useQueryClient()
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: ['exam-sessions', examId] })
 
-  // state assign per sesi: { [sessionId]: {codeFrom: string, codeTo: string} }
   const [ranges, setRanges] = useState<Record<string, { codeFrom: string; codeTo: string }>>({})
 
   const assignMutation = useMutation({
@@ -54,6 +57,25 @@ export function SessionsManager({ examId }: { examId: string }) {
     onError: (error: any) => toast.error(error?.message ?? 'Terjadi kesalahan'),
   })
 
+  if (!isOlympiad) {
+    return (
+      <div className="rounded-2xl border border-amber-500/40 bg-amber-500/5 p-6 space-y-3">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="size-5 text-amber-600 mt-0.5 shrink-0" />
+          <div className="space-y-1">
+            <p className="text-sm font-medium">
+              Sesi tidak tersedia untuk ujian tipe {exam?.type ?? 'ini'}.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Fitur sesi hanya berlaku untuk ujian tipe <strong>OLYMPIAD</strong>.
+              Ujian tipe TRYOUT tidak memerlukan sesi karena berlangsung dalam satu window waktu.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (sessions.length === 0) {
     return (
       <div className="rounded-2xl border p-8 text-center space-y-3">
@@ -62,7 +84,11 @@ export function SessionsManager({ examId }: { examId: string }) {
           Belum ada sesi. Exam akan mengikuti window tanggal ujian sampai sesi dibuat.
         </p>
         <div className="flex justify-center">
-          <FormSessionDialog examId={examId} />
+          <FormSessionDialog
+            examId={examId}
+            examStartDate={exam?.startDate}
+            examEndDate={exam?.endDate}
+          />
         </div>
       </div>
     )
@@ -72,7 +98,11 @@ export function SessionsManager({ examId }: { examId: string }) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold">Daftar Sesi</h2>
-        <FormSessionDialog examId={examId} />
+        <FormSessionDialog
+          examId={examId}
+          examStartDate={exam?.startDate}
+          examEndDate={exam?.endDate}
+        />
       </div>
 
       {sessions.map((session) => {
@@ -95,6 +125,8 @@ export function SessionsManager({ examId }: { examId: string }) {
                 <div className="flex items-center gap-1">
                   <FormSessionDialog
                     examId={examId}
+                    examStartDate={exam?.startDate}
+                    examEndDate={exam?.endDate}
                     existing={{
                       id: session.id,
                       name: session.name,

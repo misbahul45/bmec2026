@@ -18,6 +18,33 @@ export default class ExamSessionRepo {
     })
   }
 
+  findOverlappingSessions(
+    examId: string,
+    startTime: Date,
+    endTime: Date,
+    excludeId?: string,
+  ) {
+    return prisma.examSession.findMany({
+      where: {
+        examId,
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+        AND: [
+          { startTime: { lt: endTime } },
+          { endTime: { gt: startTime } },
+        ],
+      },
+      select: { id: true, name: true, startTime: true, endTime: true },
+      orderBy: { startTime: 'asc' },
+    })
+  }
+
+  findSessionByName(examId: string, name: string) {
+    return prisma.examSession.findUnique({
+      where: { examId_name: { examId, name } },
+      select: { id: true },
+    })
+  }
+
   findExamMeta(examId: string) {
     return prisma.exam.findUnique({
       where: { id: examId },

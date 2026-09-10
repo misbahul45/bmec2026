@@ -29,6 +29,7 @@ export function handleError(error: unknown): ErrorResult {
         error.message,
         process.env.NODE_ENV === "development" ? error : undefined,
         error.code,
+        error.field,
       ),
     }
   }

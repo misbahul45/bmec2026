@@ -4,6 +4,7 @@ export class AppError extends Error {
     message: string,
     public statusCode = 400,
     public code = "APP_ERROR",
+    public field?: string,
   ) {
     super(message)
     this.name = "AppError"

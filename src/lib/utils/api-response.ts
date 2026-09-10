@@ -9,6 +9,7 @@ export type ApiError = {
   message: string
   errors?: unknown
   code?: string
+  field?: string
 }
 
 export type ApiResponse<T = unknown> = ApiSuccess<T> | ApiError
@@ -27,10 +28,12 @@ export const successResponse = <T>(
 export const errorResponse = (
   message = 'Something went wrong',
   errors?: unknown,
-  code?: string
+  code?: string,
+  field?: string,
 ): ApiError => ({
   success: false,
   message,
   errors,
   code,
+  field,
 })

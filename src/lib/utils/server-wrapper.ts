@@ -15,12 +15,17 @@ export function withErrorHandling<TContext, TOutput>(
         throw error
       }
 
+      if (error instanceof AppError) {
+        throw error
+      }
+
       const { body, status } = handleError(error)
 
       throw new AppError(
         (body as any).message || "Terjadi kesalahan tidak terduga. Coba lagi beberapa saat.",
         status,
-        (body as any).code || "INTERNAL_ERROR"
+        (body as any).code || "INTERNAL_ERROR",
+        (body as any).field,
       )
     }
   }
