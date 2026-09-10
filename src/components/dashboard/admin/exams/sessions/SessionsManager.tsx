@@ -217,7 +217,6 @@ export function SessionsManager({ examId }: { examId: string }) {
                       {(session.assignments as any[]).map((a) => {
                         const t = a.team
                         const memberCount = (t.members ?? []).length
-                        const kapten = (t.members ?? []).find((m: any) => m.role === 'KETUA')
                         const regStatus = t.registration?.status
                         const attempt = t.attempts?.[0]
                         const score = attempt?.totalScore
@@ -227,11 +226,6 @@ export function SessionsManager({ examId }: { examId: string }) {
                             <td className="px-3 py-2 font-mono text-xs">{t.code}</td>
                             <td className="px-3 py-2">
                               <div className="font-medium text-foreground">{t.name}</div>
-                              {kapten && (
-                                <div className="text-[10px] text-muted-foreground">
-                                  Ketua: {kapten.name ?? '(tanpa nama)'}
-                                </div>
-                              )}
                             </td>
                             <td className="px-3 py-2 text-xs text-muted-foreground">
                               <div>{t.schoolName}</div>

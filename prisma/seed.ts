@@ -4,13 +4,15 @@ import { seedStage } from "./seeds/stage";
 import { seedCompetitionOrsinil } from "./seeds/orisinil/competition.orsinil";
 import { seedExamOrsinil } from "./seeds/orisinil/exam.orsinil";
 import { seedTeams } from "./seeds/data";
+import { seedExamSessionsOlimpiade } from "./seeds/exam-sessions.olimpiade";
 
 const seeds = [
   // seedCompetitionOrsinil,
   // seedStage,
   // seedAdmin,
   // seedExamOrsinil,
-  seedTeams
+  seedTeams,
+  // seedExamSessionsOlimpiade, // aktifkan setelah seedTeams (butuh tim OLIMPIADE di DB)
 ]
 
 async function main() {
