@@ -179,38 +179,46 @@ export async function seedOlimpiadeTestFixtures() {
   console.log(`   Window: ${examStart.toISOString()} → ${examEnd.toISOString()} (hari ini 13:00–17:00 WIB)`);
   console.log(`   Duration: 10 menit`);
 
+  await prisma.examQuestion.deleteMany({
+    where: {
+      examId: exam.id,
+      id: { startsWith: "test-q-" },
+    },
+  });
+
   for (let i = 0; i < TEST_QUESTIONS.length; i++) {
     const q = TEST_QUESTIONS[i];
-    await prisma.examQuestion.upsert({
-      where: { id: `test-q-${exam.id}-${i + 1}` },
-      update: {
-        question: q.question,
-        optionA: q.optionA,
-        optionB: q.optionB,
-        optionC: q.optionC,
-        optionD: q.optionD,
-        optionE: q.optionE,
-        correctAnswer: q.correctAnswer,
-        order: i + 1,
-        difficulty: q.difficulty,
-      },
-      create: {
-        id: `test-q-${exam.id}-${i + 1}`,
-        examId: exam.id,
-        question: q.question,
-        optionA: q.optionA,
-        optionB: q.optionB,
-        optionC: q.optionC,
-        optionD: q.optionD,
-        optionE: q.optionE,
-        correctAnswer: q.correctAnswer,
-        correctScore: 4,
-        wrongScore: -1,
-        emptyScore: 0,
-        order: i + 1,
-        difficulty: q.difficulty,
-      },
+    const questionData = {
+      question: q.question,
+      optionA: q.optionA,
+      optionB: q.optionB,
+      optionC: q.optionC,
+      optionD: q.optionD,
+      optionE: q.optionE,
+      correctAnswer: q.correctAnswer,
+      order: i + 1,
+      difficulty: q.difficulty,
+    };
+    const existing = await prisma.examQuestion.findFirst({
+      where: { examId: exam.id, order: i + 1 },
+      select: { id: true },
     });
+    if (existing) {
+      await prisma.examQuestion.update({
+        where: { id: existing.id },
+        data: questionData,
+      });
+    } else {
+      await prisma.examQuestion.create({
+        data: {
+          examId: exam.id,
+          ...questionData,
+          correctScore: 4,
+          wrongScore: -1,
+          emptyScore: 0,
+        },
+      });
+    }
   }
   console.log(`   ✅ ${TEST_QUESTIONS.length} soal masuk`);
 
@@ -425,38 +433,46 @@ export async function seedOlimpiadeTest2JamFixtures() {
   console.log(`   Window: ${exam2JamStart.toISOString()} → ${exam2JamEnd.toISOString()} (hari ini 18:00–24:00 WIB)`);
   console.log(`   Duration: 120 menit (2 jam)`);
 
+  await prisma.examQuestion.deleteMany({
+    where: {
+      examId: exam.id,
+      id: { startsWith: "test2j-q-" },
+    },
+  });
+
   for (let i = 0; i < TEST_2JAM_QUESTIONS.length; i++) {
     const q = TEST_2JAM_QUESTIONS[i];
-    await prisma.examQuestion.upsert({
-      where: { id: `test2j-q-${exam.id}-${i + 1}` },
-      update: {
-        question: q.question,
-        optionA: q.optionA,
-        optionB: q.optionB,
-        optionC: q.optionC,
-        optionD: q.optionD,
-        optionE: q.optionE,
-        correctAnswer: q.correctAnswer,
-        order: i + 1,
-        difficulty: q.difficulty,
-      },
-      create: {
-        id: `test2j-q-${exam.id}-${i + 1}`,
-        examId: exam.id,
-        question: q.question,
-        optionA: q.optionA,
-        optionB: q.optionB,
-        optionC: q.optionC,
-        optionD: q.optionD,
-        optionE: q.optionE,
-        correctAnswer: q.correctAnswer,
-        correctScore: 4,
-        wrongScore: -1,
-        emptyScore: 0,
-        order: i + 1,
-        difficulty: q.difficulty,
-      },
+    const questionData = {
+      question: q.question,
+      optionA: q.optionA,
+      optionB: q.optionB,
+      optionC: q.optionC,
+      optionD: q.optionD,
+      optionE: q.optionE,
+      correctAnswer: q.correctAnswer,
+      order: i + 1,
+      difficulty: q.difficulty,
+    };
+    const existing = await prisma.examQuestion.findFirst({
+      where: { examId: exam.id, order: i + 1 },
+      select: { id: true },
     });
+    if (existing) {
+      await prisma.examQuestion.update({
+        where: { id: existing.id },
+        data: questionData,
+      });
+    } else {
+      await prisma.examQuestion.create({
+        data: {
+          examId: exam.id,
+          ...questionData,
+          correctScore: 4,
+          wrongScore: -1,
+          emptyScore: 0,
+        },
+      });
+    }
   }
   console.log(`   ✅ ${TEST_2JAM_QUESTIONS.length} soal masuk`);
 
