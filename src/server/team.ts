@@ -90,7 +90,14 @@ export const updateTeam = createServerFn({ method: "POST" })
   }))
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
-      await requireTeamSession(data.id)
+      const session = await useAppSession()
+      const role = session.data.role
+      if (role !== 'ADMIN' && role !== 'TEAM') {
+        throw new AppError('Sesi tidak valid atau telah kedaluwarsa. Silakan login kembali.', 401, 'INVALID_SESSION')
+      }
+      if (role === 'TEAM' && session.data.userId !== data.id) {
+        throw new AppError('Akses ditolak: Anda tidak memiliki izin untuk mengubah data tim lain.', 403, 'TEAM_ACCESS_DENIED')
+      }
       const { id, body } = data as { id: string; body: typeof updateTeamSchema._type }
       const result = await teamService.update(id, body)
       return successResponse<any>(result.data, result.message)
