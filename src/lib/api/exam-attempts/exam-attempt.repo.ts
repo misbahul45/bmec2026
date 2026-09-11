@@ -367,16 +367,26 @@ export default class ExamAttemptRepo {
 
     if (weight <= 0) return createEvent
 
-    return Promise.all([
-      createEvent,
-      prisma.examAttempt.updateMany({
+    return prisma.$transaction(async (tx) => {
+      const current = await tx.examAttempt.findUnique({
         where: { id: attemptId, finished: false },
-        data: {
-          cheatCount: { increment: 1 },
-          suspiciousScore: { increment: weight },
-          ...(weight >= 25 ? { flagged: true } : {}),
-        },
-      }),
-    ])
+        select: { suspiciousScore: true },
+      })
+      if (!current) return [createEvent]
+
+      const nextScore = (current.suspiciousScore ?? 0) + weight
+
+      return Promise.all([
+        createEvent,
+        tx.examAttempt.update({
+          where: { id: attemptId, finished: false },
+          data: {
+            cheatCount: { increment: 1 },
+            suspiciousScore: { increment: weight },
+            ...(nextScore >= 25 ? { flagged: true } : {}),
+          },
+        }),
+      ])
+    })
   }
 }
