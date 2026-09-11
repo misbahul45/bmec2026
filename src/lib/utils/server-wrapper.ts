@@ -18,8 +18,9 @@ export function withErrorHandling<TContext, TOutput>(
       if (error instanceof AppError) {
         throw error
       }
-
       const { body, status } = handleError(error)
+
+      console.log("withErrorHandling", { body, status }, error)
 
       throw new AppError(
         (body as any).message || "Terjadi kesalahan tidak terduga. Coba lagi beberapa saat.",

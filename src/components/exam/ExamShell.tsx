@@ -84,26 +84,46 @@ export function ExamShell({
     if (!currentQuestion) return
     const existing = answers[currentQuestion.id]
     setSelectedAnswer(existing?.answer ?? null)
-  }, [currentIndex, currentQuestion?.id, answers, setSelectedAnswer])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, currentQuestion?.id])
 
   const persistAnswer = useCallback(async (questionId: string, answer: string) => {
-    const response = await saveAnswer({
-      data: {
-        attemptId: attempt.id,
-        questionId,
-        answer,
-        teamId,
-      },
-    })
+    let response: unknown
+    try {
+      response = await saveAnswer({
+        data: {
+          attemptId: attempt.id,
+          questionId,
+          answer,
+          teamId,
+        },
+      })
+    } catch (networkError) {
+      console.error('[persistAnswer] saveAnswer network/server error:', networkError)
+      throw networkError
+    }
 
-    const result = response.data as { skipped?: boolean; reason?: string } | undefined
-    if (result?.skipped) {
-      throw new Error(result.reason ?? 'ANSWER_NOT_SAVED')
+    const responseObj = response as { data?: unknown } | undefined
+    const innerData =
+      responseObj && typeof responseObj === 'object' && 'data' in responseObj
+        ? (responseObj.data as { skipped?: boolean; reason?: string } | undefined)
+        : (response as { skipped?: boolean; reason?: string } | undefined)
+
+    if (innerData && typeof innerData === 'object' && 'skipped' in innerData && innerData.skipped) {
+      throw new Error(innerData.reason ?? 'ANSWER_NOT_SAVED')
     }
   }, [attempt.id, teamId])
 
   const handleDoubt = useCallback(async () => {
-    if (!currentQuestion || !selectedAnswer || isSaving || isSubmitting) return
+    if (!currentQuestion || !selectedAnswer || isSaving || isSubmitting) {
+      console.warn('[handleDoubt] early return', {
+        hasQuestion: !!currentQuestion,
+        hasSelectedAnswer: selectedAnswer !== null,
+        isSaving,
+        isSubmitting,
+      })
+      return
+    }
 
     setIsSaving(true)
     try {
@@ -111,6 +131,7 @@ export function ExamShell({
       markAsDoubt(currentQuestion.id, selectedAnswer)
       goToNext()
     } catch (error) {
+      console.error('[handleDoubt] persistAnswer failed:', error)
       if (error instanceof Error && error.message === 'TIME_EXPIRED') {
         void submitAuto()
       } else {
@@ -122,7 +143,15 @@ export function ExamShell({
   }, [currentQuestion, selectedAnswer, isSaving, isSubmitting, persistAnswer, markAsDoubt, goToNext, submitAuto])
 
   const handleSave = useCallback(async () => {
-    if (!currentQuestion || !selectedAnswer || isSaving || isSubmitting) return
+    if (!currentQuestion || !selectedAnswer || isSaving || isSubmitting) {
+      console.warn('[handleSave] early return', {
+        hasQuestion: !!currentQuestion,
+        hasSelectedAnswer: selectedAnswer !== null,
+        isSaving,
+        isSubmitting,
+      })
+      return
+    }
 
     setIsSaving(true)
     try {
@@ -130,6 +159,7 @@ export function ExamShell({
       markAsSaved(currentQuestion.id, selectedAnswer)
       if (!isLast) goToNext()
     } catch (error) {
+      console.error('[handleSave] persistAnswer failed:', error)
       if (error instanceof Error && error.message === 'TIME_EXPIRED') {
         void submitAuto()
       } else {

@@ -78,6 +78,79 @@ export default class AttemptRepo {
     })
   }
 
+  findOngoingAttemptsByExam(examId: string) {
+    return prisma.examAttempt.findMany({
+      where: { examId, finished: false },
+      select: {
+        id: true,
+        teamId: true,
+        startTime: true,
+        examId: true,
+      },
+    })
+  }
+
+  findSessionEndByTeamExam(teamId: string, examId: string) {
+    return prisma.examSessionTeam
+      .findUnique({
+        where: { teamId_examId: { teamId, examId } },
+        select: { session: { select: { endTime: true } } },
+      })
+      .then((row) => row?.session?.endTime ?? null)
+  }
+
+  findExamLite(examId: string) {
+    return prisma.exam.findUnique({
+      where: { id: examId },
+      select: { id: true, startDate: true, endDate: true, duration: true, type: true },
+    })
+  }
+
+  findAttemptForAutoFinish(attemptId: string) {
+    return prisma.examAttempt.findUnique({
+      where: { id: attemptId },
+      select: {
+        teamId: true,
+        finished: true,
+        examId: true,
+        answers: {
+          select: {
+            questionId: true,
+            answer: true,
+            isCorrect: true,
+          },
+        },
+        exam: {
+          select: {
+            questions: {
+              select: {
+                id: true,
+                correctAnswer: true,
+                correctScore: true,
+                wrongScore: true,
+                emptyScore: true,
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+
+  finishAttemptOnce(attemptId: string, totalScore: number) {
+    return prisma.examAttempt.updateMany({
+      where: { id: attemptId, finished: false },
+      data: { finished: true, endTime: new Date(), totalScore },
+    })
+  }
+
+  findAttemptMetaById(attemptId: string) {
+    return prisma.examAttempt.findUnique({
+      where: { id: attemptId },
+      select: { id: true, examId: true, finished: true },
+    })
+  }
+
   findById(id: string) {
     return prisma.examAttempt.findUnique({
       where: {

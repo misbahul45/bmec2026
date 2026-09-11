@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start"
 import { withErrorHandling } from "~/lib/utils/server-wrapper"
 import { successResponse, ApiSuccess } from "~/lib/utils/api-response"
+import { AppError } from "~/lib/utils/app-error"
 import TeamService from "~/lib/api/teams/team.service"
 import { z } from "zod"
 import { registerSchema } from "~/schemas/auth.schema"
@@ -10,6 +11,7 @@ import { queryTeam, updateTeamSchema } from "~/schemas/team.schema"
 import { loginFn } from "./auth"
 import { createMentorSchema } from "~/schemas/team.mentor.schema"
 import { requireTeamSession, requireAdminSession } from "~/lib/utils/server-auth"
+import { useAppSession } from "~/lib/utils/session"
 
 const teamService = new TeamService()
 
@@ -27,7 +29,14 @@ export const getTeam = createServerFn({ method: "GET" })
   .inputValidator(Uuid)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
-      await requireTeamSession(data)
+      const session = await useAppSession()
+      const role = session.data.role
+      if (role !== 'ADMIN' && role !== 'TEAM') {
+        throw new AppError('Sesi tidak valid atau telah kedaluwarsa. Silakan login kembali.', 401, 'INVALID_SESSION')
+      }
+      if (role === 'TEAM' && session.data.userId !== data) {
+        throw new AppError('Akses ditolak: Anda tidak memiliki izin untuk mengakses data tim lain.', 403, 'TEAM_ACCESS_DENIED')
+      }
       const result = await teamService.findOne(data)
       return successResponse<any>(result.data, result.message)
     })

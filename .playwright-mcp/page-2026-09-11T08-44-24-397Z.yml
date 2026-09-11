@@ -1,0 +1,83 @@
+- generic [active] [ref=f1e1]:
+  - banner [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - link "logo BMEC 2026" [ref=f1e4] [cursor=pointer]:
+        - /url: /
+        - img "logo" [ref=f1e6]
+        - generic [ref=f1e7]: BMEC 2026
+      - button "Open menu" [ref=f1e8]
+  - generic:
+    - generic:
+      - navigation:
+        - link "Home":
+          - /url: /#home
+        - link "About":
+          - /url: /#about
+        - link "Benefits":
+          - /url: /#benefits
+        - link "Timeline":
+          - /url: /#timeline
+        - link "Competition":
+          - /url: /#competition
+        - link "Gallery":
+          - /url: /#gallery
+        - link "FAQ":
+          - /url: /#faq
+      - generic:
+        - generic:
+          - link "Login":
+            - /url: /auth/login
+          - link "Daftar":
+            - /url: /auth/register
+  - generic [ref=f1e14]:
+    - generic [ref=f1e15]:
+      - paragraph [ref=f1e16]: BMEC 2026
+      - heading "Masuk" [level=1] [ref=f1e17]
+      - paragraph [ref=f1e18]: Login ke akun tim kamu
+    - generic [ref=f1e19]:
+      - generic [ref=f1e20]:
+        - text: Email
+        - textbox "Email" [ref=f1e21]:
+          - /placeholder: tim@email.com
+      - generic [ref=f1e22]:
+        - text: Password
+        - textbox "Password" [ref=f1e23]:
+          - /placeholder: ••••••••
+      - button "Masuk" [ref=f1e25]
+    - paragraph [ref=f1e26]:
+      - text: Belum daftar?
+      - link "Daftar sekarang" [ref=f1e27] [cursor=pointer]:
+        - /url: /auth/register
+  - contentinfo [ref=f1e28]:
+    - generic [ref=f1e29]:
+      - generic [ref=f1e30]:
+        - generic [ref=f1e31]:
+          - heading "BMEC 2026" [level=2] [ref=f1e32]
+          - paragraph [ref=f1e33]: Kompetisi tahunan Teknik Biomedis oleh HMTB Universitas Airlangga. Bangun ide, kembangkan solusi, jadilah inovator.
+        - navigation [ref=f1e34]:
+          - generic [ref=f1e35]: Navigasi
+          - link "Home" [ref=f1e36] [cursor=pointer]:
+            - /url: /#home
+          - link "About" [ref=f1e37] [cursor=pointer]:
+            - /url: /#about
+          - link "Benefits" [ref=f1e38] [cursor=pointer]:
+            - /url: /#benefits
+          - link "Timeline" [ref=f1e39] [cursor=pointer]:
+            - /url: /#timeline
+          - link "Competition" [ref=f1e40] [cursor=pointer]:
+            - /url: /#competition
+          - link "Gallery" [ref=f1e41] [cursor=pointer]:
+            - /url: /#gallery
+          - link "FAQ" [ref=f1e42] [cursor=pointer]:
+            - /url: /#faq
+      - generic [ref=f1e43]:
+        - generic [ref=f1e44]:
+          - link "Instagram BMEC" [ref=f1e45] [cursor=pointer]:
+            - /url: https://www.instagram.com/bmecunair?igsh=ZDA0NGN2cjNscHVi
+          - link "WhatsApp BMEC" [ref=f1e48] [cursor=pointer]:
+            - /url: https://wa.me/6281227206052
+            - generic: WA BMEC
+          - link "Tiktok BMEC" [ref=f1e51] [cursor=pointer]:
+            - /url: https://www.tiktok.com/@bmecunair?_r=1&_t=ZS-95zQw5cyxeP
+        - paragraph [ref=f1e54]: © 2026 BMEC · HMTB Universitas Airlangga
+  - region "Notifications alt+T"
