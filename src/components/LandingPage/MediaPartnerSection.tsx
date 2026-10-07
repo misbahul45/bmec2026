@@ -55,6 +55,19 @@ const MEDIA_PARTNERS = [
   },
 ] as const
 
+const SPONSORS = [
+  {
+    id: 1,
+    image:
+      'https://tbz7ucrzr2.ufs.sh/f/uEc5gvzB5LqY3NQgvic6cwxH82PZaubgLq9RYrWU0MyO7T4C',
+  },
+  {
+    id: 2,
+    image:
+      'https://tbz7ucrzr2.ufs.sh/f/uEc5gvzB5LqY3NQgvic6cwxH82PZaubgLq9RYrWU0MyO7T4C',
+  },
+] as const
+
 const MediaPartnerSection = () => {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
@@ -77,18 +90,18 @@ const MediaPartnerSection = () => {
         },
       )
 
-      gsap.from('.media-partner-heading', {
+      gsap.from('.sponsor-heading', {
         opacity: 0,
         y: 30,
         duration: 0.8,
         ease: 'power3.out',
       })
 
-      gsap.from('.media-partner-description', {
+      gsap.from('.media-partner-heading', {
         opacity: 0,
-        y: 20,
+        y: 30,
         duration: 0.8,
-        delay: 0.15,
+        delay: 0.1,
         ease: 'power3.out',
       })
     },
@@ -110,15 +123,33 @@ const MediaPartnerSection = () => {
       ref={sectionRef}
       className="overflow-hidden py-16 md:py-24"
     >
+      <div className="mx-auto mb-16 max-w-7xl px-4 sm:px-6 lg:px-8">
+        <h2 className="sponsor-heading mb-8 text-center text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+          Sponsors
+        </h2>
+
+        <div className="flex flex-wrap items-center justify-center gap-6">
+          {SPONSORS.map((sponsor) => (
+            <div
+              key={sponsor.id}
+              className="flex h-36 w-72 items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md"
+            >
+              <img
+                src={sponsor.image}
+                alt={`Sponsor ${sponsor.id}`}
+                loading="lazy"
+                draggable={false}
+                className="h-full w-full object-contain"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="mx-auto mb-10 max-w-7xl px-4 text-center sm:px-6 lg:px-8">
         <h2 className="media-partner-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
           Media Partners
         </h2>
-
-        <p className="media-partner-description mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
-          Supported by media partners who help us expand our reach and share
-          meaningful information with a wider audience.
-        </p>
       </div>
 
       <div

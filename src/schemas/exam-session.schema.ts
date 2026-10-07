@@ -52,3 +52,22 @@ export const removeTeamFromSessionSchema = z.object({
   sessionId: z.string().uuid(),
   teamId: z.string().uuid(),
 })
+
+export const setTeamsByNamesSchema = z.object({
+  examLookup: z.object({
+    competition: z.string().min(1),
+    stage: z.enum(['PENYISIHAN', 'SEMIFINAL', 'FINAL']),
+    type: z.enum(['TRYOUT', 'OLYMPIAD']),
+  }),
+  assignments: z
+    .array(
+      z.object({
+        teamName: z.string().min(1),
+        schoolName: z.string().min(1),
+        sessionName: z.string().min(1),
+      }),
+    )
+    .min(1, 'Minimal satu assignment'),
+})
+
+export type SetTeamsByNamesData = z.output<typeof setTeamsByNamesSchema>

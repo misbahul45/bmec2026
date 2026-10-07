@@ -168,4 +168,40 @@ export default class ExamSessionRepo {
       where: { sessionId, teamId },
     })
   }
+
+  findExamByLookup(input: {
+    competitionName: string
+    stageName: 'PENYISIHAN' | 'SEMIFINAL' | 'FINAL'
+    type: 'TRYOUT' | 'OLYMPIAD'
+  }) {
+    return prisma.exam.findFirst({
+      where: {
+        type: input.type,
+        stage: {
+          name: input.stageName,
+          competition: { name: input.competitionName },
+        },
+      },
+      select: { id: true, title: true, type: true, startDate: true, endDate: true },
+    })
+  }
+
+  findSessionsMetaByExamId(examId: string) {
+    return prisma.examSession.findMany({
+      where: { examId },
+      select: { id: true, name: true },
+      orderBy: { startTime: 'asc' },
+    })
+  }
+
+  findTeamsByNameSchool(pairs: Array<{ teamName: string; schoolName: string }>) {
+    if (pairs.length === 0) return Promise.resolve([])
+    const names = [...new Set(pairs.map((p) => p.teamName.trim()))]
+    return prisma.team.findMany({
+      where: {
+        OR: names.map((n) => ({ name: { contains: n, mode: 'insensitive' as const } })),
+      },
+      select: { id: true, code: true, name: true, schoolName: true, competitionType: true },
+    })
+  }
 }

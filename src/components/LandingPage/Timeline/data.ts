@@ -58,11 +58,11 @@ export const processes: TimelineProcess[] = [
         label: 'Technical Meeting Semifinal',
       },
       {
-        date: '7 November',
+        date: '14 November',
         label: 'Semifinal',
       },
       {
-        date: '8 November',
+        date: '15 November',
         label: 'Final',
       },
     ],
@@ -101,7 +101,7 @@ export const processes: TimelineProcess[] = [
         label: 'Technical Meeting Final',
       },
       {
-        date: '8 November',
+        date: '15 November',
         label: 'Final',
       },
     ],
@@ -140,7 +140,7 @@ export const processes: TimelineProcess[] = [
         label: 'Voting Karya Finalis Infografis',
       },
       {
-        date: '8 November',
+        date: '15 November',
         label: 'Final',
       },
     ],

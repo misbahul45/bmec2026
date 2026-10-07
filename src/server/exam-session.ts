@@ -9,6 +9,7 @@ import {
   examSessionIdSchema,
   examSessionsQuerySchema,
   removeTeamFromSessionSchema,
+  setTeamsByNamesSchema,
   updateExamSessionSchema,
 } from '~/schemas/exam-session.schema'
 
@@ -71,5 +72,15 @@ export const removeTeamFromSession = createServerFn({ method: 'POST' })
       await requireAdminSession()
       const result = await service.removeTeam(data)
       return successResponse<null>(result.data, result.message)
+    }),
+  )
+
+export const setTeamsByNames = createServerFn({ method: 'POST' })
+  .inputValidator(setTeamsByNamesSchema)
+  .handler(
+    withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
+      await requireAdminSession()
+      const result = await service.setTeamsByNames(data)
+      return successResponse<any>(result.data, result.message)
     }),
   )
