@@ -10,34 +10,29 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DashboardAuthedRouteImport } from './routes/dashboard/_authed'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as DashboardAuthedRouteImport } from './routes/dashboard/_authed'
 import { Route as AuthRegisterIndexRouteImport } from './routes/auth/register/index'
-import { Route as DashboardAuthedTeamIndexRouteImport } from './routes/dashboard/_authed/team/index'
-import { Route as DashboardAuthedAdminIndexRouteImport } from './routes/dashboard/_authed/admin/index'
 import { Route as AuthRegisterTeamIdIndexRouteImport } from './routes/auth/register/$teamId/index'
 import { Route as AuthRegisterTeamIdCompletedRouteImport } from './routes/auth/register/$teamId/completed'
-import { Route as DashboardAuthedAdminTeamsIndexRouteImport } from './routes/dashboard/_authed/admin/teams/index'
-import { Route as DashboardAuthedAdminSubmissionsIndexRouteImport } from './routes/dashboard/_authed/admin/submissions/index'
-import { Route as DashboardAuthedAdminScoreboardIndexRouteImport } from './routes/dashboard/_authed/admin/scoreboard/index'
-import { Route as DashboardAuthedAdminExamsIndexRouteImport } from './routes/dashboard/_authed/admin/exams/index'
+import { Route as DashboardAuthedAdminIndexRouteImport } from './routes/dashboard/_authed/admin/index'
+import { Route as DashboardAuthedTeamIndexRouteImport } from './routes/dashboard/_authed/team/index'
 import { Route as DashboardAuthedAdminCompetitionsIndexRouteImport } from './routes/dashboard/_authed/admin/competitions/index'
+import { Route as DashboardAuthedAdminExamsIndexRouteImport } from './routes/dashboard/_authed/admin/exams/index'
+import { Route as DashboardAuthedAdminScoreboardIndexRouteImport } from './routes/dashboard/_authed/admin/scoreboard/index'
+import { Route as DashboardAuthedAdminSubmissionsIndexRouteImport } from './routes/dashboard/_authed/admin/submissions/index'
+import { Route as DashboardAuthedAdminTeamsIndexRouteImport } from './routes/dashboard/_authed/admin/teams/index'
 import { Route as DashboardAuthedAdminTeamsTeamIdRouteImport } from './routes/dashboard/_authed/admin/teams/$teamId'
-import { Route as DashboardAuthedTeamExamExamIdIndexRouteImport } from './routes/dashboard/_authed/team/exam/$examId/index'
 import { Route as DashboardAuthedAdminExamsExamIdIndexRouteImport } from './routes/dashboard/_authed/admin/exams/$examId/index'
-import { Route as DashboardAuthedTeamExamExamIdReviewRouteImport } from './routes/dashboard/_authed/team/exam/$examId/review'
 import { Route as DashboardAuthedAdminExamsExamIdReviewsRouteImport } from './routes/dashboard/_authed/admin/exams/$examId/reviews'
-import { Route as DashboardAuthedAdminExamsExamIdSessionsIndexRouteImport } from './routes/dashboard/_authed/admin/exams/$examId/sessions/index'
+import { Route as DashboardAuthedTeamExamExamIdIndexRouteImport } from './routes/dashboard/_authed/team/exam/$examId/index'
+import { Route as DashboardAuthedTeamExamExamIdReviewRouteImport } from './routes/dashboard/_authed/team/exam/$examId/review'
 import { Route as DashboardAuthedAdminExamsExamIdAttemptsAttemptIdRouteImport } from './routes/dashboard/_authed/admin/exams/$examId/attempts/$attemptId'
+import { Route as DashboardAuthedAdminExamsExamIdSessionsIndexRouteImport } from './routes/dashboard/_authed/admin/exams/$examId/sessions/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardAuthedRoute = DashboardAuthedRouteImport.update({
-  id: '/dashboard/_authed',
-  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
@@ -45,23 +40,16 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardAuthedRoute = DashboardAuthedRouteImport.update({
+  id: '/dashboard/_authed',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRegisterIndexRoute = AuthRegisterIndexRouteImport.update({
   id: '/auth/register/',
   path: '/auth/register/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardAuthedTeamIndexRoute =
-  DashboardAuthedTeamIndexRouteImport.update({
-    id: '/team/',
-    path: '/team/',
-    getParentRoute: () => DashboardAuthedRoute,
-  } as any)
-const DashboardAuthedAdminIndexRoute =
-  DashboardAuthedAdminIndexRouteImport.update({
-    id: '/admin/',
-    path: '/admin/',
-    getParentRoute: () => DashboardAuthedRoute,
-  } as any)
 const AuthRegisterTeamIdIndexRoute = AuthRegisterTeamIdIndexRouteImport.update({
   id: '/auth/register/$teamId/',
   path: '/auth/register/$teamId/',
@@ -73,28 +61,16 @@ const AuthRegisterTeamIdCompletedRoute =
     path: '/auth/register/$teamId/completed',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DashboardAuthedAdminTeamsIndexRoute =
-  DashboardAuthedAdminTeamsIndexRouteImport.update({
-    id: '/admin/teams/',
-    path: '/admin/teams/',
+const DashboardAuthedAdminIndexRoute =
+  DashboardAuthedAdminIndexRouteImport.update({
+    id: '/admin/',
+    path: '/admin/',
     getParentRoute: () => DashboardAuthedRoute,
   } as any)
-const DashboardAuthedAdminSubmissionsIndexRoute =
-  DashboardAuthedAdminSubmissionsIndexRouteImport.update({
-    id: '/admin/submissions/',
-    path: '/admin/submissions/',
-    getParentRoute: () => DashboardAuthedRoute,
-  } as any)
-const DashboardAuthedAdminScoreboardIndexRoute =
-  DashboardAuthedAdminScoreboardIndexRouteImport.update({
-    id: '/admin/scoreboard/',
-    path: '/admin/scoreboard/',
-    getParentRoute: () => DashboardAuthedRoute,
-  } as any)
-const DashboardAuthedAdminExamsIndexRoute =
-  DashboardAuthedAdminExamsIndexRouteImport.update({
-    id: '/admin/exams/',
-    path: '/admin/exams/',
+const DashboardAuthedTeamIndexRoute =
+  DashboardAuthedTeamIndexRouteImport.update({
+    id: '/team/',
+    path: '/team/',
     getParentRoute: () => DashboardAuthedRoute,
   } as any)
 const DashboardAuthedAdminCompetitionsIndexRoute =
@@ -103,16 +79,34 @@ const DashboardAuthedAdminCompetitionsIndexRoute =
     path: '/admin/competitions/',
     getParentRoute: () => DashboardAuthedRoute,
   } as any)
+const DashboardAuthedAdminExamsIndexRoute =
+  DashboardAuthedAdminExamsIndexRouteImport.update({
+    id: '/admin/exams/',
+    path: '/admin/exams/',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
+const DashboardAuthedAdminScoreboardIndexRoute =
+  DashboardAuthedAdminScoreboardIndexRouteImport.update({
+    id: '/admin/scoreboard/',
+    path: '/admin/scoreboard/',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
+const DashboardAuthedAdminSubmissionsIndexRoute =
+  DashboardAuthedAdminSubmissionsIndexRouteImport.update({
+    id: '/admin/submissions/',
+    path: '/admin/submissions/',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
+const DashboardAuthedAdminTeamsIndexRoute =
+  DashboardAuthedAdminTeamsIndexRouteImport.update({
+    id: '/admin/teams/',
+    path: '/admin/teams/',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
 const DashboardAuthedAdminTeamsTeamIdRoute =
   DashboardAuthedAdminTeamsTeamIdRouteImport.update({
     id: '/admin/teams/$teamId',
     path: '/admin/teams/$teamId',
-    getParentRoute: () => DashboardAuthedRoute,
-  } as any)
-const DashboardAuthedTeamExamExamIdIndexRoute =
-  DashboardAuthedTeamExamExamIdIndexRouteImport.update({
-    id: '/team/exam/$examId/',
-    path: '/team/exam/$examId/',
     getParentRoute: () => DashboardAuthedRoute,
   } as any)
 const DashboardAuthedAdminExamsExamIdIndexRoute =
@@ -121,28 +115,34 @@ const DashboardAuthedAdminExamsExamIdIndexRoute =
     path: '/admin/exams/$examId/',
     getParentRoute: () => DashboardAuthedRoute,
   } as any)
-const DashboardAuthedTeamExamExamIdReviewRoute =
-  DashboardAuthedTeamExamExamIdReviewRouteImport.update({
-    id: '/team/exam/$examId/review',
-    path: '/team/exam/$examId/review',
-    getParentRoute: () => DashboardAuthedRoute,
-  } as any)
 const DashboardAuthedAdminExamsExamIdReviewsRoute =
   DashboardAuthedAdminExamsExamIdReviewsRouteImport.update({
     id: '/admin/exams/$examId/reviews',
     path: '/admin/exams/$examId/reviews',
     getParentRoute: () => DashboardAuthedRoute,
   } as any)
-const DashboardAuthedAdminExamsExamIdSessionsIndexRoute =
-  DashboardAuthedAdminExamsExamIdSessionsIndexRouteImport.update({
-    id: '/admin/exams/$examId/sessions/',
-    path: '/admin/exams/$examId/sessions/',
+const DashboardAuthedTeamExamExamIdIndexRoute =
+  DashboardAuthedTeamExamExamIdIndexRouteImport.update({
+    id: '/team/exam/$examId/',
+    path: '/team/exam/$examId/',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
+const DashboardAuthedTeamExamExamIdReviewRoute =
+  DashboardAuthedTeamExamExamIdReviewRouteImport.update({
+    id: '/team/exam/$examId/review',
+    path: '/team/exam/$examId/review',
     getParentRoute: () => DashboardAuthedRoute,
   } as any)
 const DashboardAuthedAdminExamsExamIdAttemptsAttemptIdRoute =
   DashboardAuthedAdminExamsExamIdAttemptsAttemptIdRouteImport.update({
     id: '/admin/exams/$examId/attempts/$attemptId',
     path: '/admin/exams/$examId/attempts/$attemptId',
+    getParentRoute: () => DashboardAuthedRoute,
+  } as any)
+const DashboardAuthedAdminExamsExamIdSessionsIndexRoute =
+  DashboardAuthedAdminExamsExamIdSessionsIndexRouteImport.update({
+    id: '/admin/exams/$examId/sessions/',
+    path: '/admin/exams/$examId/sessions/',
     getParentRoute: () => DashboardAuthedRoute,
   } as any)
 
@@ -300,18 +300,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/_authed': {
-      id: '/dashboard/_authed'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardAuthedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth/login': {
       id: '/auth/login'
       path: '/auth/login'
       fullPath: '/auth/login'
       preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/_authed': {
+      id: '/dashboard/_authed'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardAuthedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/register/': {
@@ -320,20 +320,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/register/'
       preLoaderRoute: typeof AuthRegisterIndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/_authed/team/': {
-      id: '/dashboard/_authed/team/'
-      path: '/team'
-      fullPath: '/dashboard/team/'
-      preLoaderRoute: typeof DashboardAuthedTeamIndexRouteImport
-      parentRoute: typeof DashboardAuthedRoute
-    }
-    '/dashboard/_authed/admin/': {
-      id: '/dashboard/_authed/admin/'
-      path: '/admin'
-      fullPath: '/dashboard/admin/'
-      preLoaderRoute: typeof DashboardAuthedAdminIndexRouteImport
-      parentRoute: typeof DashboardAuthedRoute
     }
     '/auth/register/$teamId/': {
       id: '/auth/register/$teamId/'
@@ -349,32 +335,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterTeamIdCompletedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/_authed/admin/teams/': {
-      id: '/dashboard/_authed/admin/teams/'
-      path: '/admin/teams'
-      fullPath: '/dashboard/admin/teams/'
-      preLoaderRoute: typeof DashboardAuthedAdminTeamsIndexRouteImport
+    '/dashboard/_authed/admin/': {
+      id: '/dashboard/_authed/admin/'
+      path: '/admin'
+      fullPath: '/dashboard/admin/'
+      preLoaderRoute: typeof DashboardAuthedAdminIndexRouteImport
       parentRoute: typeof DashboardAuthedRoute
     }
-    '/dashboard/_authed/admin/submissions/': {
-      id: '/dashboard/_authed/admin/submissions/'
-      path: '/admin/submissions'
-      fullPath: '/dashboard/admin/submissions/'
-      preLoaderRoute: typeof DashboardAuthedAdminSubmissionsIndexRouteImport
-      parentRoute: typeof DashboardAuthedRoute
-    }
-    '/dashboard/_authed/admin/scoreboard/': {
-      id: '/dashboard/_authed/admin/scoreboard/'
-      path: '/admin/scoreboard'
-      fullPath: '/dashboard/admin/scoreboard/'
-      preLoaderRoute: typeof DashboardAuthedAdminScoreboardIndexRouteImport
-      parentRoute: typeof DashboardAuthedRoute
-    }
-    '/dashboard/_authed/admin/exams/': {
-      id: '/dashboard/_authed/admin/exams/'
-      path: '/admin/exams'
-      fullPath: '/dashboard/admin/exams/'
-      preLoaderRoute: typeof DashboardAuthedAdminExamsIndexRouteImport
+    '/dashboard/_authed/team/': {
+      id: '/dashboard/_authed/team/'
+      path: '/team'
+      fullPath: '/dashboard/team/'
+      preLoaderRoute: typeof DashboardAuthedTeamIndexRouteImport
       parentRoute: typeof DashboardAuthedRoute
     }
     '/dashboard/_authed/admin/competitions/': {
@@ -384,18 +356,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAuthedAdminCompetitionsIndexRouteImport
       parentRoute: typeof DashboardAuthedRoute
     }
+    '/dashboard/_authed/admin/exams/': {
+      id: '/dashboard/_authed/admin/exams/'
+      path: '/admin/exams'
+      fullPath: '/dashboard/admin/exams/'
+      preLoaderRoute: typeof DashboardAuthedAdminExamsIndexRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
+    '/dashboard/_authed/admin/scoreboard/': {
+      id: '/dashboard/_authed/admin/scoreboard/'
+      path: '/admin/scoreboard'
+      fullPath: '/dashboard/admin/scoreboard/'
+      preLoaderRoute: typeof DashboardAuthedAdminScoreboardIndexRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
+    '/dashboard/_authed/admin/submissions/': {
+      id: '/dashboard/_authed/admin/submissions/'
+      path: '/admin/submissions'
+      fullPath: '/dashboard/admin/submissions/'
+      preLoaderRoute: typeof DashboardAuthedAdminSubmissionsIndexRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
+    '/dashboard/_authed/admin/teams/': {
+      id: '/dashboard/_authed/admin/teams/'
+      path: '/admin/teams'
+      fullPath: '/dashboard/admin/teams/'
+      preLoaderRoute: typeof DashboardAuthedAdminTeamsIndexRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
     '/dashboard/_authed/admin/teams/$teamId': {
       id: '/dashboard/_authed/admin/teams/$teamId'
       path: '/admin/teams/$teamId'
       fullPath: '/dashboard/admin/teams/$teamId'
       preLoaderRoute: typeof DashboardAuthedAdminTeamsTeamIdRouteImport
-      parentRoute: typeof DashboardAuthedRoute
-    }
-    '/dashboard/_authed/team/exam/$examId/': {
-      id: '/dashboard/_authed/team/exam/$examId/'
-      path: '/team/exam/$examId'
-      fullPath: '/dashboard/team/exam/$examId/'
-      preLoaderRoute: typeof DashboardAuthedTeamExamExamIdIndexRouteImport
       parentRoute: typeof DashboardAuthedRoute
     }
     '/dashboard/_authed/admin/exams/$examId/': {
@@ -405,13 +398,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAuthedAdminExamsExamIdIndexRouteImport
       parentRoute: typeof DashboardAuthedRoute
     }
-    '/dashboard/_authed/team/exam/$examId/review': {
-      id: '/dashboard/_authed/team/exam/$examId/review'
-      path: '/team/exam/$examId/review'
-      fullPath: '/dashboard/team/exam/$examId/review'
-      preLoaderRoute: typeof DashboardAuthedTeamExamExamIdReviewRouteImport
-      parentRoute: typeof DashboardAuthedRoute
-    }
     '/dashboard/_authed/admin/exams/$examId/reviews': {
       id: '/dashboard/_authed/admin/exams/$examId/reviews'
       path: '/admin/exams/$examId/reviews'
@@ -419,11 +405,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAuthedAdminExamsExamIdReviewsRouteImport
       parentRoute: typeof DashboardAuthedRoute
     }
-    '/dashboard/_authed/admin/exams/$examId/sessions/': {
-      id: '/dashboard/_authed/admin/exams/$examId/sessions/'
-      path: '/admin/exams/$examId/sessions'
-      fullPath: '/dashboard/admin/exams/$examId/sessions/'
-      preLoaderRoute: typeof DashboardAuthedAdminExamsExamIdSessionsIndexRouteImport
+    '/dashboard/_authed/team/exam/$examId/': {
+      id: '/dashboard/_authed/team/exam/$examId/'
+      path: '/team/exam/$examId'
+      fullPath: '/dashboard/team/exam/$examId/'
+      preLoaderRoute: typeof DashboardAuthedTeamExamExamIdIndexRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
+    '/dashboard/_authed/team/exam/$examId/review': {
+      id: '/dashboard/_authed/team/exam/$examId/review'
+      path: '/team/exam/$examId/review'
+      fullPath: '/dashboard/team/exam/$examId/review'
+      preLoaderRoute: typeof DashboardAuthedTeamExamExamIdReviewRouteImport
       parentRoute: typeof DashboardAuthedRoute
     }
     '/dashboard/_authed/admin/exams/$examId/attempts/$attemptId': {
@@ -431,6 +424,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/exams/$examId/attempts/$attemptId'
       fullPath: '/dashboard/admin/exams/$examId/attempts/$attemptId'
       preLoaderRoute: typeof DashboardAuthedAdminExamsExamIdAttemptsAttemptIdRouteImport
+      parentRoute: typeof DashboardAuthedRoute
+    }
+    '/dashboard/_authed/admin/exams/$examId/sessions/': {
+      id: '/dashboard/_authed/admin/exams/$examId/sessions/'
+      path: '/admin/exams/$examId/sessions'
+      fullPath: '/dashboard/admin/exams/$examId/sessions/'
+      preLoaderRoute: typeof DashboardAuthedAdminExamsExamIdSessionsIndexRouteImport
       parentRoute: typeof DashboardAuthedRoute
     }
   }
