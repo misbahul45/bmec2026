@@ -1,0 +1,9 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e14]:
+    - generic [ref=f4e18]:
+      - heading "Ujian Tidak Dapat Dibuka" [level=1] [ref=f4e19]
+      - paragraph [ref=f4e20]: Terjadi kesalahan saat membuka ujian. Silakan coba lagi atau hubungi panitia.
+      - paragraph [ref=f4e21]: "Detail: router.serverSsr?.isDehydrated is not a function"
+    - link "Kembali ke Dashboard" [ref=f4e23] [cursor=pointer]:
+      - /url: /dashboard/team
+  - region "Notifications alt+T"

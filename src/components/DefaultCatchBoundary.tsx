@@ -96,7 +96,7 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
           <details className="text-left text-xs text-muted-foreground bg-muted/40 p-2 rounded-md">
             <summary className="cursor-pointer">Error details</summary>
             <pre className="whitespace-pre-wrap wrap-break-word mt-2">
-              {String(error?.message ?? error)}
+              {error instanceof Error ? error.message : String(error)}
             </pre>
           </details>
 

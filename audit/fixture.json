@@ -1,0 +1,12 @@
+{
+  "tryoutExamId": "ae6c930b-87ee-4ce5-b4b1-d2362265ad0c",
+  "finalExamId": "73e60f84-a0d6-45d7-9015-9b03bd571719",
+  "oldCheapBatchId": "b5d58d6c-06a0-4841-9029-5fb7c8a71018",
+  "olimpiadeId": "c1475561-d8b2-4155-9f09-092bad80f6b7",
+  "teamIds": {
+    "approved": "4a6f0476-6b1d-4ab1-b675-b1d45e49270d",
+    "pending": "991871ff-628d-4573-ad72-18f004dfb7e3",
+    "infografis": "eeadfc59-e933-4f53-b9b2-9a44cb814557",
+    "unregistered": "ecd0d601-4a30-43dc-aff4-873bff18d82f"
+  }
+}

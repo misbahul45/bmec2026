@@ -1,0 +1,219 @@
+- generic [active] [ref=f7e1]:
+  - banner [ref=f7e2]:
+    - generic [ref=f7e3]:
+      - link "logo BMEC 2026" [ref=f7e4] [cursor=pointer]:
+        - /url: /
+        - img "logo" [ref=f7e6]
+        - generic [ref=f7e7]: BMEC 2026
+      - button "Open menu" [ref=f7e8]
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - generic: A
+            - generic:
+              - paragraph: admin-audit
+              - paragraph: admin-audit@example.test
+          - paragraph: Management
+          - link "Teams":
+            - /url: /dashboard/admin/teams
+          - link "Exams":
+            - /url: /dashboard/admin/exams
+          - link "Submissions":
+            - /url: /dashboard/admin/submissions
+          - link "Scoreboard":
+            - /url: /dashboard/admin/scoreboard
+          - button "Logout"
+  - generic [ref=f7e56]:
+    - generic [ref=f7e57]:
+      - heading "Dashboard" [level=1] [ref=f7e58]
+      - paragraph [ref=f7e59]: Ringkasan aktivitas sistem BMEC 2026
+    - generic [ref=f7e60]:
+      - generic [ref=f7e68]:
+        - paragraph [ref=f7e69]: "4"
+        - paragraph [ref=f7e70]: Total Tim
+      - generic [ref=f7e77]:
+        - paragraph [ref=f7e78]: "12"
+        - paragraph [ref=f7e79]: Total Member
+      - generic [ref=f7e85]:
+        - paragraph [ref=f7e86]: "1"
+        - paragraph [ref=f7e87]: Total Admin
+      - generic [ref=f7e96]:
+        - paragraph [ref=f7e97]: "3"
+        - paragraph [ref=f7e98]: Kompetisi
+      - generic [ref=f7e104]:
+        - paragraph [ref=f7e105]: "3"
+        - paragraph [ref=f7e106]: Registrasi
+      - generic [ref=f7e112]:
+        - paragraph [ref=f7e113]: "0"
+        - paragraph [ref=f7e114]: Submission
+      - generic [ref=f7e119]:
+        - paragraph [ref=f7e120]: "0"
+        - paragraph [ref=f7e121]: Exam Attempt
+      - generic [ref=f7e127]:
+        - paragraph [ref=f7e128]: "0"
+        - paragraph [ref=f7e129]: Abstract
+    - generic [ref=f7e130]:
+      - generic [ref=f7e131]:
+        - paragraph [ref=f7e132]: Registrasi
+        - generic [ref=f7e133]:
+          - generic [ref=f7e134]:
+            - generic [ref=f7e135]: PENDING
+            - generic [ref=f7e136]: "1"
+          - generic [ref=f7e137]:
+            - generic [ref=f7e138]: APPROVED
+            - generic [ref=f7e139]: "2"
+          - generic [ref=f7e140]:
+            - generic [ref=f7e141]: REJECTED
+            - generic [ref=f7e142]: "0"
+      - generic [ref=f7e143]:
+        - paragraph [ref=f7e144]: Submission
+        - generic [ref=f7e145]:
+          - generic [ref=f7e146]:
+            - generic [ref=f7e147]: PENDING
+            - generic [ref=f7e148]: "0"
+          - generic [ref=f7e149]:
+            - generic [ref=f7e150]: APPROVED
+            - generic [ref=f7e151]: "0"
+          - generic [ref=f7e152]:
+            - generic [ref=f7e153]: REJECTED
+            - generic [ref=f7e154]: "0"
+    - generic [ref=f7e155]:
+      - generic [ref=f7e156]:
+        - generic [ref=f7e157]: Kompetisi Terpopuler
+        - paragraph [ref=f7e161]: OLIMPIADE
+      - generic [ref=f7e162]:
+        - generic [ref=f7e163]: Stage Paling Aktif
+        - paragraph [ref=f7e169]: —
+      - generic [ref=f7e170]:
+        - generic [ref=f7e171]: Tim Paling Aktif
+        - paragraph [ref=f7e176]: —
+      - generic [ref=f7e177]:
+        - generic [ref=f7e178]: Rata-rata Skor Exam
+        - paragraph [ref=f7e181]: "0"
+      - generic [ref=f7e182]:
+        - generic [ref=f7e183]: Attempt Flagged
+        - paragraph [ref=f7e187]: "0"
+    - generic [ref=f7e188]:
+      - paragraph [ref=f7e189]: Quick Actions
+      - generic [ref=f7e190]:
+        - link "Approve Registrasi" [ref=f7e191] [cursor=pointer]:
+          - /url: /dashboard/admin/teams
+        - link "Review Submission" [ref=f7e198] [cursor=pointer]:
+          - /url: /dashboard/admin/submissions
+        - link "Monitor Exam" [ref=f7e205] [cursor=pointer]:
+          - /url: /dashboard/admin/exams
+        - link "Cek Kecurangan" [ref=f7e210] [cursor=pointer]:
+          - /url: /dashboard/admin/exams
+    - generic [ref=f7e215]:
+      - generic [ref=f7e216]:
+        - paragraph [ref=f7e217]: Registrasi per Kompetisi
+        - application [ref=f7e220]:
+          - generic [ref=f7e242]:
+            - generic [ref=f7e243]:
+              - generic [ref=f7e244]: INFOGRAFIS
+              - generic [ref=f7e246]: OLIMPIADE
+            - generic [ref=f7e248]:
+              - generic [ref=f7e249]: "0"
+              - generic [ref=f7e251]: "0.75"
+              - generic [ref=f7e253]: "1.5"
+              - generic [ref=f7e255]: "2.25"
+              - generic [ref=f7e257]: "3"
+      - generic [ref=f7e259]:
+        - paragraph [ref=f7e260]: Status Registrasi
+        - application [ref=f7e263]:
+          - generic [ref=f7e381]:
+            - generic [ref=f7e382]: "APPROVED: 2"
+            - generic [ref=f7e384]: "PENDING: 1"
+      - generic [ref=f7e273]:
+        - paragraph [ref=f7e274]: Submission per Stage
+        - application [ref=f7e277]:
+          - generic [ref=f7e289]:
+            - generic [ref=f7e290]:
+              - generic [ref=f7e291]: PENYISIHAN
+              - generic [ref=f7e293]: FINAL
+              - generic [ref=f7e295]: SEMIFINAL
+            - generic [ref=f7e297]:
+              - generic [ref=f7e298]: "0"
+              - generic [ref=f7e300]: "1"
+              - generic [ref=f7e302]: "2"
+              - generic [ref=f7e304]: "3"
+              - generic [ref=f7e306]: "4"
+      - generic [ref=f7e308]:
+        - paragraph [ref=f7e309]: Aktivitas Exam (per Hari)
+        - application [ref=f7e312]
+      - generic [ref=f7e318]:
+        - paragraph [ref=f7e319]: Kecurangan (Flagged vs Normal)
+        - generic [ref=f7e321]:
+          - list [ref=f7e323]:
+            - listitem [ref=f7e324]:
+              - img "Flagged legend icon" [ref=f7e325]
+              - text: Flagged
+            - listitem [ref=f7e327]:
+              - img "Normal legend icon" [ref=f7e328]
+              - text: Normal
+          - application [ref=f7e330]
+    - generic [ref=f7e331]:
+      - paragraph [ref=f7e333]: Aktivitas Terbaru
+      - table [ref=f7e335]:
+        - rowgroup [ref=f7e336]:
+          - row [ref=f7e337]:
+            - columnheader "Tim" [ref=f7e338]
+            - columnheader "Detail" [ref=f7e339]
+            - columnheader "Tipe" [ref=f7e340]
+            - columnheader "Status" [ref=f7e341]
+            - columnheader "Waktu" [ref=f7e342]
+        - rowgroup [ref=f7e343]:
+          - row [ref=f7e344]:
+            - cell "Team infografis" [ref=f7e345]
+            - cell "INFOGRAFIS" [ref=f7e346]
+            - cell "Registrasi" [ref=f7e347]
+            - cell "APPROVED" [ref=f7e349]
+            - cell "08/10/26, 11.27" [ref=f7e351]
+          - row [ref=f7e352]:
+            - cell "Team pending" [ref=f7e353]
+            - cell "OLIMPIADE" [ref=f7e354]
+            - cell "Registrasi" [ref=f7e355]
+            - cell "PENDING" [ref=f7e357]
+            - cell "08/10/26, 11.27" [ref=f7e359]
+          - row [ref=f7e360]:
+            - cell "Team approved" [ref=f7e361]
+            - cell "OLIMPIADE" [ref=f7e362]
+            - cell "Registrasi" [ref=f7e363]
+            - cell "APPROVED" [ref=f7e365]
+            - cell "08/10/26, 11.27" [ref=f7e367]
+  - contentinfo [ref=f7e28]:
+    - generic [ref=f7e29]:
+      - generic [ref=f7e30]:
+        - generic [ref=f7e31]:
+          - heading "BMEC 2026" [level=2] [ref=f7e32]
+          - paragraph [ref=f7e33]: Kompetisi tahunan Teknik Biomedis oleh HMTB Universitas Airlangga. Bangun ide, kembangkan solusi, jadilah inovator.
+        - navigation [ref=f7e34]:
+          - generic [ref=f7e35]: Navigasi
+          - link "Home" [ref=f7e36] [cursor=pointer]:
+            - /url: /#home
+          - link "About" [ref=f7e37] [cursor=pointer]:
+            - /url: /#about
+          - link "Benefits" [ref=f7e38] [cursor=pointer]:
+            - /url: /#benefits
+          - link "Timeline" [ref=f7e39] [cursor=pointer]:
+            - /url: /#timeline
+          - link "Competition" [ref=f7e40] [cursor=pointer]:
+            - /url: /#competition
+          - link "Gallery" [ref=f7e41] [cursor=pointer]:
+            - /url: /#gallery
+          - link "FAQ" [ref=f7e42] [cursor=pointer]:
+            - /url: /#faq
+      - generic [ref=f7e43]:
+        - generic [ref=f7e44]:
+          - link "Instagram BMEC" [ref=f7e45] [cursor=pointer]:
+            - /url: https://www.instagram.com/bmecunair?igsh=ZDA0NGN2cjNscHVi
+          - link "WhatsApp BMEC" [ref=f7e48] [cursor=pointer]:
+            - /url: https://wa.me/6281227206052
+            - generic: WA BMEC
+          - link "Tiktok BMEC" [ref=f7e51] [cursor=pointer]:
+            - /url: https://www.tiktok.com/@bmecunair?_r=1&_t=ZS-95zQw5cyxeP
+        - paragraph [ref=f7e54]: © 2026 BMEC · HMTB Universitas Airlangga
+  - region "Notifications alt+T"
+  - generic [aria-hidden] [ref=f7e374]: "1"
