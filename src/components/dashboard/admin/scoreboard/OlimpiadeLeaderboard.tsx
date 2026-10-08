@@ -169,10 +169,10 @@ export function OlimpiadeLeaderboard() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
         <span className="text-xs text-muted-foreground">Pilih Ujian:</span>
         <Select value={selectedExamId} onValueChange={setSelectedExamId}>
-          <SelectTrigger className="w-64">
+          <SelectTrigger className="w-full sm:w-64">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

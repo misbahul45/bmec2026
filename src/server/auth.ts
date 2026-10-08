@@ -7,39 +7,63 @@ import TeamRepo from "~/lib/api/teams/team.repo"
 import AdminRepo from "~/lib/api/admins/admin.repo"
 import * as bcrypt from "bcrypt"
 import { useAppSession } from "~/lib/utils/session"
+import { assertNotRateLimited, recordFailure, resetRateLimit } from "~/lib/utils/rate-limit"
+import { getRequestIP } from "@tanstack/react-start/server"
 
 const teamRepo = new TeamRepo()
 const adminRepo = new AdminRepo()
 
+// Only failed attempts count (successful logins never lock anyone out).
+//  - per email+IP: tight, so a remote attacker cannot lock the real owner out of their account;
+//  - per email overall: looser, bounds guessing spread across many IPs;
+//  - per IP: generous, so a shared campus/school NAT during the registration rush is not blocked.
+const LOGIN_WINDOW_MS = 15 * 60 * 1000
+const LIMIT_PER_EMAIL_AND_IP = { limit: 8, windowMs: LOGIN_WINDOW_MS }
+const LIMIT_PER_EMAIL = { limit: 40, windowMs: LOGIN_WINDOW_MS }
+const LIMIT_PER_IP = { limit: 100, windowMs: LOGIN_WINDOW_MS }
+
+// Compared against when the email is unknown so response time does not reveal
+// whether an account exists.
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync("not-a-real-password", 10)
+
+const INVALID_CREDENTIALS = () =>
+  new AppError("Email atau kata sandi salah. Periksa kembali data Anda.", 401, "INVALID_CREDENTIALS")
 
 export const loginFn = createServerFn({ method: "POST" })
   .inputValidator(loginSchema)
   .handler(
     withErrorHandling(async ({ data }): Promise<ApiSuccess<any>> => {
-      const [team, admin] = await Promise.all([
-        teamRepo.findByEmail(data.email),
-        adminRepo.findByEmail(data.email),
-      ])
+      const email = data.email.trim()
+      const ip = getRequestIP({ xForwardedFor: true }) ?? "unknown"
+      const emailIpKey = `login:email-ip:${email.toLowerCase()}:${ip}`
+      const emailKey = `login:email:${email.toLowerCase()}`
+      const ipKey = `login:ip:${ip}`
 
-      if (!team && !admin) {
-        throw new AppError("Akun tidak ditemukan. Periksa kembali email Anda atau daftar terlebih dahulu.", 404, "ACCOUNT_NOT_FOUND")
-      }
+      assertNotRateLimited(emailIpKey, LIMIT_PER_EMAIL_AND_IP)
+      assertNotRateLimited(emailKey, LIMIT_PER_EMAIL)
+      assertNotRateLimited(ipKey, LIMIT_PER_IP)
+
+      const [team, admin] = await Promise.all([
+        teamRepo.findByEmail(email),
+        adminRepo.findByEmail(email),
+      ])
 
       const user = admin ?? team
       const role = admin ? "ADMIN" : "TEAM"
 
-      if (!user) {
-        throw new AppError("Akun tidak ditemukan. Periksa kembali email Anda atau daftar terlebih dahulu.", 404, "ACCOUNT_NOT_FOUND")
-      }
-
       const isValidPassword = await bcrypt.compare(
         data.password,
-        user.password
+        user?.password ?? DUMMY_PASSWORD_HASH
       )
 
-      if (!isValidPassword) {
-        throw new AppError("Kata sandi salah. Periksa kembali kata sandi Anda.", 401, "INVALID_PASSWORD")
+      if (!user || !isValidPassword) {
+        recordFailure(emailIpKey, LIMIT_PER_EMAIL_AND_IP)
+        recordFailure(emailKey, LIMIT_PER_EMAIL)
+        recordFailure(ipKey, LIMIT_PER_IP)
+        throw INVALID_CREDENTIALS()
       }
+
+      resetRateLimit(emailIpKey)
 
       const session = await useAppSession()
 

@@ -9,13 +9,13 @@ const attemptService = new AttemptService()
 
 const attemptQuerySchema = z.object({
   examId: z.string().uuid(),
-  search: z.string().optional(),
+  search: z.string().max(100).optional(),
   sortBy: z.enum(['totalScore', 'createdAt', 'teamName', 'cheatCount']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
   finished: z.boolean().optional(),
   flagged: z.boolean().optional(),
-  page: z.number().optional(),
-  limit: z.number().optional(),
+  page: z.number().int().min(1).optional(),
+  limit: z.number().int().min(1).max(1000).optional(),
 })
 
 export const getExamAttempts = createServerFn({ method: 'GET' })

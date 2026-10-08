@@ -23,12 +23,30 @@ interface Props {
   cheat: { flagged: number; normal: number }
 }
 
+const STAGE_ORDER = ['PENYISIHAN', 'SEMIFINAL', 'FINAL']
+
+function stageRank(name: string) {
+  const i = STAGE_ORDER.indexOf(name)
+  return i === -1 ? STAGE_ORDER.length : i
+}
+
+function EmptyChart({ label = 'Belum ada data' }: { label?: string }) {
+  return (
+    <div className="flex h-[160px] items-center justify-center text-xs text-muted-foreground" role="status">
+      {label}
+    </div>
+  )
+}
+
 export function Charts({ registrationByCompetition, registrationByStatus, submissionByStage, attemptsByDate, cheat }: Props) {
   const regStatusData: StatusData[] = Object.entries(registrationByStatus).map(([status, count]) => ({ status, count }))
   const cheatData: CheatData[] = [
     { name: 'Normal', value: cheat.normal },
     { name: 'Flagged', value: cheat.flagged },
   ]
+  const stageData = [...submissionByStage].sort((a, b) => stageRank(a.name) - stageRank(b.name))
+  const hasStageData = stageData.some((d) => d.count > 0)
+  const hasCheatData = cheat.flagged + cheat.normal > 0
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -38,7 +56,7 @@ export function Charts({ registrationByCompetition, registrationByStatus, submis
           <BarChart data={registrationByCompetition} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
             <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-            <YAxis tick={{ fontSize: 10 }} />
+            <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
             <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
             <Bar dataKey="count" fill="var(--color-primary)" radius={[4, 4, 0, 0]} />
           </BarChart>
@@ -61,42 +79,54 @@ export function Charts({ registrationByCompetition, registrationByStatus, submis
 
       <div className="border rounded-xl p-4 bg-card space-y-3">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Submission per Stage</p>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={submissionByStage} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-            <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-            <YAxis tick={{ fontSize: 10 }} />
-            <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
-            <Bar dataKey="count" fill="var(--color-secondary)" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        {hasStageData ? (
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={stageData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
+              <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
+              <Bar dataKey="count" fill="var(--color-secondary)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <EmptyChart />
+        )}
       </div>
 
       <div className="border rounded-xl p-4 bg-card space-y-3">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Aktivitas Exam (per Hari)</p>
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={attemptsByDate} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-            <XAxis dataKey="date" tick={{ fontSize: 9 }} />
-            <YAxis tick={{ fontSize: 10 }} />
-            <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
-            <Line type="monotone" dataKey="count" stroke="var(--color-primary)" strokeWidth={2} dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
+        {attemptsByDate.length > 0 ? (
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={attemptsByDate} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="date" tick={{ fontSize: 9 }} />
+              <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
+              <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
+              <Line type="monotone" dataKey="count" stroke="var(--color-primary)" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <EmptyChart />
+        )}
       </div>
 
       <div className="border rounded-xl p-4 bg-card space-y-3 lg:col-span-2">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Kecurangan (Flagged vs Normal)</p>
-        <ResponsiveContainer width="100%" height={160}>
-          <PieChart>
-            <Pie data={cheatData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} label={({ name, value }) => `${name}: ${value}`}>
-              <Cell fill="#22c55e" />
-              <Cell fill="#ef4444" />
-            </Pie>
-            <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
-            <Legend wrapperStyle={{ fontSize: 11 }} />
-          </PieChart>
-        </ResponsiveContainer>
+        {hasCheatData ? (
+          <ResponsiveContainer width="100%" height={160}>
+            <PieChart>
+              <Pie data={cheatData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} label={({ name, value }) => `${name}: ${value}`}>
+                <Cell fill="#22c55e" />
+                <Cell fill="#ef4444" />
+              </Pie>
+              <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : (
+          <EmptyChart label="Belum ada attempt ujian" />
+        )}
       </div>
     </div>
   )

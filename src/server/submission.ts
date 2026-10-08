@@ -8,22 +8,23 @@ import { z } from 'zod'
 const submissionService = new SubmissionService()
 
 const submissionQuerySchema = z.object({
-  search: z.string().optional(),
+  search: z.string().max(100).optional(),
   stageId: z.string().optional(),
   status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'ALL']).optional(),
   competitionType: z.string().optional(),
-  page: z.coerce.number().optional(),
-  limit: z.coerce.number().optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).optional(),
 })
 
 const reviewSchema = z.object({
   id: z.string().uuid(),
 })
 
+// Submission.score is an Int column: fractional or huge values would reach Prisma and surface as a 500.
 const updateScoreSchema = z.object({
   id: z.string().uuid(),
-  score: z.number().min(0),
-  feedback: z.string().nullable().optional(),
+  score: z.number().int('Nilai harus bilangan bulat').min(0).max(100_000),
+  feedback: z.string().max(5000).nullable().optional(),
 })
 
 const leaderboardSchema = z.object({

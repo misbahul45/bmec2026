@@ -140,7 +140,7 @@ const RegisterForm = () => {
       </CardHeader>
 
       <CardContent className="px-0 fade-up">
-        <form id="form-register" onSubmit={form.handleSubmit(onSubmit)}>
+        <form id="form-register" method="post" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup className="gap-4">
 
             <Controller

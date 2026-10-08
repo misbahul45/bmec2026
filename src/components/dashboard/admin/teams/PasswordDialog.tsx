@@ -115,6 +115,7 @@ const PasswordDialog: React.FC<Props> = ({
         </DialogHeader>
 
         <form
+          method="post"
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <FieldGroup>

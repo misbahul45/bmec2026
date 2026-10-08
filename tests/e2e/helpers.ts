@@ -29,6 +29,9 @@ export function loadFixture(): Fixture {
 export async function login(page: Page, who: keyof typeof ACCOUNTS) {
   const { email, password } = ACCOUNTS[who]
   await page.goto('/auth/login')
+  // The submit handler only exists after hydration; wait for the bundle to settle first.
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(1_500)
   await page.locator('#email').fill(email)
   await page.locator('#password').fill(password)
   await page.getByRole('button', { name: /^Masuk/ }).click()
@@ -37,7 +40,7 @@ export async function login(page: Page, who: keyof typeof ACCOUNTS) {
 
 export type ServerFnResult<T = unknown> =
   | { ok: true; data: T }
-  | { ok: false; message?: string; code?: string; status?: number }
+  | { ok: false; message?: string; code?: string; statusCode?: number; field?: string }
 
 /**
  * Calls a real TanStack Start server function through the dev server's
@@ -61,7 +64,8 @@ export async function callServerFn<T = any>(
           ok: false as const,
           message: e?.message,
           code: e?.code,
-          status: e?.status ?? e?.statusCode,
+          statusCode: e?.statusCode,
+          field: e?.field,
         }
       }
     },

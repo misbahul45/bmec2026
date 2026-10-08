@@ -1,0 +1,1 @@
+{"version":9,"type":"context-options","origin":"library","browserName":"","playwrightVersion":"1.63.0","options":{},"platform":"linux","wallTime":1791434967418,"monotonicTime":52447.314,"sdkLanguage":"javascript","title":"admin-dashboard.spec.ts:28 › admin dashboard pages › team detail: direct load is clean (200, one h1, no console/network errors)"}

@@ -34,6 +34,7 @@ function ExamsContent() {
 function RouteComponent() {
   return (
     <div className="space-y-4 w-full pt-20 min-h-screen pb-6 max-w-6xl mx-auto px-8">
+      <h1 className="sr-only">Daftar Ujian</h1>
       <Suspense fallback={<div>Loading...</div>}>
         <ExamsContent />
       </Suspense>

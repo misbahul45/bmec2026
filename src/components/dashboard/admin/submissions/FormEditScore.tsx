@@ -9,7 +9,7 @@ import { Label } from '~/components/ui/label'
 import { updateSubmissionScore } from '~/server/submission'
 
 const schema = z.object({
-  score: z.number({ invalid_type_error: 'Masukkan angka' }).min(0, 'Min 0'),
+  score: z.number({ invalid_type_error: 'Masukkan angka' }).int('Nilai harus bilangan bulat').min(0, 'Min 0'),
   feedback: z.string().optional(),
 })
 

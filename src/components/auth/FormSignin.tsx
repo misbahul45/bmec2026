@@ -54,7 +54,8 @@ const FormSignin = () => {
         <p className="text-xs text-muted-foreground">Login ke akun tim kamu</p>
       </div>
 
-      <form onSubmit={form.handleSubmit((d) => mutation.mutate(d))} className="space-y-4">
+      {/* method="post": if the user submits before hydration, the browser must not put the password in the URL */}
+      <form method="post" onSubmit={form.handleSubmit((d) => mutation.mutate(d))} className="space-y-4">
         <Controller
           name="email"
           control={form.control}

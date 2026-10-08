@@ -38,23 +38,39 @@ export const getAllCompetitionsWithBatches = createServerFn({ method: 'GET' })
     })
   )
 
-const batchUpdateSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string().optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  price: z.number().optional(),
-  module_bacth: z.string().optional(),
-})
+// `new Date("garbage")` is an Invalid Date that Prisma rejects with a 500, so reject it here.
+const dateString = z
+  .string()
+  .refine((v) => !Number.isNaN(Date.parse(v)), 'Tanggal tidak valid')
 
-const batchCreateSchema = z.object({
-  competitionId: z.string().uuid(),
-  name: z.string().min(1),
-  startDate: z.string(),
-  endDate: z.string(),
-  price: z.number(),
-  module_bacth: z.string(),
-})
+const price = z.number().min(0, 'Harga tidak boleh negatif').max(1_000_000_000)
+
+const endNotBeforeStart = (d: { startDate?: string; endDate?: string }) =>
+  !d.startDate || !d.endDate || Date.parse(d.endDate) >= Date.parse(d.startDate)
+
+const endDateIssue = { message: 'Tanggal selesai tidak boleh sebelum tanggal mulai', path: ['endDate'] }
+
+const batchUpdateSchema = z
+  .object({
+    id: z.string().uuid(),
+    name: z.string().min(1).max(100).optional(),
+    startDate: dateString.optional(),
+    endDate: dateString.optional(),
+    price: price.optional(),
+    module_bacth: z.string().optional(),
+  })
+  .refine(endNotBeforeStart, endDateIssue)
+
+const batchCreateSchema = z
+  .object({
+    competitionId: z.string().uuid(),
+    name: z.string().min(1).max(100),
+    startDate: dateString,
+    endDate: dateString,
+    price,
+    module_bacth: z.string(),
+  })
+  .refine(endNotBeforeStart, endDateIssue)
 
 export const updateBatch = createServerFn({ method: 'POST' })
   .inputValidator(batchUpdateSchema)
