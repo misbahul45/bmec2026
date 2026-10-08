@@ -329,3 +329,4 @@
     at http://127.0.0.1:3100/dashboard/admin/exams/ae6c930b-87ee-4ce5-b4b1-d2362265ad0c:1:25972
     at http://127.0.0.1:3100/dashboard/admin/exams/ae6c930b-87ee-4ce5-b4b1-d2362265ad0c:85:496 The above error occurred in the <MatchInnerImpl> component. React will try to recreate this component tree from scratch using the error boundary you provided, CatchBoundary. @ http://127.0.0.1:3100/@vite/client:509
 [   76692ms] [WARNING] Warning: Error in route match: /dashboard/_authed/admin/exams/$examId//dashboard/admin/exams/ae6c930b-87ee-4ce5-b4b1-d2362265ad0c/ @ http://127.0.0.1:3100/@vite/client:509
+[   98691ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:3100/@vite/client:968
