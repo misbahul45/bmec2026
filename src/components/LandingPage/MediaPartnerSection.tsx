@@ -59,7 +59,7 @@ const SPONSORS = [
   {
     id: 1,
     image:
-      'https://tbz7ucrzr2.ufs.sh/f/uEc5gvzB5LqY3NQgvic6cwxH82PZaubgLq9RYrWU0MyO7T4C',
+      'https://tbz7ucrzr2.ufs.sh/f/uEc5gvzB5LqYhWtavxgZmCORuIEFw28oKkWSgDtcdU5xeBzG',
   },
   {
     id: 2,
