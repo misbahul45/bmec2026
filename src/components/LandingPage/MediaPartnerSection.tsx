@@ -72,6 +72,7 @@ const MediaPartnerSection = () => {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const animationRef = useRef<gsap.core.Tween | null>(null)
+  
 
   useGSAP(
     () => {
